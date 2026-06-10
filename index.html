@@ -4,13 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Heisterlux - AI Agent Register</title>
+
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937}
+nav{background:#111827;padding:15px;text-align:center;position:sticky;top:0;z-index:10}
+nav a{color:white;margin:0 15px;text-decoration:none;font-weight:bold}
+.lang{position:absolute;right:20px;top:10px}
+.lang button{width:auto;margin:0 3px;padding:7px 10px;border:none;border-radius:6px;cursor:pointer}
 header{background:#0f172a;color:white;padding:70px 8%;text-align:center}
 header h1{font-size:56px;margin:0}
 header p{font-size:22px;max-width:850px;margin:20px auto}
-nav{background:#111827;padding:15px;text-align:center}
-nav a{color:white;margin:0 15px;text-decoration:none;font-weight:bold}
 section{max-width:1150px;margin:auto;padding:55px 25px}
 h2{font-size:34px;margin-bottom:15px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
@@ -23,69 +26,103 @@ table{width:100%;border-collapse:collapse;background:white;border-radius:12px;ov
 th,td{padding:14px;border-bottom:1px solid #e5e7eb;text-align:left}
 th{background:#0f172a;color:white}
 .badge{padding:5px 10px;border-radius:20px;color:white;font-size:13px}
-.laag{background:#16a34a}.middel{background:#f97316}.hoog{background:#dc2626}
+.laag,.low{background:#16a34a}
+.middel,.medium{background:#f97316}
+.hoog,.high{background:#dc2626}
 .metric{font-size:32px;font-weight:bold;color:#2563eb}
 footer{background:#0f172a;color:white;text-align:center;padding:35px;margin-top:50px}
 .notice{background:#e0f2fe;border-left:6px solid #0284c7;padding:18px;border-radius:8px}
 </style>
 </head>
+
 <body>
 
 <nav>
-<a href="#probleem">Probleem</a>
-<a href="#oplossing">Oplossing</a>
-<a href="#demo">Demo</a>
-<a href="#pilot">Pilot</a>
+<a href="#probleem" data-key="navProblem">Probleem</a>
+<a href="#oplossing" data-key="navSolution">Oplossing</a>
+<a href="#demo" data-key="navDemo">Demo</a>
+<a href="#pilot" data-key="navPilot">Pilot</a>
+
+<div class="lang">
+<button onclick="setLanguage('nl')">🇳🇱 NL</button>
+<button onclick="setLanguage('en')">🇬🇧 EN</button>
+</div>
 </nav>
 
 <header>
 <h1>Heisterlux</h1>
-<p>AI Governance Lab voor organisaties die grip willen krijgen op AI-tools, AI-agents en geautomatiseerde workflows.</p>
-<a class="hero-btn" href="#demo">Test de demo</a>
-<a class="hero-btn secondary" href="#pilot">Aanmelden voor pilot</a>
+<p data-key="heroText">AI Governance Lab voor organisaties die grip willen krijgen op AI-tools, AI-agents en geautomatiseerde workflows.</p>
+<a class="hero-btn" href="#demo" data-key="heroDemo">Test de demo</a>
+<a class="hero-btn secondary" href="#pilot" data-key="heroPilot">Aanmelden voor pilot</a>
 </header>
 
 <section id="probleem">
-<h2>Het probleem</h2>
-<p>Organisaties gebruiken steeds meer AI-systemen zoals ChatGPT, Copilot, Claude, Gemini, Zapier, Make en n8n. Vaak ontbreekt overzicht.</p>
+<h2 data-key="problemTitle">Het probleem</h2>
+<p data-key="problemIntro">Organisaties gebruiken steeds meer AI-systemen zoals ChatGPT, Copilot, Claude, Gemini, Zapier, Make en n8n. Vaak ontbreekt overzicht.</p>
+
 <div class="grid">
-<div class="card"><h3>Shadow AI</h3><p>Medewerkers gebruiken AI-tools zonder centraal inzicht of eigenaarschap.</p></div>
-<div class="card"><h3>Risico's</h3><p>Onbekend welke data wordt verwerkt en of dit past binnen AVG, AI Act en informatiebeveiliging.</p></div>
-<div class="card"><h3>Kosten</h3><p>Licenties, dubbele tools en ongebruikte abonnementen blijven onzichtbaar.</p></div>
+<div class="card">
+<h3 data-key="shadowTitle">Shadow AI</h3>
+<p data-key="shadowText">Medewerkers gebruiken AI-tools zonder centraal inzicht of eigenaarschap.</p>
+</div>
+
+<div class="card">
+<h3 data-key="riskTitle">Risico's</h3>
+<p data-key="riskText">Onbekend welke data wordt verwerkt en of dit past binnen AVG, AI Act en informatiebeveiliging.</p>
+</div>
+
+<div class="card">
+<h3 data-key="costTitle">Kosten</h3>
+<p data-key="costText">Licenties, dubbele tools en ongebruikte abonnementen blijven onzichtbaar.</p>
+</div>
 </div>
 </section>
 
 <section id="oplossing">
-<h2>De oplossing: AI Agent Register</h2>
-<p>Een centraal register voor AI binnen organisaties. Vergelijkbaar met een CMDB voor IT-assets, maar specifiek gericht op AI-tools, agents en workflows.</p>
+<h2 data-key="solutionTitle">De oplossing: AI Agent Register</h2>
+<p data-key="solutionIntro">Een centraal register voor AI binnen organisaties. Vergelijkbaar met een CMDB voor IT-assets, maar specifiek gericht op AI-tools, agents en workflows.</p>
+
 <div class="grid">
-<div class="card"><h3>AI-tools registreren</h3><p>Leg naam, leverancier, eigenaar, afdeling, doel en status vast.</p></div>
-<div class="card"><h3>Risico inschatten</h3><p>Maak zichtbaar welke AI-systemen laag, middel of hoog risico hebben.</p></div>
-<div class="card"><h3>Managementdashboard</h3><p>Bekijk aantal systemen, kosten, eigenaarschap en compliance-status.</p></div>
+<div class="card">
+<h3 data-key="registerTitle">AI-tools registreren</h3>
+<p data-key="registerText">Leg naam, leverancier, eigenaar, afdeling, doel en status vast.</p>
+</div>
+
+<div class="card">
+<h3 data-key="assessTitle">Risico inschatten</h3>
+<p data-key="assessText">Maak zichtbaar welke AI-systemen laag, middel of hoog risico hebben.</p>
+</div>
+
+<div class="card">
+<h3 data-key="dashboardTitle">Managementdashboard</h3>
+<p data-key="dashboardText">Bekijk aantal systemen, kosten, eigenaarschap en compliance-status.</p>
+</div>
 </div>
 </section>
 
 <section id="demo">
-<h2>Demo: AI Agent Register</h2>
-<p class="notice">Deze demo slaat gegevens alleen lokaal op in je browser. Er wordt nog niets naar een server gestuurd.</p>
+<h2 data-key="demoTitle">Demo: AI Agent Register</h2>
+<p class="notice" data-key="demoNotice">Deze demo slaat gegevens alleen lokaal op in je browser. Er wordt nog niets naar een server gestuurd.</p>
 
 <div class="grid">
 <div class="card">
 <div class="metric" id="count">0</div>
-<p>AI-systemen geregistreerd</p>
+<p data-key="metricSystems">AI-systemen geregistreerd</p>
 </div>
+
 <div class="card">
 <div class="metric" id="costTotal">€0</div>
-<p>Totale maandkosten</p>
+<p data-key="metricCosts">Totale maandkosten</p>
 </div>
+
 <div class="card">
 <div class="metric" id="highRisk">0</div>
-<p>Hoog-risico systemen</p>
+<p data-key="metricRisk">Hoog-risico systemen</p>
 </div>
 </div>
 
 <div class="card">
-<h3>Nieuw AI-systeem toevoegen</h3>
+<h3 data-key="newSystemTitle">Nieuw AI-systeem toevoegen</h3>
 <input id="name" placeholder="Naam, bijv. ChatGPT Team">
 <input id="owner" placeholder="Eigenaar, bijv. ICT / Onderwijs / HR">
 <input id="supplier" placeholder="Leverancier, bijv. OpenAI / Microsoft">
@@ -95,20 +132,27 @@ footer{background:#0f172a;color:white;text-align:center;padding:35px;margin-top:
 <option value="Middel">Middel risico</option>
 <option value="Hoog">Hoog risico</option>
 </select>
-<button onclick="addItem()">Toevoegen</button>
+<button onclick="addItem()" data-key="addButton">Toevoegen</button>
 </div>
 
 <table>
 <thead>
-<tr><th>Naam</th><th>Eigenaar</th><th>Leverancier</th><th>Kosten</th><th>Risico</th></tr>
+<tr>
+<th data-key="tableName">Naam</th>
+<th data-key="tableOwner">Eigenaar</th>
+<th data-key="tableSupplier">Leverancier</th>
+<th data-key="tableCosts">Kosten</th>
+<th data-key="tableRisk">Risico</th>
+</tr>
 </thead>
 <tbody id="table"></tbody>
 </table>
 </section>
 
 <section id="pilot">
-<h2>Aanmelden voor pilot</h2>
-<p>Heisterlux zoekt organisaties die willen meedenken over AI-governance, AI-registratie en verantwoord gebruik van AI.</p>
+<h2 data-key="pilotTitle">Aanmelden voor pilot</h2>
+<p data-key="pilotText">Heisterlux zoekt organisaties die willen meedenken over AI-governance, AI-registratie en verantwoord gebruik van AI.</p>
+
 <div class="card">
 <input placeholder="Naam">
 <input placeholder="Organisatie">
@@ -118,7 +162,7 @@ footer{background:#0f172a;color:white;text-align:center;padding:35px;margin-top:
 <option>Ik wil meedoen aan een pilot</option>
 <option>Ik wil vrijblijvend contact</option>
 </select>
-<button onclick="alert('Formulier is nog een demo. Later koppelen we dit aan e-mail of database.')">Versturen</button>
+<button onclick="alert('Formulier is nog een demo. Later koppelen we dit aan e-mail of database.')" data-key="sendButton">Versturen</button>
 </div>
 </section>
 
@@ -127,26 +171,133 @@ footer{background:#0f172a;color:white;text-align:center;padding:35px;margin-top:
 </footer>
 
 <script>
+const translations = {
+nl: {
+navProblem:"Probleem",
+navSolution:"Oplossing",
+navDemo:"Demo",
+navPilot:"Pilot",
+heroText:"AI Governance Lab voor organisaties die grip willen krijgen op AI-tools, AI-agents en geautomatiseerde workflows.",
+heroDemo:"Test de demo",
+heroPilot:"Aanmelden voor pilot",
+problemTitle:"Het probleem",
+problemIntro:"Organisaties gebruiken steeds meer AI-systemen zoals ChatGPT, Copilot, Claude, Gemini, Zapier, Make en n8n. Vaak ontbreekt overzicht.",
+shadowTitle:"Shadow AI",
+shadowText:"Medewerkers gebruiken AI-tools zonder centraal inzicht of eigenaarschap.",
+riskTitle:"Risico's",
+riskText:"Onbekend welke data wordt verwerkt en of dit past binnen AVG, AI Act en informatiebeveiliging.",
+costTitle:"Kosten",
+costText:"Licenties, dubbele tools en ongebruikte abonnementen blijven onzichtbaar.",
+solutionTitle:"De oplossing: AI Agent Register",
+solutionIntro:"Een centraal register voor AI binnen organisaties. Vergelijkbaar met een CMDB voor IT-assets, maar specifiek gericht op AI-tools, agents en workflows.",
+registerTitle:"AI-tools registreren",
+registerText:"Leg naam, leverancier, eigenaar, afdeling, doel en status vast.",
+assessTitle:"Risico inschatten",
+assessText:"Maak zichtbaar welke AI-systemen laag, middel of hoog risico hebben.",
+dashboardTitle:"Managementdashboard",
+dashboardText:"Bekijk aantal systemen, kosten, eigenaarschap en compliance-status.",
+demoTitle:"Demo: AI Agent Register",
+demoNotice:"Deze demo slaat gegevens alleen lokaal op in je browser. Er wordt nog niets naar een server gestuurd.",
+metricSystems:"AI-systemen geregistreerd",
+metricCosts:"Totale maandkosten",
+metricRisk:"Hoog-risico systemen",
+newSystemTitle:"Nieuw AI-systeem toevoegen",
+addButton:"Toevoegen",
+tableName:"Naam",
+tableOwner:"Eigenaar",
+tableSupplier:"Leverancier",
+tableCosts:"Kosten",
+tableRisk:"Risico",
+pilotTitle:"Aanmelden voor pilot",
+pilotText:"Heisterlux zoekt organisaties die willen meedenken over AI-governance, AI-registratie en verantwoord gebruik van AI.",
+sendButton:"Versturen"
+},
+en: {
+navProblem:"Problem",
+navSolution:"Solution",
+navDemo:"Demo",
+navPilot:"Pilot",
+heroText:"AI Governance Lab for organisations that want control over AI tools, AI agents and automated workflows.",
+heroDemo:"Test the demo",
+heroPilot:"Join the pilot",
+problemTitle:"The problem",
+problemIntro:"Organisations are increasingly using AI systems such as ChatGPT, Copilot, Claude, Gemini, Zapier, Make and n8n. In many cases, there is no clear overview.",
+shadowTitle:"Shadow AI",
+shadowText:"Employees use AI tools without central visibility, ownership or governance.",
+riskTitle:"Risks",
+riskText:"It is often unclear what data is processed and whether usage aligns with GDPR, the AI Act and information security policies.",
+costTitle:"Costs",
+costText:"Licences, overlapping tools and unused subscriptions often remain invisible.",
+solutionTitle:"The solution: AI Agent Register",
+solutionIntro:"A central AI register for organisations. Similar to a CMDB for IT assets, but focused specifically on AI tools, agents and workflows.",
+registerTitle:"Register AI tools",
+registerText:"Record name, supplier, owner, department, purpose and status.",
+assessTitle:"Assess risks",
+assessText:"Make visible which AI systems are low, medium or high risk.",
+dashboardTitle:"Management dashboard",
+dashboardText:"View number of systems, costs, ownership and compliance status.",
+demoTitle:"Demo: AI Agent Register",
+demoNotice:"This demo only stores data locally in your browser. Nothing is sent to a server yet.",
+metricSystems:"AI systems registered",
+metricCosts:"Total monthly costs",
+metricRisk:"High-risk systems",
+newSystemTitle:"Add new AI system",
+addButton:"Add",
+tableName:"Name",
+tableOwner:"Owner",
+tableSupplier:"Supplier",
+tableCosts:"Costs",
+tableRisk:"Risk",
+pilotTitle:"Join the pilot",
+pilotText:"Heisterlux is looking for organisations that want to explore AI governance, AI registration and responsible AI use.",
+sendButton:"Send"
+}
+};
+
+function setLanguage(lang){
+localStorage.setItem("siteLanguage", lang);
+document.documentElement.lang = lang;
+document.querySelectorAll("[data-key]").forEach(el=>{
+const key = el.getAttribute("data-key");
+if(translations[lang][key]) el.innerText = translations[lang][key];
+});
+}
+
 let data = JSON.parse(localStorage.getItem("aiRegister")) || [
 {name:"ChatGPT Team",owner:"ICT",supplier:"OpenAI",cost:60,risk:"Middel"},
 {name:"Microsoft Copilot",owner:"Onderwijs",supplier:"Microsoft",cost:120,risk:"Middel"},
 {name:"n8n Workflow",owner:"Marketing",supplier:"n8n",cost:20,risk:"Hoog"}
 ];
 
-function save(){localStorage.setItem("aiRegister",JSON.stringify(data))}
+function save(){
+localStorage.setItem("aiRegister",JSON.stringify(data));
+}
+
 function render(){
-let tbody=document.getElementById("table");tbody.innerHTML="";
-let total=0, high=0;
+let tbody=document.getElementById("table");
+tbody.innerHTML="";
+let total=0;
+let high=0;
+
 data.forEach(i=>{
 total+=Number(i.cost||0);
-if(i.risk==="Hoog")high++;
+if(i.risk==="Hoog" || i.risk==="High") high++;
 let cls=i.risk.toLowerCase();
-tbody.innerHTML+=`<tr><td>${i.name}</td><td>${i.owner}</td><td>${i.supplier}</td><td>€${i.cost}</td><td><span class="badge ${cls}">${i.risk}</span></td></tr>`;
+tbody.innerHTML+=`
+<tr>
+<td>${i.name}</td>
+<td>${i.owner}</td>
+<td>${i.supplier}</td>
+<td>€${i.cost}</td>
+<td><span class="badge ${cls}">${i.risk}</span></td>
+</tr>`;
 });
+
 document.getElementById("count").innerText=data.length;
 document.getElementById("costTotal").innerText="€"+total;
 document.getElementById("highRisk").innerText=high;
 }
+
 function addItem(){
 let item={
 name:document.getElementById("name").value,
@@ -155,9 +306,19 @@ supplier:document.getElementById("supplier").value,
 cost:document.getElementById("cost").value,
 risk:document.getElementById("risk").value
 };
-if(!item.name||!item.owner){alert("Vul minimaal naam en eigenaar in.");return}
-data.push(item);save();render();
+
+if(!item.name || !item.owner){
+alert("Vul minimaal naam en eigenaar in.");
+return;
 }
+
+data.push(item);
+save();
+render();
+}
+
+const savedLanguage = localStorage.getItem("siteLanguage") || "nl";
+setLanguage(savedLanguage);
 render();
 </script>
 
