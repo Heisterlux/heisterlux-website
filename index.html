@@ -6,47 +6,281 @@
 <title>Heisterlux - AI Agent Register</title>
 
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937}
-nav{background:#111827;padding:15px;text-align:center;position:sticky;top:0;z-index:10}
-nav a{color:white;margin:0 15px;text-decoration:none;font-weight:bold}
-.lang{position:absolute;right:20px;top:10px}
-.lang button{width:auto;margin:0 3px;padding:7px 10px;border:none;border-radius:6px;cursor:pointer}
-header{background:#0f172a;color:white;padding:70px 8%;text-align:center}
-header h1{font-size:56px;margin:0}
-header p{font-size:22px;max-width:850px;margin:20px auto}
-section{max-width:1150px;margin:auto;padding:55px 25px}
-h2{font-size:34px;margin-bottom:15px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
-.card{background:white;border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
-.hero-btn{display:inline-block;background:#2563eb;color:white;padding:14px 22px;border-radius:9px;text-decoration:none;font-weight:bold;margin:8px}
-.secondary{background:#334155}
-input,select,button{padding:12px;border-radius:8px;border:1px solid #cbd5e1;margin:6px;width:calc(100% - 24px)}
-button{background:#2563eb;color:white;font-weight:bold;cursor:pointer}
-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}
-th,td{padding:14px;border-bottom:1px solid #e5e7eb;text-align:left}
-th{background:#0f172a;color:white}
-.badge{padding:5px 10px;border-radius:20px;color:white;font-size:13px}
-.laag,.low{background:#16a34a}
-.middel,.medium{background:#f97316}
-.hoog,.high{background:#dc2626}
-.metric{font-size:32px;font-weight:bold;color:#2563eb}
-footer{background:#0f172a;color:white;text-align:center;padding:35px;margin-top:50px}
-.notice{background:#e0f2fe;border-left:6px solid #0284c7;padding:18px;border-radius:8px}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f6f8;
+  color:#1f2937;
+}
+
+nav{
+  background:#111827;
+  padding:15px 20px;
+  position:sticky;
+  top:0;
+  z-index:10;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.nav-links{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:30px;
+  flex-wrap:wrap;
+}
+
+nav a{
+  color:white;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.lang{
+  display:flex;
+  gap:8px;
+}
+
+.lang button{
+  width:auto;
+  margin:0;
+  padding:9px 14px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+header{
+  background:#0f172a;
+  color:white;
+  padding:70px 8%;
+  text-align:center;
+}
+
+header h1{
+  font-size:56px;
+  margin:0;
+}
+
+header p{
+  font-size:22px;
+  max-width:850px;
+  margin:20px auto;
+}
+
+section{
+  max-width:1150px;
+  margin:auto;
+  padding:55px 25px;
+}
+
+h2{
+  font-size:34px;
+  margin-bottom:15px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:22px;
+}
+
+.card{
+  background:white;
+  border-radius:14px;
+  padding:24px;
+  box-shadow:0 4px 16px rgba(0,0,0,.08);
+}
+
+.hero-btn{
+  display:inline-block;
+  background:#2563eb;
+  color:white;
+  padding:14px 22px;
+  border-radius:9px;
+  text-decoration:none;
+  font-weight:bold;
+  margin:8px;
+}
+
+.secondary{
+  background:#334155;
+}
+
+input,select,button{
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #cbd5e1;
+  margin:6px;
+  width:calc(100% - 24px);
+}
+
+button{
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.table-wrapper{
+  overflow-x:auto;
+  margin-top:20px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
+  min-width:650px;
+}
+
+th,td{
+  padding:14px;
+  border-bottom:1px solid #e5e7eb;
+  text-align:left;
+}
+
+th{
+  background:#0f172a;
+  color:white;
+}
+
+.badge{
+  padding:5px 10px;
+  border-radius:20px;
+  color:white;
+  font-size:13px;
+}
+
+.laag,.low{
+  background:#16a34a;
+}
+
+.middel,.medium{
+  background:#f97316;
+}
+
+.hoog,.high{
+  background:#dc2626;
+}
+
+.metric{
+  font-size:32px;
+  font-weight:bold;
+  color:#2563eb;
+}
+
+footer{
+  background:#0f172a;
+  color:white;
+  text-align:center;
+  padding:35px;
+  margin-top:50px;
+}
+
+.notice{
+  background:#e0f2fe;
+  border-left:6px solid #0284c7;
+  padding:18px;
+  border-radius:8px;
+}
+
+/* Mobiele weergave */
+@media (max-width: 768px){
+  nav{
+    flex-direction:column;
+    gap:14px;
+    padding:14px 10px;
+  }
+
+  .nav-links{
+    width:100%;
+    gap:18px;
+    row-gap:10px;
+  }
+
+  nav a{
+    font-size:16px;
+  }
+
+  .lang{
+    width:100%;
+    justify-content:center;
+  }
+
+  .lang button{
+    width:auto;
+    padding:9px 16px;
+    font-size:15px;
+  }
+
+  header{
+    padding:60px 7%;
+  }
+
+  header h1{
+    font-size:44px;
+  }
+
+  header p{
+    font-size:19px;
+  }
+
+  h2{
+    font-size:30px;
+  }
+}
+
+@media (max-width: 480px){
+  .nav-links{
+    gap:14px;
+  }
+
+  nav a{
+    font-size:15px;
+  }
+
+  header h1{
+    font-size:40px;
+  }
+
+  header p{
+    font-size:18px;
+  }
+
+  .hero-btn{
+    display:block;
+    max-width:240px;
+    margin:12px auto;
+  }
+}
 </style>
 </head>
 
 <body>
 
 <nav>
-<a href="#probleem" data-key="navProblem">Probleem</a>
-<a href="#oplossing" data-key="navSolution">Oplossing</a>
-<a href="#demo" data-key="navDemo">Demo</a>
-<a href="#pilot" data-key="navPilot">Pilot</a>
+  <div class="nav-links">
+    <a href="#probleem" data-key="navProblem">Probleem</a>
+    <a href="#oplossing" data-key="navSolution">Oplossing</a>
+    <a href="#demo" data-key="navDemo">Demo</a>
+    <a href="#pilot" data-key="navPilot">Pilot</a>
+  </div>
 
-<div class="lang">
-<button onclick="setLanguage('nl')">🇳🇱 NL</button>
-<button onclick="setLanguage('en')">🇬🇧 EN</button>
-</div>
+  <div class="lang">
+    <button onclick="setLanguage('nl')">🇳🇱 NL</button>
+    <button onclick="setLanguage('en')">🇬🇧 EN</button>
+  </div>
 </nav>
 
 <header>
@@ -135,6 +369,7 @@ footer{background:#0f172a;color:white;text-align:center;padding:35px;margin-top:
 <button onclick="addItem()" data-key="addButton">Toevoegen</button>
 </div>
 
+<div class="table-wrapper">
 <table>
 <thead>
 <tr>
@@ -147,6 +382,7 @@ footer{background:#0f172a;color:white;text-align:center;padding:35px;margin-top:
 </thead>
 <tbody id="table"></tbody>
 </table>
+</div>
 </section>
 
 <section id="pilot">
