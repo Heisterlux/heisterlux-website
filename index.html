@@ -1,653 +1,293 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Heisterlux - AI Discovery & Governance Platform</title>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Heisterlux - AI Discovery Demo</title>
 <style>
-:root{
-  --dark:#0f172a;
-  --nav:#111827;
-  --blue:#2563eb;
-  --slate:#334155;
-  --bg:#f4f6f8;
-  --text:#1f2937;
-  --muted:#64748b;
-  --green:#16a34a;
-  --orange:#f97316;
-  --red:#dc2626;
-  --purple:#7c3aed;
-}
-
-*{box-sizing:border-box;}
-
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  line-height:1.55;
-}
-
-nav{
-  background:var(--nav);
-  padding:15px 20px;
-  position:sticky;
-  top:0;
-  z-index:10;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:20px;
-  flex-wrap:wrap;
-}
-
-.nav-links{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:28px;
-  flex-wrap:wrap;
-}
-
-nav a{
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
-}
-
-.lang{
-  display:flex;
-  gap:8px;
-}
-
-.lang button{
-  width:auto;
-  margin:0;
-  padding:9px 14px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  background:var(--blue);
-  color:white;
-  font-weight:bold;
-  white-space:nowrap;
-}
-
-header{
-  background:linear-gradient(135deg,#0f172a,#1e293b);
-  color:white;
-  padding:78px 8%;
-  text-align:center;
-}
-
-header h1{
-  font-size:56px;
-  margin:0;
-}
-
-header .subtitle{
-  font-size:22px;
-  max-width:950px;
-  margin:20px auto;
-}
-
-header .tagline{
-  display:inline-block;
-  background:rgba(37,99,235,.25);
-  border:1px solid rgba(255,255,255,.25);
-  padding:8px 14px;
-  border-radius:999px;
-  font-weight:bold;
-  margin-bottom:18px;
-}
-
-section{
-  max-width:1180px;
-  margin:auto;
-  padding:55px 25px;
-}
-
-h2{
-  font-size:34px;
-  margin-bottom:15px;
-}
-
-h3{margin-top:0;}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:22px;
-}
-
-.grid-4{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:18px;
-}
-
-.card{
-  background:white;
-  border-radius:14px;
-  padding:24px;
-  box-shadow:0 4px 16px rgba(0,0,0,.08);
-}
-
-.hero-btn{
-  display:inline-block;
-  background:var(--blue);
-  color:white;
-  padding:14px 22px;
-  border-radius:9px;
-  text-decoration:none;
-  font-weight:bold;
-  margin:8px;
-}
-
-.secondary{background:var(--slate);}
-
-input,select,button,textarea{
-  padding:12px;
-  border-radius:8px;
-  border:1px solid #cbd5e1;
-  margin:6px 0;
-  width:100%;
-  font-family:Arial,sans-serif;
-}
-
-button{
-  background:var(--blue);
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.button-row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-
-.button-row button,.button-row label{
-  width:auto;
-  display:inline-block;
-}
-
-label.upload{
-  background:var(--slate);
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-  padding:12px 16px;
-  border-radius:8px;
-}
-
-.table-wrapper{
-  overflow-x:auto;
-  margin-top:20px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  background:white;
-  border-radius:12px;
-  overflow:hidden;
-  min-width:850px;
-}
-
-th,td{
-  padding:13px;
-  border-bottom:1px solid #e5e7eb;
-  text-align:left;
-  vertical-align:top;
-}
-
-th{
-  background:var(--dark);
-  color:white;
-}
-
-.badge{
-  display:inline-block;
-  padding:5px 10px;
-  border-radius:20px;
-  color:white;
-  font-size:13px;
-  white-space:nowrap;
-}
-
-.low,.laag,.approved,.goedgekeurd,.known,.bekend{background:var(--green);}
-.medium,.middel,.review,.in-review,.beoordelen{background:var(--orange);}
-.high,.hoog,.shadow,.unknown,.onbekend{background:var(--red);}
-.gpa,.ai-act,.policy{background:var(--purple);}
-
-.metric{
-  font-size:32px;
-  font-weight:bold;
-  color:var(--blue);
-}
-
-.small{
-  color:var(--muted);
-  font-size:14px;
-}
-
-.notice{
-  background:#e0f2fe;
-  border-left:6px solid #0284c7;
-  padding:18px;
-  border-radius:8px;
-}
-
-.warning{
-  background:#fff7ed;
-  border-left:6px solid var(--orange);
-  padding:18px;
-  border-radius:8px;
-}
-
-.tabs{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:18px 0;
-}
-
-.tab-btn{
-  width:auto;
-  background:#e2e8f0;
-  color:#0f172a;
-  border:none;
-}
-
-.tab-btn.active{
-  background:var(--blue);
-  color:white;
-}
-
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-
-.scorebar{
-  background:#e5e7eb;
-  border-radius:999px;
-  overflow:hidden;
-  height:12px;
-  margin-top:10px;
-}
-
-.scorebar span{
-  display:block;
-  height:12px;
-  background:var(--blue);
-}
-
-footer{
-  background:var(--dark);
-  color:white;
-  text-align:center;
-  padding:35px;
-  margin-top:50px;
-}
-
-@media (max-width: 768px){
-  nav{flex-direction:column;gap:14px;padding:14px 10px;}
-  .nav-links{width:100%;gap:16px;row-gap:10px;}
-  nav a{font-size:15px;}
-  .lang{width:100%;justify-content:center;}
-  .lang button{width:auto;padding:9px 16px;font-size:15px;}
-  header{padding:60px 7%;}
-  header h1{font-size:42px;}
-  header .subtitle{font-size:19px;}
-  h2{font-size:29px;}
-}
-
-@media (max-width: 480px){
-  .nav-links{gap:12px;}
-  nav a{font-size:14px;}
-  header h1{font-size:38px;}
-  header .subtitle{font-size:18px;}
-  .hero-btn{display:block;max-width:260px;margin:12px auto;}
-}
+:root{--dark:#0f172a;--blue:#2563eb;--bg:#f4f6f8;--text:#1f2937;--muted:#64748b;--green:#16a34a;--orange:#f97316;--red:#dc2626;--purple:#7c3aed}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+nav{background:#111827;color:white;padding:14px 20px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+nav a{color:white;text-decoration:none;font-weight:bold}
+header{background:linear-gradient(135deg,#0f172a,#1e293b);color:white;text-align:center;padding:70px 8%}
+header h1{font-size:54px;margin:0}
+header p{font-size:21px;max-width:900px;margin:18px auto}
+section{max-width:1150px;margin:auto;padding:45px 22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card{background:white;border-radius:14px;padding:22px;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+input,select,button{width:100%;padding:12px;border-radius:8px;border:1px solid #cbd5e1;margin:6px 0;font-family:Arial,sans-serif}
+button{background:var(--blue);color:white;font-weight:bold;cursor:pointer}
+.metric{font-size:32px;font-weight:bold;color:var(--blue)}
+.notice{background:#e0f2fe;border-left:6px solid #0284c7;padding:16px;border-radius:8px}
+.warning{background:#fff7ed;border-left:6px solid var(--orange);padding:16px;border-radius:8px}
+.small{font-size:14px;color:var(--muted)}
+.result{background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:14px;margin:12px 0}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;min-width:980px}
+th,td{padding:12px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
+th{background:var(--dark);color:white}
+.badge{display:inline-block;padding:5px 10px;border-radius:999px;color:white;font-size:13px}
+.low{background:var(--green)}.medium{background:var(--orange)}.high,.shadow{background:var(--red)}.gpa{background:var(--purple)}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}
+.tab{width:auto;background:#e2e8f0;color:#0f172a;border:0}
+.tab.active{background:var(--blue);color:white}
+.panel{display:none}.panel.active{display:block}
+footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-top:40px}
+@media(max-width:700px){header h1{font-size:38px}header p{font-size:18px}}
 </style>
 </head>
-
 <body>
 
 <nav>
-  <div class="nav-links">
-    <a href="#probleem" data-key="navProblem">Probleem</a>
-    <a href="#platform" data-key="navPlatform">Platform</a>
-    <a href="#dashboard" data-key="navDashboard">Dashboard</a>
-    <a href="#demo" data-key="navDemo">Demo</a>
-    <a href="#pilot" data-key="navPilot">Pilot</a>
-  </div>
-  <div class="lang">
-    <button onclick="setLanguage('nl')">🇳🇱 NL</button>
-    <button onclick="setLanguage('en')">🇬🇧 EN</button>
-  </div>
+<a href="#probleem">Probleem</a>
+<a href="#demo">Demo</a>
+<a href="#pilot">Pilot</a>
 </nav>
 
 <header>
-  <div class="tagline" data-key="heroTag">AI Discovery & Governance Platform</div>
-  <h1>Heisterlux</h1>
-  <p class="subtitle" data-key="heroText">Ontdek welke AI-tools, AI-agents en workflows binnen je organisatie worden gebruikt voordat risico's, kosten of complianceproblemen onzichtbaar groeien.</p>
-  <a class="hero-btn" href="#demo" data-key="heroDemo">Bekijk Product B-demo</a>
-  <a class="hero-btn secondary" href="#pilot" data-key="heroPilot">Aanmelden voor pilot</a>
+<h1>Heisterlux</h1>
+<p>AI Discovery & Governance Platform voor organisaties die grip willen krijgen op AI-tools, AI-agents en shadow AI.</p>
 </header>
 
 <section id="probleem">
-  <h2 data-key="problemTitle">Het probleem: organisaties missen zicht op AI-gebruik</h2>
-  <p data-key="problemIntro">Medewerkers gebruiken ChatGPT, Copilot, Claude, Gemini, Perplexity, Zapier, Make, n8n en andere AI-tools. Vaak weet niemand centraal welke tools worden gebruikt, wie eigenaar is, welke data erin gaat en of het voldoet aan AVG, AI Act en informatiebeveiliging.</p>
-
-  <div class="grid">
-    <div class="card">
-      <h3 data-key="shadowTitle">Shadow AI</h3>
-      <p data-key="shadowText">AI-gebruik ontstaat buiten IT, privacy en security om. Daardoor blijven risico's onzichtbaar.</p>
-    </div>
-    <div class="card">
-      <h3 data-key="governanceTitle">Geen eigenaarschap</h3>
-      <p data-key="governanceText">Veel AI-tools hebben geen duidelijke eigenaar, reviewdatum, beleid of goedkeuringsstatus.</p>
-    </div>
-    <div class="card">
-      <h3 data-key="riskTitle">Compliance-risico</h3>
-      <p data-key="riskText">Organisaties moeten kunnen uitleggen welke AI wordt gebruikt, met welk doel en welke gegevens worden verwerkt.</p>
-    </div>
-  </div>
-</section>
-
-<section id="platform">
-  <h2 data-key="platformTitle">De oplossing: van AI-register naar AI Discovery & Governance</h2>
-  <p data-key="platformIntro">Heisterlux combineert inventarisatie, discovery, risicobeoordeling en bestuurlijk overzicht in één platform. De eerste versie werkt zonder technische koppelingen; later kan dit groeien naar Microsoft 365, Entra ID, Google Workspace en netwerkdata.</p>
-
-  <div class="grid">
-    <div class="card">
-      <h3 data-key="moduleDiscovery">1. AI Discovery</h3>
-      <p data-key="moduleDiscoveryText">Breng bekende én vermoedelijke AI-tools in beeld via vragenlijsten, CSV-import en later technische koppelingen.</p>
-    </div>
-    <div class="card">
-      <h3 data-key="moduleRadar">2. Shadow AI Radar</h3>
-      <p data-key="moduleRadarText">Signaleer tools zonder eigenaar, zonder beoordeling of buiten beleid.</p>
-    </div>
-    <div class="card">
-      <h3 data-key="moduleGovernance">3. Governance Register</h3>
-      <p data-key="moduleGovernanceText">Leg eigenaar, afdeling, leverancier, doel, data, kosten, status en reviewmoment vast.</p>
-    </div>
-    <div class="card">
-      <h3 data-key="moduleRisk">4. Risk Engine</h3>
-      <p data-key="moduleRiskText">Bereken risico op basis van data, eigenaarschap, status, kosten en AI Act-indicatie.</p>
-    </div>
-  </div>
+<h2>Het probleem</h2>
+<p>Organisaties gebruiken steeds meer AI-tools, maar weten vaak niet centraal welke systemen worden gebruikt, wie eigenaar is, welke data wordt verwerkt en welke risico's ontstaan.</p>
+<div class="grid">
+<div class="card"><h3>Shadow AI</h3><p>AI-tools worden gebruikt buiten IT, privacy en security om.</p></div>
+<div class="card"><h3>AI Knowledge Base</h3><p>Bekende AI-tools worden automatisch herkend en verrijkt met leverancier, categorie en risicoscore.</p></div>
+<div class="card"><h3>Risk Engine</h3><p>Ook onbekende AI-tools krijgen een voorlopige classificatie op basis van naam en datagebruik.</p></div>
+</div>
 </section>
 
 <section id="dashboard">
-  <h2 data-key="dashboardTitle">Executive dashboard</h2>
-  <p class="notice" data-key="dashboardNotice">Deze demo gebruikt lokale browseropslag. Er wordt nog niets naar een server gestuurd.</p>
-
-  <div class="grid-4">
-    <div class="card"><div class="metric" id="totalSystems">0</div><p data-key="metricSystems">AI-systemen gevonden</p></div>
-    <div class="card"><div class="metric" id="shadowSystems">0</div><p data-key="metricShadow">Shadow AI-signalen</p></div>
-    <div class="card"><div class="metric" id="highRiskSystems">0</div><p data-key="metricHighRisk">Hoog-risico systemen</p></div>
-    <div class="card"><div class="metric" id="monthlyCosts">€0</div><p data-key="metricCosts">Maandelijkse kosten</p></div>
-  </div>
-
-  <div class="grid" style="margin-top:22px;">
-    <div class="card">
-      <h3 data-key="complianceScoreTitle">Governance score</h3>
-      <div class="metric" id="governanceScore">0%</div>
-      <div class="scorebar"><span id="governanceBar" style="width:0%"></span></div>
-      <p class="small" data-key="complianceScoreText">Gebaseerd op eigenaarschap, status en risicobeoordeling.</p>
-    </div>
-    <div class="card">
-      <h3 data-key="aiActTitle">AI Act readiness</h3>
-      <div class="metric" id="aiActOpen">0</div>
-      <p data-key="aiActText">Systemen die nog AI Act-beoordeling nodig hebben.</p>
-    </div>
-  </div>
+<h2>Executive dashboard</h2>
+<p class="notice">Deze demo gebruikt alleen lokale browseropslag. Er wordt niets naar een server gestuurd.</p>
+<div class="grid">
+<div class="card"><div class="metric" id="totalSystems">0</div><p>AI-systemen geregistreerd</p></div>
+<div class="card"><div class="metric" id="shadowSystems">0</div><p>Shadow AI-signalen</p></div>
+<div class="card"><div class="metric" id="highRiskSystems">0</div><p>Hoog-risico systemen</p></div>
+<div class="card"><div class="metric" id="monthlyCosts">€0</div><p>Maandelijkse kosten</p></div>
+</div>
 </section>
 
 <section id="demo">
-  <h2 data-key="demoTitle">Demo: Product B</h2>
-  <p class="warning" data-key="demoIntro">Voeg AI-systemen toe, ontdek shadow AI-signalen, beoordeel governance en exporteer het overzicht. Dit is een klikbare MVP-demo, nog geen gekoppeld SaaS-platform.</p>
+<h2>Demo: AI Discovery Register</h2>
+<p class="warning">Typ bijvoorbeeld Cursor, Claude, Perplexity, NotebookLM, Fireflies, Lovable, n8n, Zapier of een onbekende naam zoals MeetingMind AI.</p>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('register')" data-key="tabRegister">Governance register</button>
-    <button class="tab-btn" onclick="showTab('discovery')" data-key="tabDiscovery">Discovery radar</button>
-    <button class="tab-btn" onclick="showTab('risk')" data-key="tabRisk">Risk engine</button>
-    <button class="tab-btn" onclick="showTab('importExport')" data-key="tabImport">Import / export</button>
-  </div>
+<div class="tabs">
+<button class="tab active" onclick="showTab('register',this)">Register</button>
+<button class="tab" onclick="showTab('radar',this)">Shadow AI Radar</button>
+<button class="tab" onclick="showTab('riskpanel',this)">Risk Engine</button>
+<button class="tab" onclick="showTab('databasepanel',this)">AI Database</button>
+</div>
 
-  <div id="register" class="tab-panel active">
-    <div class="card">
-      <h3 data-key="newSystemTitle">Nieuw AI-systeem toevoegen</h3>
-      <div class="grid">
-        <input id="name" placeholder="Naam, bijv. ChatGPT Team">
-        <input id="supplier" placeholder="Leverancier, bijv. OpenAI">
-        <input id="department" placeholder="Afdeling, bijv. HR / ICT / Onderwijs">
-        <input id="owner" placeholder="Eigenaar, bijv. Privacy Officer">
-        <input id="purpose" placeholder="Doel, bijv. tekstgeneratie / analyse">
-        <input id="dataType" placeholder="Data, bijv. openbaar / intern / persoonsgegevens">
-        <input id="users" type="number" placeholder="Aantal gebruikers">
-        <input id="cost" type="number" placeholder="Kosten per maand">
-        <select id="status">
-          <option value="Goedgekeurd">Goedgekeurd</option>
-          <option value="Beoordelen">Beoordelen</option>
-          <option value="Shadow AI">Shadow AI</option>
-        </select>
-        <select id="risk">
-          <option value="Laag">Laag risico</option>
-          <option value="Middel">Middel risico</option>
-          <option value="Hoog">Hoog risico</option>
-        </select>
-        <select id="aiAct">
-          <option value="Nog niet beoordeeld">AI Act: nog niet beoordeeld</option>
-          <option value="Laag risico">AI Act: laag risico</option>
-          <option value="Hoog risico">AI Act: hoog risico</option>
-          <option value="General Purpose AI">AI Act: General Purpose AI</option>
-        </select>
-        <input id="source" placeholder="Bron, bijv. survey / CSV / Microsoft 365">
-      </div>
-      <button onclick="addItem()" data-key="addButton">Toevoegen</button>
-    </div>
+<div id="register" class="panel active">
+<div class="card">
+<h3>Nieuw AI-systeem toevoegen</h3>
+<div class="grid">
+<input id="toolName" list="aiToolOptions" placeholder="Naam AI-tool, bijv. Cursor" oninput="detectTool()">
+<datalist id="aiToolOptions"></datalist>
+<input id="supplier" placeholder="Leverancier">
+<input id="category" placeholder="Categorie">
+<input id="department" placeholder="Afdeling">
+<input id="owner" placeholder="Eigenaar">
+<input id="purpose" placeholder="Doel">
+<input id="dataType" placeholder="Gebruikte data">
+<input id="users" type="number" placeholder="Aantal gebruikers">
+<input id="cost" type="number" placeholder="Kosten per maand">
+<select id="status">
+<option value="Goedgekeurd">Goedgekeurd</option>
+<option value="Beoordelen">Beoordelen</option>
+<option value="Shadow AI">Shadow AI</option>
+</select>
+<select id="risk">
+<option value="Laag">Laag risico</option>
+<option value="Middel">Middel risico</option>
+<option value="Hoog">Hoog risico</option>
+</select>
+<select id="aiAct">
+<option value="Nog niet beoordeeld">AI Act: nog niet beoordeeld</option>
+<option value="Laag risico">AI Act: laag risico</option>
+<option value="Hoog risico">AI Act: hoog risico</option>
+<option value="General Purpose AI">AI Act: General Purpose AI</option>
+</select>
+<input id="source" placeholder="Bron, bijv. survey / browserlog / CSV">
+</div>
+<div id="detectionResult" class="result" style="display:none"></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button style="width:auto" onclick="addItem()">Toevoegen</button>
+<button style="width:auto;background:var(--purple)" onclick="simulateUnknownTool()">Simuleer onbekende AI-tool</button>
+<button style="width:auto;background:var(--red)" onclick="resetDemo()">Reset demo</button>
+</div>
+</div>
 
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th data-key="tableName">Naam</th>
-            <th data-key="tableSupplier">Leverancier</th>
-            <th data-key="tableDept">Afdeling</th>
-            <th data-key="tableOwner">Eigenaar</th>
-            <th data-key="tableUsers">Gebruikers</th>
-            <th data-key="tableCosts">Kosten</th>
-            <th data-key="tableStatus">Status</th>
-            <th data-key="tableRisk">Risico</th>
-            <th data-key="tableAiAct">AI Act</th>
-          </tr>
-        </thead>
-        <tbody id="table"></tbody>
-      </table>
-    </div>
-  </div>
+<div class="tablewrap">
+<table>
+<thead>
+<tr><th>Naam</th><th>Leverancier</th><th>Categorie</th><th>Afdeling</th><th>Eigenaar</th><th>Gebruikers</th><th>Kosten</th><th>Status</th><th>Risico</th><th>AI Act</th></tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+</div>
 
-  <div id="discovery" class="tab-panel">
-    <div class="card">
-      <h3 data-key="discoveryTitle">Shadow AI Radar</h3>
-      <p data-key="discoveryText">Deze radar toont AI-tools die extra aandacht nodig hebben omdat ze shadow AI zijn, geen eigenaar hebben of nog beoordeeld moeten worden.</p>
-      <div id="radarList"></div>
-    </div>
-  </div>
-
-  <div id="risk" class="tab-panel">
-    <div class="card">
-      <h3 data-key="riskEngineTitle">Risk Engine</h3>
-      <p data-key="riskEngineText">De demo berekent signalen op basis van status, risico, AI Act-beoordeling, datagebruik en eigenaarschap.</p>
-      <div id="riskList"></div>
-    </div>
-  </div>
-
-  <div id="importExport" class="tab-panel">
-    <div class="card">
-      <h3 data-key="importTitle">CSV import / export</h3>
-      <p data-key="importText">Gebruik CSV voor een eerste inventarisatie vanuit interviews, vragenlijsten, inkoopoverzichten of SaaS-lijsten.</p>
-      <div class="button-row">
-        <button onclick="exportCSV()" data-key="exportButton">Exporteer CSV</button>
-        <label class="upload" for="csvFile" data-key="importButton">Importeer CSV</label>
-        <input id="csvFile" type="file" accept=".csv" style="display:none" onchange="importCSV(event)">
-        <button onclick="resetDemo()" style="background:#dc2626" data-key="resetButton">Reset demo</button>
-      </div>
-      <p class="small" data-key="csvFormat">CSV-kolommen: name,supplier,department,owner,purpose,dataType,users,cost,status,risk,aiAct,source</p>
-    </div>
-  </div>
+<div id="radar" class="panel"><div class="card"><h3>Shadow AI Radar</h3><div id="radarList"></div></div></div>
+<div id="riskpanel" class="panel"><div class="card"><h3>Risk Engine</h3><div id="riskList"></div></div></div>
+<div id="databasepanel" class="panel"><div class="card"><h3>AI Tool Database</h3><p class="small">Demo-database met bekende AI-tools. In een echte SaaS-versie wordt dit een continu bijgewerkte knowledge base.</p><div id="knowledgeList"></div></div></div>
 </section>
 
 <section id="pilot">
-  <h2 data-key="pilotTitle">Pilot: van demo naar echte organisatie-scan</h2>
-  <p data-key="pilotText">Heisterlux zoekt organisaties die willen ontdekken welke AI-tools, AI-agents en workflows werkelijk gebruikt worden. De pilot kan starten met een survey en register, zonder technische koppeling.</p>
-
-  <div class="grid">
-    <div class="card">
-      <h3 data-key="pilotStep1">Stap 1: AI Discovery Survey</h3>
-      <p data-key="pilotStep1Text">Medewerkers en teams geven aan welke AI-tools ze gebruiken en waarvoor.</p>
-    </div>
-    <div class="card">
-      <h3 data-key="pilotStep2">Stap 2: Governance Review</h3>
-      <p data-key="pilotStep2Text">IT, privacy en security beoordelen eigenaarschap, data, beleid en risico.</p>
-    </div>
-    <div class="card">
-      <h3 data-key="pilotStep3">Stap 3: Executive Report</h3>
-      <p data-key="pilotStep3Text">Bestuur en management krijgen overzicht van risico's, kosten, shadow AI en vervolgstappen.</p>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:22px;">
-    <input placeholder="Naam">
-    <input placeholder="Organisatie">
-    <input placeholder="E-mailadres">
-    <select>
-      <option>Ik wil een demo zien</option>
-      <option>Ik wil meedoen aan een pilot</option>
-      <option>Ik wil vrijblijvend contact</option>
-    </select>
-    <button onclick="alert('Formulier is nog een demo. Later koppelen we dit aan e-mail of database.')" data-key="sendButton">Versturen</button>
-  </div>
+<h2>Pilot</h2>
+<p>Heisterlux zoekt organisaties die hun AI-gebruik in kaart willen brengen. De eerste pilot kan starten met een survey, AI-register en managementrapportage.</p>
+<div class="card">
+<input placeholder="Naam">
+<input placeholder="Organisatie">
+<input placeholder="E-mailadres">
+<select><option>Ik wil een demo zien</option><option>Ik wil meedoen aan een pilot</option><option>Ik wil vrijblijvend contact</option></select>
+<button onclick="alert('Formulier is nog een demo. Later koppelen we dit aan e-mail of database.')">Versturen</button>
+</div>
 </section>
 
-<footer>
-  <p>© 2026 Heisterlux · AI Discovery & Governance Platform</p>
-</footer>
+<footer>© 2026 Heisterlux · AI Discovery & Governance Platform</footer>
 
 <script>
-const translations = {
-  nl: {
-    navProblem:"Probleem", navPlatform:"Platform", navDashboard:"Dashboard", navDemo:"Demo", navPilot:"Pilot",
-    heroTag:"AI Discovery & Governance Platform",
-    heroText:"Ontdek welke AI-tools, AI-agents en workflows binnen je organisatie worden gebruikt voordat risico's, kosten of complianceproblemen onzichtbaar groeien.",
-    heroDemo:"Bekijk Product B-demo", heroPilot:"Aanmelden voor pilot",
-    problemTitle:"Het probleem: organisaties missen zicht op AI-gebruik",
-    problemIntro:"Medewerkers gebruiken ChatGPT, Copilot, Claude, Gemini, Perplexity, Zapier, Make, n8n en andere AI-tools. Vaak weet niemand centraal welke tools worden gebruikt, wie eigenaar is, welke data erin gaat en of het voldoet aan AVG, AI Act en informatiebeveiliging.",
-    shadowTitle:"Shadow AI", shadowText:"AI-gebruik ontstaat buiten IT, privacy en security om. Daardoor blijven risico's onzichtbaar.",
-    governanceTitle:"Geen eigenaarschap", governanceText:"Veel AI-tools hebben geen duidelijke eigenaar, reviewdatum, beleid of goedkeuringsstatus.",
-    riskTitle:"Compliance-risico", riskText:"Organisaties moeten kunnen uitleggen welke AI wordt gebruikt, met welk doel en welke gegevens worden verwerkt.",
-    platformTitle:"De oplossing: van AI-register naar AI Discovery & Governance",
-    platformIntro:"Heisterlux combineert inventarisatie, discovery, risicobeoordeling en bestuurlijk overzicht in één platform. De eerste versie werkt zonder technische koppelingen; later kan dit groeien naar Microsoft 365, Entra ID, Google Workspace en netwerkdata.",
-    moduleDiscovery:"1. AI Discovery", moduleDiscoveryText:"Breng bekende én vermoedelijke AI-tools in beeld via vragenlijsten, CSV-import en later technische koppelingen.",
-    moduleRadar:"2. Shadow AI Radar", moduleRadarText:"Signaleer tools zonder eigenaar, zonder beoordeling of buiten beleid.",
-    moduleGovernance:"3. Governance Register", moduleGovernanceText:"Leg eigenaar, afdeling, leverancier, doel, data, kosten, status en reviewmoment vast.",
-    moduleRisk:"4. Risk Engine", moduleRiskText:"Bereken risico op basis van data, eigenaarschap, status, kosten en AI Act-indicatie.",
-    dashboardTitle:"Executive dashboard", dashboardNotice:"Deze demo gebruikt lokale browseropslag. Er wordt nog niets naar een server gestuurd.",
-    metricSystems:"AI-systemen gevonden", metricShadow:"Shadow AI-signalen", metricHighRisk:"Hoog-risico systemen", metricCosts:"Maandelijkse kosten",
-    complianceScoreTitle:"Governance score", complianceScoreText:"Gebaseerd op eigenaarschap, status en risicobeoordeling.",
-    aiActTitle:"AI Act readiness", aiActText:"Systemen die nog AI Act-beoordeling nodig hebben.",
-    demoTitle:"Demo: Product B", demoIntro:"Voeg AI-systemen toe, ontdek shadow AI-signalen, beoordeel governance en exporteer het overzicht. Dit is een klikbare MVP-demo, nog geen gekoppeld SaaS-platform.",
-    tabRegister:"Governance register", tabDiscovery:"Discovery radar", tabRisk:"Risk engine", tabImport:"Import / export",
-    newSystemTitle:"Nieuw AI-systeem toevoegen", addButton:"Toevoegen",
-    tableName:"Naam", tableSupplier:"Leverancier", tableDept:"Afdeling", tableOwner:"Eigenaar", tableUsers:"Gebruikers", tableCosts:"Kosten", tableStatus:"Status", tableRisk:"Risico", tableAiAct:"AI Act",
-    discoveryTitle:"Shadow AI Radar", discoveryText:"Deze radar toont AI-tools die extra aandacht nodig hebben omdat ze shadow AI zijn, geen eigenaar hebben of nog beoordeeld moeten worden.",
-    riskEngineTitle:"Risk Engine", riskEngineText:"De demo berekent signalen op basis van status, risico, AI Act-beoordeling, datagebruik en eigenaarschap.",
-    importTitle:"CSV import / export", importText:"Gebruik CSV voor een eerste inventarisatie vanuit interviews, vragenlijsten, inkoopoverzichten of SaaS-lijsten.",
-    exportButton:"Exporteer CSV", importButton:"Importeer CSV", resetButton:"Reset demo", csvFormat:"CSV-kolommen: name,supplier,department,owner,purpose,dataType,users,cost,status,risk,aiAct,source",
-    pilotTitle:"Pilot: van demo naar echte organisatie-scan", pilotText:"Heisterlux zoekt organisaties die willen ontdekken welke AI-tools, AI-agents en workflows werkelijk gebruikt worden. De pilot kan starten met een survey en register, zonder technische koppeling.",
-    pilotStep1:"Stap 1: AI Discovery Survey", pilotStep1Text:"Medewerkers en teams geven aan welke AI-tools ze gebruiken en waarvoor.",
-    pilotStep2:"Stap 2: Governance Review", pilotStep2Text:"IT, privacy en security beoordelen eigenaarschap, data, beleid en risico.",
-    pilotStep3:"Stap 3: Executive Report", pilotStep3Text:"Bestuur en management krijgen overzicht van risico's, kosten, shadow AI en vervolgstappen.",
-    sendButton:"Versturen"
-  },
-  en: {
-    navProblem:"Problem", navPlatform:"Platform", navDashboard:"Dashboard", navDemo:"Demo", navPilot:"Pilot",
-    heroTag:"AI Discovery & Governance Platform",
-    heroText:"Discover which AI tools, AI agents and workflows are being used across your organisation before risks, costs and compliance issues grow out of sight.",
-    heroDemo:"View Product B demo", heroPilot:"Join the pilot",
-    problemTitle:"The problem: organisations lack visibility into AI use",
-    problemIntro:"Employees use ChatGPT, Copilot, Claude, Gemini, Perplexity, Zapier, Make, n8n and other AI tools. Often there is no central view of which tools are used, who owns them, what data goes in and whether usage aligns with GDPR, the AI Act and information security.",
-    shadowTitle:"Shadow AI", shadowText:"AI use emerges outside IT, privacy and security. As a result, risks remain invisible.",
-    governanceTitle:"No ownership", governanceText:"Many AI tools lack a clear owner, review date, policy status or approval status.",
-    riskTitle:"Compliance risk", riskText:"Organisations need to explain which AI is used, for what purpose and what data is processed.",
-    platformTitle:"The solution: from AI register to AI Discovery & Governance",
-    platformIntro:"Heisterlux combines inventory, discovery, risk assessment and executive visibility in one platform. The first version works without technical integrations; later it can grow into Microsoft 365, Entra ID, Google Workspace and network data.",
-    moduleDiscovery:"1. AI Discovery", moduleDiscoveryText:"Map known and suspected AI tools through surveys, CSV import and later technical integrations.",
-    moduleRadar:"2. Shadow AI Radar", moduleRadarText:"Signal tools without ownership, without assessment or outside policy.",
-    moduleGovernance:"3. Governance Register", moduleGovernanceText:"Record owner, department, supplier, purpose, data, costs, status and review moments.",
-    moduleRisk:"4. Risk Engine", moduleRiskText:"Calculate risk based on data, ownership, status, costs and AI Act indication.",
-    dashboardTitle:"Executive dashboard", dashboardNotice:"This demo uses local browser storage. Nothing is sent to a server yet.",
-    metricSystems:"AI systems found", metricShadow:"Shadow AI signals", metricHighRisk:"High-risk systems", metricCosts:"Monthly costs",
-    complianceScoreTitle:"Governance score", complianceScoreText:"Based on ownership, status and risk assessment.",
-    aiActTitle:"AI Act readiness", aiActText:"Systems that still need AI Act assessment.",
-    demoTitle:"Demo: Product B", demoIntro:"Add AI systems, discover shadow AI signals, assess governance and export the overview. This is a clickable MVP demo, not a connected SaaS platform yet.",
-    tabRegister:"Governance register", tabDiscovery:"Discovery radar", tabRisk:"Risk engine", tabImport:"Import / export",
-    newSystemTitle:"Add new AI system", addButton:"Add",
-    tableName:"Name", tableSupplier:"Supplier", tableDept:"Department", tableOwner:"Owner", tableUsers:"Users", tableCosts:"Costs", tableStatus:"Status", tableRisk:"Risk", tableAiAct:"AI Act",
-    discoveryTitle:"Shadow AI Radar", discoveryText:"This radar shows AI tools that need attention because they are shadow AI, lack ownership or still need assessment.",
-    riskEngineTitle:"Risk Engine", riskEngineText:"The demo calculates signals based on status, risk, AI Act assessment, data use and ownership.",
-    importTitle:"CSV import / export", importText:"Use CSV for a first inventory based on interviews, surveys, procurement lists or SaaS exports.",
-    exportButton:"Export CSV", importButton:"Import CSV", resetButton:"Reset demo", csvFormat:"CSV columns: name,supplier,department,owner,purpose,dataType,users,cost,status,risk,aiAct,source",
-    pilotTitle:"Pilot: from demo to real organisation scan", pilotText:"Heisterlux is looking for organisations that want to discover which AI tools, AI agents and workflows are actually being used. The pilot can start with a survey and register, without technical integration.",
-    pilotStep1:"Step 1: AI Discovery Survey", pilotStep1Text:"Employees and teams indicate which AI tools they use and for what purpose.",
-    pilotStep2:"Step 2: Governance Review", pilotStep2Text:"IT, privacy and security assess ownership, data, policy and risk.",
-    pilotStep3:"Step 3: Executive Report", pilotStep3Text:"Executives and management get visibility into risks, costs, shadow AI and next steps.",
-    sendButton:"Send"
-  }
+const aiToolDB = {
+"chatgpt":{name:"ChatGPT",supplier:"OpenAI",category:"Generative AI",purpose:"Tekstgeneratie, analyse en assistentie",dataType:"Promptdata, documenten, mogelijk persoonsgegevens",risk:"Middel",aiAct:"General Purpose AI"},
+"chatgpt team":{name:"ChatGPT Team",supplier:"OpenAI",category:"Generative AI",purpose:"Teamgebruik van generatieve AI",dataType:"Interne data, documenten, promptdata",risk:"Middel",aiAct:"General Purpose AI"},
+"claude":{name:"Claude",supplier:"Anthropic",category:"Generative AI",purpose:"Tekstgeneratie en documentanalyse",dataType:"Promptdata, documenten, mogelijk persoonsgegevens",risk:"Middel",aiAct:"General Purpose AI"},
+"gemini":{name:"Gemini",supplier:"Google",category:"Generative AI",purpose:"Tekstgeneratie, zoeken en productiviteit",dataType:"Promptdata, documenten",risk:"Middel",aiAct:"General Purpose AI"},
+"copilot":{name:"Microsoft Copilot",supplier:"Microsoft",category:"Productivity AI",purpose:"Productiviteit binnen Microsoft 365",dataType:"Interne documenten, e-mail, agenda, Teams",risk:"Middel",aiAct:"General Purpose AI"},
+"microsoft copilot":{name:"Microsoft Copilot",supplier:"Microsoft",category:"Productivity AI",purpose:"Productiviteit binnen Microsoft 365",dataType:"Interne documenten, e-mail, agenda, Teams",risk:"Middel",aiAct:"General Purpose AI"},
+"perplexity":{name:"Perplexity",supplier:"Perplexity AI",category:"AI Search",purpose:"Online research en AI-zoeken",dataType:"Zoekvragen, promptdata, externe bronnen",risk:"Middel",aiAct:"General Purpose AI"},
+"notebooklm":{name:"NotebookLM",supplier:"Google",category:"Knowledge Assistant",purpose:"Documentanalyse en kennisassistent",dataType:"Geüploade documenten, interne kennis",risk:"Middel",aiAct:"General Purpose AI"},
+"cursor":{name:"Cursor",supplier:"Anysphere",category:"AI Coding Assistant",purpose:"Softwareontwikkeling met AI",dataType:"Broncode, repositories, prompts",risk:"Hoog",aiAct:"General Purpose AI"},
+"github copilot":{name:"GitHub Copilot",supplier:"GitHub / Microsoft",category:"AI Coding Assistant",purpose:"Codegeneratie en ontwikkelassistentie",dataType:"Broncode, editorcontext",risk:"Hoog",aiAct:"General Purpose AI"},
+"lovable":{name:"Lovable",supplier:"Lovable",category:"AI App Builder",purpose:"Apps bouwen met AI-prompts",dataType:"Applicatieconcepten, dataflows, mogelijk klantdata",risk:"Hoog",aiAct:"General Purpose AI"},
+"bolt":{name:"Bolt.new",supplier:"StackBlitz",category:"AI App Builder",purpose:"Webapps bouwen met AI",dataType:"Broncode, applicatiedata",risk:"Hoog",aiAct:"General Purpose AI"},
+"bolt.new":{name:"Bolt.new",supplier:"StackBlitz",category:"AI App Builder",purpose:"Webapps bouwen met AI",dataType:"Broncode, applicatiedata",risk:"Hoog",aiAct:"General Purpose AI"},
+"v0":{name:"v0",supplier:"Vercel",category:"AI App Builder",purpose:"UI en frontend genereren",dataType:"Ontwerpdata, code, prompts",risk:"Middel",aiAct:"General Purpose AI"},
+"replit":{name:"Replit AI",supplier:"Replit",category:"AI Coding Platform",purpose:"Codegeneratie en appontwikkeling",dataType:"Broncode, projectdata",risk:"Hoog",aiAct:"General Purpose AI"},
+"midjourney":{name:"Midjourney",supplier:"Midjourney",category:"Image Generation",purpose:"Beeldgeneratie",dataType:"Prompts, beeldmateriaal",risk:"Middel",aiAct:"General Purpose AI"},
+"runway":{name:"Runway",supplier:"Runway AI",category:"Video AI",purpose:"AI-video en mediabewerking",dataType:"Video, beeld, audio, prompts",risk:"Middel",aiAct:"General Purpose AI"},
+"elevenlabs":{name:"ElevenLabs",supplier:"ElevenLabs",category:"Voice AI",purpose:"Stemgeneratie en audio",dataType:"Stemdata, audio, scripts",risk:"Hoog",aiAct:"General Purpose AI"},
+"fireflies":{name:"Fireflies.ai",supplier:"Fireflies.ai",category:"Meeting AI",purpose:"Vergaderopnames en transcripties",dataType:"Gespreksdata, audio, mogelijk persoonsgegevens",risk:"Hoog",aiAct:"General Purpose AI"},
+"fireflies.ai":{name:"Fireflies.ai",supplier:"Fireflies.ai",category:"Meeting AI",purpose:"Vergaderopnames en transcripties",dataType:"Gespreksdata, audio, mogelijk persoonsgegevens",risk:"Hoog",aiAct:"General Purpose AI"},
+"otter":{name:"Otter.ai",supplier:"Otter.ai",category:"Meeting AI",purpose:"Transcriptie en meeting notes",dataType:"Gespreksdata, audio, persoonsgegevens",risk:"Hoog",aiAct:"General Purpose AI"},
+"otter.ai":{name:"Otter.ai",supplier:"Otter.ai",category:"Meeting AI",purpose:"Transcriptie en meeting notes",dataType:"Gespreksdata, audio, persoonsgegevens",risk:"Hoog",aiAct:"General Purpose AI"},
+"gamma":{name:"Gamma",supplier:"Gamma",category:"Presentation AI",purpose:"Presentaties en documenten genereren",dataType:"Content, prompts, mogelijk bedrijfsinformatie",risk:"Middel",aiAct:"General Purpose AI"},
+"canva":{name:"Canva Magic Studio",supplier:"Canva",category:"Design AI",purpose:"Ontwerp, beeld en contentgeneratie",dataType:"Beeld, tekst, merkdata",risk:"Middel",aiAct:"General Purpose AI"},
+"grammarly":{name:"Grammarly AI",supplier:"Grammarly",category:"Writing Assistant",purpose:"Schrijfverbetering en tekstsuggesties",dataType:"Tekstinput, documenten, mogelijk persoonsgegevens",risk:"Middel",aiAct:"General Purpose AI"},
+"deepl":{name:"DeepL Write",supplier:"DeepL",category:"Translation / Writing AI",purpose:"Vertalen en herschrijven",dataType:"Tekstinput, documenten",risk:"Middel",aiAct:"General Purpose AI"},
+"zapier":{name:"Zapier AI",supplier:"Zapier",category:"Workflow Automation",purpose:"Automatisering tussen SaaS-systemen",dataType:"Procesdata, API-data, klantdata",risk:"Hoog",aiAct:"General Purpose AI"},
+"make":{name:"Make",supplier:"Make",category:"Workflow Automation",purpose:"Automatisering en integraties",dataType:"Procesdata, API-data, klantdata",risk:"Hoog",aiAct:"General Purpose AI"},
+"n8n":{name:"n8n",supplier:"n8n",category:"Workflow / Agent Platform",purpose:"Automatisering en AI-agent workflows",dataType:"Procesdata, API-data, interne systemen",risk:"Hoog",aiAct:"General Purpose AI"},
+"dify":{name:"Dify",supplier:"Dify",category:"AI Agent Platform",purpose:"AI-apps en agents bouwen",dataType:"Promptdata, API-data, kennisbronnen",risk:"Hoog",aiAct:"General Purpose AI"},
+"flowise":{name:"Flowise",supplier:"Flowise",category:"AI Agent Platform",purpose:"LLM-flows en agents bouwen",dataType:"Promptdata, API-data, kennisbronnen",risk:"Hoog",aiAct:"General Purpose AI"},
+"langflow":{name:"Langflow",supplier:"Langflow",category:"AI Agent Platform",purpose:"AI-flows en agent pipelines",dataType:"Promptdata, API-data, kennisbronnen",risk:"Hoog",aiAct:"General Purpose AI"}
 };
 
-function setLanguage(lang){
-  localStorage.setItem("siteLanguage", lang);
-  document.documentElement.lang = lang;
-  document.querySelectorAll("[data-key]").forEach(el=>{
-    const key = el.getAttribute("data-key");
-    if(translations[lang][key]) el.innerText = translations[lang][key];
+function norm(value){return String(value || "").trim().toLowerCase();}
+function findKnownTool(name){
+  const key = norm(name);
+  if(aiToolDB[key]) return aiToolDB[key];
+  return Object.values(aiToolDB).find(tool => norm(tool.name) === key) || null;
+}
+function classifyUnknownTool(name){
+  const key = norm(name);
+  const tool = {name:name,supplier:"Onbekend",category:"Unknown AI Tool",purpose:"Nog te beoordelen",dataType:"Onbekend",risk:"Middel",aiAct:"Nog niet beoordeeld",knownTool:false,reason:"Deze AI-tool staat nog niet in de demo-database."};
+
+  if(key.includes("code") || key.includes("dev") || key.includes("builder") || key.includes("app") || key.includes("studio")){
+    tool.category = "Possible AI App / Coding Tool";
+    tool.risk = "Hoog";
+    tool.purpose = "Mogelijke app- of codegeneratie";
+    tool.dataType = "Mogelijk broncode, applicatiedata of bedrijfsinformatie";
+    tool.reason = "Naam lijkt op een ontwikkel- of appbouwtool. Let op broncode, datastromen en shadow development.";
+  } else if(key.includes("meet") || key.includes("note") || key.includes("transcript") || key.includes("voice") || key.includes("audio")){
+    tool.category = "Possible Meeting / Voice AI";
+    tool.risk = "Hoog";
+    tool.purpose = "Mogelijke opname, transcriptie of stemverwerking";
+    tool.dataType = "Mogelijk audio, gespreksdata of persoonsgegevens";
+    tool.reason = "Naam lijkt op meeting-, audio- of voice-AI. Let op privacy en toestemming.";
+  } else if(key.includes("image") || key.includes("video") || key.includes("avatar") || key.includes("design")){
+    tool.category = "Possible Media Generation AI";
+    tool.risk = "Middel";
+    tool.purpose = "Mogelijke beeld-, video- of contentgeneratie";
+    tool.dataType = "Mogelijk beeldmateriaal, merkdata of persoonsgegevens";
+    tool.reason = "Naam lijkt op media-AI. Let op beeldrechten, IP en persoonsgegevens.";
+  } else if(key.includes("agent") || key.includes("flow") || key.includes("automate") || key.includes("workflow")){
+    tool.category = "Possible Agent / Workflow AI";
+    tool.risk = "Hoog";
+    tool.purpose = "Mogelijke automatisering of agent-workflow";
+    tool.dataType = "Mogelijk procesdata, API-data of interne systeemdata";
+    tool.reason = "Naam lijkt op agent- of workflowautomatisering. Let op continuïteit, datastromen en eigenaarschap.";
+  }
+  return tool;
+}
+function detectTool(){
+  const value = document.getElementById("toolName").value.trim();
+  const box = document.getElementById("detectionResult");
+  if(!value){ box.style.display = "none"; return; }
+
+  const known = findKnownTool(value);
+  const tool = known || classifyUnknownTool(value);
+
+  document.getElementById("supplier").value = tool.supplier;
+  document.getElementById("category").value = tool.category;
+  document.getElementById("purpose").value = tool.purpose;
+  document.getElementById("dataType").value = tool.dataType;
+  document.getElementById("risk").value = tool.risk;
+  document.getElementById("aiAct").value = tool.aiAct;
+  document.getElementById("source").value = known ? "AI Tool Database" : "Unknown AI detection";
+
+  box.style.display = "block";
+  if(known){
+    box.innerHTML = "<strong>Bekende AI-tool herkend:</strong> " + tool.name + "<br><span class='small'>Leverancier: " + tool.supplier + " · Categorie: " + tool.category + " · Voorgesteld risico: " + tool.risk + "</span>";
+  } else {
+    box.innerHTML = "<strong>Onbekende AI-tool gedetecteerd:</strong> " + tool.name + "<br><span class='small'>" + tool.reason + "<br>Voorgestelde categorie: " + tool.category + " · Voorgesteld risico: " + tool.risk + "</span>";
+  }
+}
+function simulateUnknownTool(){
+  const examples = ["AgentFlow X","MeetingMind AI","PromptBuilder Studio","AutoWorkflow Agent","VoiceNote AI"];
+  document.getElementById("toolName").value = examples[Math.floor(Math.random() * examples.length)];
+  detectTool();
+}
+function populateOptions(){
+  const list = document.getElementById("aiToolOptions");
+  const names = {};
+  Object.values(aiToolDB).forEach(tool => names[tool.name] = true);
+  Object.keys(names).sort().forEach(name => {
+    const option = document.createElement("option");
+    option.value = name;
+    list.appendChild(option);
   });
 }
-
 const starterData = [
-  {name:"ChatGPT Team",supplier:"OpenAI",department:"ICT",owner:"ICT Manager",purpose:"Tekstgeneratie en analyse",dataType:"Interne data",users:43,cost:860,status:"Goedgekeurd",risk:"Middel",aiAct:"General Purpose AI",source:"Survey"},
-  {name:"Microsoft Copilot",supplier:"Microsoft",department:"Onderwijs",owner:"Informatiemanager",purpose:"Productiviteit",dataType:"Interne documenten",users:28,cost:840,status:"Goedgekeurd",risk:"Middel",aiAct:"General Purpose AI",source:"Microsoft 365"},
-  {name:"Claude",supplier:"Anthropic",department:"Onderzoek",owner:"",purpose:"Documentanalyse",dataType:"Mogelijk persoonsgegevens",users:12,cost:240,status:"Beoordelen",risk:"Hoog",aiAct:"Nog niet beoordeeld",source:"Survey"},
-  {name:"Perplexity",supplier:"Perplexity AI",department:"Marketing",owner:"",purpose:"Online research",dataType:"Openbare data",users:6,cost:120,status:"Shadow AI",risk:"Middel",aiAct:"Nog niet beoordeeld",source:"Browserlog"},
-  {name:"n8n Workflow",supplier:"n8n",department:"Operations",owner:"Procesmanager",purpose:"Automatisering",dataType:"Interne data",users:3,cost:50,status:"Beoordelen",risk:"Hoog",aiAct:"Nog niet beoordeeld",source:"CSV"}
+{name:"ChatGPT Team",supplier:"OpenAI",category:"Generative AI",department:"ICT",owner:"ICT Manager",purpose:"Tekstgeneratie en analyse",dataType:"Interne data",users:43,cost:860,status:"Goedgekeurd",risk:"Middel",aiAct:"General Purpose AI",source:"Survey",knownTool:true},
+{name:"Microsoft Copilot",supplier:"Microsoft",category:"Productivity AI",department:"Onderwijs",owner:"Informatiemanager",purpose:"Productiviteit",dataType:"Interne documenten",users:28,cost:840,status:"Goedgekeurd",risk:"Middel",aiAct:"General Purpose AI",source:"Microsoft 365",knownTool:true},
+{name:"Claude",supplier:"Anthropic",category:"Generative AI",department:"Onderzoek",owner:"",purpose:"Documentanalyse",dataType:"Mogelijk persoonsgegevens",users:12,cost:240,status:"Beoordelen",risk:"Hoog",aiAct:"Nog niet beoordeeld",source:"Survey",knownTool:true},
+{name:"Perplexity",supplier:"Perplexity AI",category:"AI Search",department:"Marketing",owner:"",purpose:"Online research",dataType:"Openbare data",users:6,cost:120,status:"Shadow AI",risk:"Middel",aiAct:"Nog niet beoordeeld",source:"Browserlog",knownTool:true},
+{name:"n8n Workflow",supplier:"n8n",category:"Workflow / Agent Platform",department:"Operations",owner:"Procesmanager",purpose:"Automatisering",dataType:"Interne data",users:3,cost:50,status:"Beoordelen",risk:"Hoog",aiAct:"Nog niet beoordeeld",source:"CSV",knownTool:true}
 ];
 
-let data = JSON.parse(localStorage.getItem("heisterluxProductB")) || starterData;
-
-function save(){localStorage.setItem("heisterluxProductB", JSON.stringify(data));}
-
+let data = JSON.parse(localStorage.getItem("heisterlux_ai_demo")) || starterData;
+function save(){localStorage.setItem("heisterlux_ai_demo", JSON.stringify(data));}
 function badgeClass(value){
   const v = String(value || "").toLowerCase();
-  if(v.includes("shadow")) return "shadow";
+  if(v.includes("shadow") || v.includes("unknown") || v.includes("onbekend")) return "shadow";
   if(v.includes("hoog") || v.includes("high")) return "high";
-  if(v.includes("middel") || v.includes("medium") || v.includes("beoordelen") || v.includes("review")) return "medium";
-  if(v.includes("goedgekeurd") || v.includes("approved") || v.includes("laag") || v.includes("low")) return "low";
+  if(v.includes("middel") || v.includes("medium") || v.includes("beoordelen")) return "medium";
+  if(v.includes("laag") || v.includes("low") || v.includes("goedgekeurd")) return "low";
   if(v.includes("general") || v.includes("act")) return "gpa";
   return "medium";
 }
-
 function addItem(){
+  const nameValue = document.getElementById("toolName").value.trim();
+  if(!nameValue){alert("Vul minimaal de naam van de AI-tool in.");return;}
   const item = {
-    name:document.getElementById("name").value.trim(),
+    name:nameValue,
     supplier:document.getElementById("supplier").value.trim(),
+    category:document.getElementById("category").value.trim(),
     department:document.getElementById("department").value.trim(),
     owner:document.getElementById("owner").value.trim(),
     purpose:document.getElementById("purpose").value.trim(),
@@ -657,132 +297,77 @@ function addItem(){
     status:document.getElementById("status").value,
     risk:document.getElementById("risk").value,
     aiAct:document.getElementById("aiAct").value,
-    source:document.getElementById("source").value.trim() || "Handmatig"
+    source:document.getElementById("source").value.trim() || "Handmatig",
+    knownTool:!!findKnownTool(nameValue)
   };
-  if(!item.name || !item.supplier){alert("Vul minimaal naam en leverancier in.");return;}
-  data.push(item); save(); render();
-  ["name","supplier","department","owner","purpose","dataType","users","cost","source"].forEach(id=>document.getElementById(id).value="");
+  data.push(item);
+  save();
+  render();
+  ["toolName","supplier","category","department","owner","purpose","dataType","users","cost","source"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("detectionResult").style.display = "none";
 }
-
 function render(){
-  const tbody = document.getElementById("table");
-  tbody.innerHTML="";
-  let totalCost=0, shadow=0, high=0, aiActOpen=0, governed=0;
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = "";
+  let total = 0, shadow = 0, high = 0;
 
-  data.forEach(i=>{
-    totalCost += Number(i.cost||0);
-    const isShadow = i.status === "Shadow AI" || !i.owner;
-    const isHigh = i.risk === "Hoog" || i.risk === "High";
-    const isOpen = !i.aiAct || i.aiAct === "Nog niet beoordeeld";
-    if(isShadow) shadow++;
-    if(isHigh) high++;
-    if(isOpen) aiActOpen++;
-    if(i.owner && i.status === "Goedgekeurd" && !isOpen) governed++;
-
-    tbody.innerHTML += `<tr>
-      <td><strong>${i.name}</strong><br><span class="small">${i.purpose || "-"}</span></td>
-      <td>${i.supplier}</td>
-      <td>${i.department || "-"}</td>
-      <td>${i.owner || "<span class='badge shadow'>Geen eigenaar</span>"}</td>
-      <td>${i.users || 0}</td>
-      <td>€${Number(i.cost||0)}</td>
-      <td><span class="badge ${badgeClass(i.status)}">${i.status}</span></td>
-      <td><span class="badge ${badgeClass(i.risk)}">${i.risk}</span></td>
-      <td><span class="badge ${badgeClass(i.aiAct)}">${i.aiAct}</span></td>
-    </tr>`;
+  data.forEach(item => {
+    total += Number(item.cost || 0);
+    if(item.status === "Shadow AI" || !item.owner || item.knownTool === false) shadow++;
+    if(item.risk === "Hoog") high++;
+    tbody.innerHTML += "<tr><td><strong>" + item.name + "</strong><br><span class='small'>" + (item.purpose || "-") + "</span></td><td>" + (item.supplier || "-") + "</td><td>" + (item.category || "-") + "</td><td>" + (item.department || "-") + "</td><td>" + (item.owner || "<span class='badge shadow'>Geen eigenaar</span>") + "</td><td>" + (item.users || 0) + "</td><td>€" + Number(item.cost || 0) + "</td><td><span class='badge " + badgeClass(item.status) + "'>" + item.status + "</span></td><td><span class='badge " + badgeClass(item.risk) + "'>" + item.risk + "</span></td><td><span class='badge " + badgeClass(item.aiAct) + "'>" + item.aiAct + "</span></td></tr>";
   });
 
-  const score = data.length ? Math.round((governed / data.length) * 100) : 0;
   document.getElementById("totalSystems").innerText = data.length;
   document.getElementById("shadowSystems").innerText = shadow;
   document.getElementById("highRiskSystems").innerText = high;
-  document.getElementById("monthlyCosts").innerText = "€" + totalCost;
-  document.getElementById("governanceScore").innerText = score + "%";
-  document.getElementById("governanceBar").style.width = score + "%";
-  document.getElementById("aiActOpen").innerText = aiActOpen;
-
-  renderRadar(); renderRisk();
+  document.getElementById("monthlyCosts").innerText = "€" + total;
+  renderRadar();
+  renderRisk();
+  renderKnowledge();
 }
-
 function renderRadar(){
   const list = document.getElementById("radarList");
-  const findings = data.filter(i => i.status === "Shadow AI" || !i.owner || i.aiAct === "Nog niet beoordeeld");
-  list.innerHTML = findings.length ? findings.map(i=>`
-    <div class="card" style="margin:12px 0;box-shadow:none;border:1px solid #e5e7eb;">
-      <strong>${i.name}</strong> · ${i.department || "Onbekende afdeling"}<br>
-      <span class="small">Bron: ${i.source || "-"} · Eigenaar: ${i.owner || "ontbreekt"} · AI Act: ${i.aiAct}</span>
-    </div>`).join("") : "<p>Geen shadow AI-signalen gevonden.</p>";
+  const findings = data.filter(item => item.status === "Shadow AI" || !item.owner || item.aiAct === "Nog niet beoordeeld" || item.knownTool === false);
+  list.innerHTML = findings.length ? findings.map(item => "<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>" + item.name + "</strong> · " + (item.department || "Onbekende afdeling") + "<br><span class='small'>Bron: " + (item.source || "-") + " · Categorie: " + (item.category || "-") + " · Eigenaar: " + (item.owner || "ontbreekt") + " · AI Act: " + item.aiAct + "</span></div>").join("") : "<p>Geen shadow AI-signalen gevonden.</p>";
 }
-
 function renderRisk(){
   const list = document.getElementById("riskList");
-  list.innerHTML = data.map(i=>{
+  list.innerHTML = data.map(item => {
     let points = 0;
-    if(i.risk === "Hoog") points += 35;
-    if(i.status === "Shadow AI") points += 25;
-    if(!i.owner) points += 20;
-    if(i.aiAct === "Nog niet beoordeeld") points += 10;
-    if(String(i.dataType||"").toLowerCase().includes("persoons")) points += 10;
-    let label = points >= 60 ? "Hoog" : points >= 30 ? "Middel" : "Laag";
-    return `<div class="card" style="margin:12px 0;box-shadow:none;border:1px solid #e5e7eb;">
-      <strong>${i.name}</strong> <span class="badge ${badgeClass(label)}">${label} risico · ${points}/100</span><br>
-      <span class="small">Datagebruik: ${i.dataType || "onbekend"} · Status: ${i.status} · Eigenaar: ${i.owner || "ontbreekt"}</span>
-    </div>`;
+    if(item.risk === "Hoog") points += 35;
+    if(item.status === "Shadow AI") points += 25;
+    if(!item.owner) points += 20;
+    if(item.aiAct === "Nog niet beoordeeld") points += 10;
+    if(item.knownTool === false) points += 10;
+    if(String(item.dataType || "").toLowerCase().includes("persoons")) points += 10;
+    if(String(item.dataType || "").toLowerCase().includes("broncode")) points += 10;
+    const label = points >= 60 ? "Hoog" : points >= 30 ? "Middel" : "Laag";
+    return "<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>" + item.name + "</strong> <span class='badge " + badgeClass(label) + "'>" + label + " risico · " + points + "/100</span><br><span class='small'>Categorie: " + (item.category || "-") + " · Datagebruik: " + (item.dataType || "onbekend") + " · Status: " + item.status + " · Eigenaar: " + (item.owner || "ontbreekt") + "</span></div>";
   }).join("");
 }
-
-function showTab(id){
-  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+function renderKnowledge(){
+  const list = document.getElementById("knowledgeList");
+  const unique = {};
+  Object.values(aiToolDB).forEach(tool => unique[tool.name] = tool);
+  list.innerHTML = Object.values(unique).sort((a,b) => a.name.localeCompare(b.name)).map(tool => "<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>" + tool.name + "</strong> <span class='badge " + badgeClass(tool.risk) + "'>" + tool.risk + "</span><br><span class='small'>Leverancier: " + tool.supplier + " · Categorie: " + tool.category + " · AI Act: " + tool.aiAct + "</span></div>").join("");
+}
+function showTab(id, button){
+  document.querySelectorAll(".panel").forEach(panel => panel.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  event.target.classList.add("active");
+  button.classList.add("active");
 }
-
-function exportCSV(){
-  const headers = ["name","supplier","department","owner","purpose","dataType","users","cost","status","risk","aiAct","source"];
-  const rows = data.map(obj => headers.map(h => `"${String(obj[h] ?? "").replace(/"/g,'""')}"`).join(","));
-  const csv = headers.join(",") + "\n" + rows.join("\n");
-  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "heisterlux-ai-discovery.csv";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importCSV(event){
-  const file = event.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split(/\r?\n/).filter(Boolean);
-    const headers = lines.shift().split(",").map(h=>h.replace(/"/g,"").trim());
-    const imported = lines.map(line=>{
-      const values = line.match(/("[^"]*(""[^"]*)*"|[^,]+)/g) || [];
-      const obj = {};
-      headers.forEach((h,idx)=>obj[h] = (values[idx] || "").replace(/^"|"$/g,"").replace(/""/g,'"'));
-      obj.users = Number(obj.users || 0);
-      obj.cost = Number(obj.cost || 0);
-      return obj;
-    });
-    data = data.concat(imported);
-    save(); render();
-  };
-  reader.readAsText(file);
-}
-
 function resetDemo(){
   if(confirm("Weet je zeker dat je de demo-data wilt herstellen?")){
+    localStorage.removeItem("heisterlux_ai_demo");
     data = starterData;
-    save(); render();
+    save();
+    render();
   }
 }
-
-const savedLanguage = localStorage.getItem("siteLanguage") || "nl";
-setLanguage(savedLanguage);
+populateOptions();
 render();
 </script>
-
 </body>
 </html>
