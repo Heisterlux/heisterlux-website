@@ -38,6 +38,17 @@ th{background:var(--dark);color:white}
 .db-toolbar input{flex:1;min-width:220px;margin:0}
 .db-toolbar button{width:auto;margin:0}
 .tool-link{color:var(--blue);text-decoration:none;font-weight:bold}.tool-link:hover{text-decoration:underline}
+.db-filters{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:10px;margin:12px 0}
+.db-filters select{margin:0}
+.db-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.db-actions button{width:auto;margin:0}
+.detail-button{background:#e2e8f0;color:#0f172a;border:0}
+.tool-details{display:none;margin-top:14px;padding-top:14px;border-top:1px solid #e5e7eb}
+.tool-details.open{display:block}
+.tool-details dl{display:grid;grid-template-columns:180px 1fr;gap:8px 14px;margin:0}
+.tool-details dt{font-weight:bold}
+.tool-details dd{margin:0}
+@media(max-width:700px){.db-filters{grid-template-columns:1fr}.tool-details dl{grid-template-columns:1fr}.tool-details dd{margin-bottom:8px}}
 footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-top:40px}
 @media(max-width:700px){header h1{font-size:38px}header p{font-size:18px}}
 </style>
@@ -107,7 +118,13 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 <div class="card">
 <h3>AI Tool Database</h3>
 <p class="small">Live knowledge base uit Supabase. Bezoekers kunnen deze gegevens alleen lezen.</p>
-<div class="db-toolbar"><input id="dbSearch" type="search" placeholder="Zoek op naam, leverancier of categorie" oninput="renderKnowledge()"><button onclick="loadKnowledgeBase()">Vernieuwen</button></div>
+<div class="db-toolbar"><input id="dbSearch" type="search" placeholder="Zoek op naam, leverancier, categorie of beschrijving" oninput="renderKnowledge()"><button onclick="loadKnowledgeBase()">Vernieuwen</button></div>
+<div class="db-filters">
+<select id="dbRiskFilter" onchange="renderKnowledge()"><option value="">Alle risiconiveaus</option></select>
+<select id="dbCategoryFilter" onchange="renderKnowledge()"><option value="">Alle categorieën</option></select>
+<select id="dbAiActFilter" onchange="renderKnowledge()"><option value="">Alle AI Act-classificaties</option></select>
+</div>
+<div class="db-actions"><button class="detail-button" onclick="resetKnowledgeFilters()">Filters wissen</button></div>
 <div id="databaseStatus" class="db-status">AI Database wordt geladen…</div>
 <div id="knowledgeList"></div>
 </div>
@@ -207,6 +224,7 @@ async function loadKnowledgeBase(){
   status.textContent=`Live verbonden met Supabase · ${knowledgeTools.length} AI-tools geladen`;
   status.style.background="#dcfce7";
   populateOptions();
+  populateKnowledgeFilters();
   renderKnowledge();
  }catch(error){
   console.error(error);
@@ -215,13 +233,84 @@ async function loadKnowledgeBase(){
   renderKnowledge();
  }
 }
+function populateKnowledgeFilters(){
+ const configs=[
+  {id:"dbRiskFilter",values:knowledgeTools.map(tool=>tool.risk_level)},
+  {id:"dbCategoryFilter",values:knowledgeTools.map(tool=>tool.category)},
+  {id:"dbAiActFilter",values:knowledgeTools.map(tool=>tool.ai_act_classification)}
+ ];
+ configs.forEach(config=>{
+  const select=document.getElementById(config.id);
+  if(!select)return;
+  const current=select.value;
+  const firstOption=select.options[0]?.outerHTML||"<option value=''>Alles</option>";
+  const values=[...new Set(config.values.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"nl"));
+  select.innerHTML=firstOption+values.map(value=>`<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("");
+  if(values.includes(current))select.value=current;
+ });
+}
+function resetKnowledgeFilters(){
+ const search=document.getElementById("dbSearch");
+ const risk=document.getElementById("dbRiskFilter");
+ const category=document.getElementById("dbCategoryFilter");
+ const aiAct=document.getElementById("dbAiActFilter");
+ if(search)search.value="";
+ if(risk)risk.value="";
+ if(category)category.value="";
+ if(aiAct)aiAct.value="";
+ renderKnowledge();
+}
+function toggleToolDetails(id){
+ const details=document.getElementById(`tool-details-${id}`);
+ const button=document.getElementById(`tool-button-${id}`);
+ if(!details||!button)return;
+ const open=details.classList.toggle("open");
+ button.textContent=open?"Details sluiten":"Bekijk details";
+ button.setAttribute("aria-expanded",String(open));
+}
+function formatDiscoveredDate(value){
+ if(!value)return"-";
+ const date=new Date(value);
+ return Number.isNaN(date.getTime())?String(value):date.toLocaleDateString("nl-NL");
+}
 function renderKnowledge(){
  const list=document.getElementById("knowledgeList");
  const query=norm(document.getElementById("dbSearch")?.value);
+ const riskFilter=document.getElementById("dbRiskFilter")?.value||"";
+ const categoryFilter=document.getElementById("dbCategoryFilter")?.value||"";
+ const aiActFilter=document.getElementById("dbAiActFilter")?.value||"";
  if(!knowledgeTools.length){list.innerHTML="<p class='small'>Nog geen live records beschikbaar.</p>";return;}
- const filtered=knowledgeTools.filter(tool=>!query||[tool.name,tool.vendor,tool.category,tool.risk_level,tool.ai_act_classification,tool.description].some(value=>norm(value).includes(query)));
- if(!filtered.length){list.innerHTML="<p>Geen AI-tools gevonden voor deze zoekopdracht.</p>";return;}
- list.innerHTML=filtered.map(tool=>{const url=safeUrl(tool.website);const title=url?`<a class="tool-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(tool.name)}</a>`:`<strong>${escapeHtml(tool.name)}</strong>`;return `<div class="card" style="margin:12px 0;box-shadow:none;border:1px solid #e5e7eb">${title} <span class="badge ${badgeClass(tool.risk_level)}">${escapeHtml(tool.risk_level||"Niet bepaald")}</span><br><span class="small">Leverancier: ${escapeHtml(tool.vendor||"-")} · Categorie: ${escapeHtml(tool.category||"-")} · AI Act: ${escapeHtml(tool.ai_act_classification||"-")}</span>${tool.description?`<p>${escapeHtml(tool.description)}</p>`:""}</div>`;}).join("");
+ const filtered=knowledgeTools.filter(tool=>{
+  const matchesQuery=!query||[tool.name,tool.vendor,tool.category,tool.risk_level,tool.ai_act_classification,tool.description].some(value=>norm(value).includes(query));
+  const matchesRisk=!riskFilter||tool.risk_level===riskFilter;
+  const matchesCategory=!categoryFilter||tool.category===categoryFilter;
+  const matchesAiAct=!aiActFilter||tool.ai_act_classification===aiActFilter;
+  return matchesQuery&&matchesRisk&&matchesCategory&&matchesAiAct;
+ });
+ if(!filtered.length){list.innerHTML="<p>Geen AI-tools gevonden met deze zoekopdracht en filters.</p>";return;}
+ list.innerHTML=filtered.map(tool=>{
+  const url=safeUrl(tool.website);
+  const detailId=String(tool.id).replace(/[^a-zA-Z0-9_-]/g,"");
+  const title=url?`<a class="tool-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(tool.name)}</a>`:`<strong>${escapeHtml(tool.name)}</strong>`;
+  return `<div class="card" style="margin:12px 0;box-shadow:none;border:1px solid #e5e7eb">
+   ${title} <span class="badge ${badgeClass(tool.risk_level)}">${escapeHtml(tool.risk_level||"Niet bepaald")}</span>
+   <br><span class="small">Leverancier: ${escapeHtml(tool.vendor||"-")} · Categorie: ${escapeHtml(tool.category||"-")} · AI Act: ${escapeHtml(tool.ai_act_classification||"-")}</span>
+   ${tool.description?`<p>${escapeHtml(tool.description)}</p>`:""}
+   <div class="db-actions"><button id="tool-button-${detailId}" class="detail-button" aria-expanded="false" onclick="toggleToolDetails('${detailId}')">Bekijk details</button></div>
+   <div id="tool-details-${detailId}" class="tool-details">
+    <dl>
+     <dt>Naam</dt><dd>${escapeHtml(tool.name||"-")}</dd>
+     <dt>Leverancier</dt><dd>${escapeHtml(tool.vendor||"-")}</dd>
+     <dt>Categorie</dt><dd>${escapeHtml(tool.category||"-")}</dd>
+     <dt>Risiconiveau</dt><dd>${escapeHtml(tool.risk_level||"-")}</dd>
+     <dt>AI Act-classificatie</dt><dd>${escapeHtml(tool.ai_act_classification||"-")}</dd>
+     <dt>Beschrijving</dt><dd>${escapeHtml(tool.description||"-")}</dd>
+     <dt>Website</dt><dd>${url?`<a class="tool-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`:"-"}</dd>
+     <dt>Ontdekt op</dt><dd>${escapeHtml(formatDiscoveredDate(tool.discovered_date))}</dd>
+    </dl>
+   </div>
+  </div>`;
+ }).join("");
 }
 function showTab(id,button){document.querySelectorAll(".panel").forEach(panel=>panel.classList.remove("active"));document.querySelectorAll(".tab").forEach(tab=>tab.classList.remove("active"));document.getElementById(id).classList.add("active");button.classList.add("active");if(id==="databasepanel"&&!knowledgeTools.length)loadKnowledgeBase();}
 function resetDemo(){if(confirm("Weet je zeker dat je de demo-data wilt herstellen?")){localStorage.removeItem("heisterlux_ai_demo");data=[...starterData];save();render();}}
