@@ -72,6 +72,13 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 .organization-row select{margin:0;max-width:420px}
 .organization-status{margin-top:10px;font-weight:bold}
 
+
+.table-action-buttons{display:flex;gap:6px;flex-wrap:wrap}
+.table-action-buttons button{width:auto;margin:0;padding:8px 10px;font-size:13px}
+.edit-button{background:#2563eb}
+.delete-button{background:#dc2626}
+.cancel-edit-button{background:#64748b}
+
 </style>
 </head>
 <body>
@@ -126,7 +133,7 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 </div>
 <div id="detectionResult" class="result" style="display:none"></div>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
-<button style="width:auto" onclick="addItem()">Toevoegen</button>
+<button id="saveSystemButton" style="width:auto" onclick="addItem()">Toevoegen</button>
 <button style="width:auto;background:var(--purple)" onclick="simulateUnknownTool()">Simuleer onbekende AI-tool</button>
 <button id="resetRegisterButton" style="width:auto;background:var(--red)" onclick="resetDemo()">Reset demo</button>
 <div id="registerDataStatus" class="notice" style="margin-top:12px">
@@ -134,7 +141,7 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
 </div>
 </div>
 </div>
-<div class="tablewrap"><table><thead><tr><th>Naam</th><th>Leverancier</th><th>Categorie</th><th>Afdeling</th><th>Eigenaar</th><th>Gebruikers</th><th>Kosten</th><th>Status</th><th>Risico</th><th>AI Act</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Naam</th><th>Leverancier</th><th>Categorie</th><th>Afdeling</th><th>Eigenaar</th><th>Gebruikers</th><th>Kosten</th><th>Status</th><th>Risico</th><th>AI Act</th><th>Acties</th></tr></thead><tbody id="tableBody"></tbody></table></div>
 </div>
 <div id="radar" class="panel"><div class="card"><h3>Shadow AI Radar</h3><div id="radarList"></div></div></div>
 <div id="riskpanel" class="panel"><div class="card"><h3>Risk Engine</h3><div id="riskList"></div></div></div>
@@ -198,7 +205,7 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
       </div>
 
       <div class="notice" style="margin-top:18px">
-        Het Register is gekoppeld aan de actieve organisatie. Nieuwe AI-systemen worden centraal in Supabase opgeslagen.
+        Het Register is gekoppeld aan de actieve organisatie. AI-systemen kunnen centraal worden toegevoegd, bewerkt en verwijderd.
       </div>
     </div>
   </div>
@@ -276,6 +283,106 @@ const starterData=[
 let data=JSON.parse(localStorage.getItem("heisterlux_ai_demo"))||starterData;
 function save(){localStorage.setItem("heisterlux_ai_demo",JSON.stringify(data));}
 function badgeClass(value){const v=norm(value);if(v.includes("shadow")||v.includes("unknown")||v.includes("onbekend")||v.includes("critical")||v.includes("prohibited"))return "shadow";if(v.includes("hoog")||v.includes("high"))return "high";if(v.includes("middel")||v.includes("medium")||v.includes("beoordelen")||v.includes("limited"))return "medium";if(v.includes("laag")||v.includes("low")||v.includes("minimal")||v.includes("goedgekeurd"))return "low";if(v.includes("general")||v.includes("act"))return "gpa";return "medium";}
+
+let editingSystemId=null;
+
+function resetSystemForm(){
+  ["toolName","supplier","category","department","owner","purpose","dataType","users","cost","source"]
+    .forEach(id=>document.getElementById(id).value="");
+
+  document.getElementById("status").value="Goedgekeurd";
+  document.getElementById("risk").value="Laag";
+  document.getElementById("aiAct").value="Nog niet beoordeeld";
+  document.getElementById("detectionResult").style.display="none";
+
+  editingSystemId=null;
+  const button=document.getElementById("saveSystemButton");
+  if(button)button.textContent="Toevoegen";
+
+  const cancelButton=document.getElementById("cancelEditButton");
+  if(cancelButton)cancelButton.remove();
+}
+
+function startEditSystem(id){
+  const item=data.find(system=>String(system.id)===String(id));
+  if(!item)return;
+
+  document.getElementById("toolName").value=item.name||"";
+  document.getElementById("supplier").value=item.supplier||"";
+  document.getElementById("category").value=item.category||"";
+  document.getElementById("department").value=item.department||"";
+  document.getElementById("owner").value=item.owner||"";
+  document.getElementById("purpose").value=item.purpose||"";
+  document.getElementById("dataType").value=item.dataType||"";
+  document.getElementById("users").value=Number(item.users||0);
+  document.getElementById("cost").value=Number(item.cost||0);
+  document.getElementById("status").value=item.status||"Goedgekeurd";
+  document.getElementById("risk").value=item.risk||"Laag";
+  document.getElementById("aiAct").value=item.aiAct||"Nog niet beoordeeld";
+  document.getElementById("source").value=item.source||"";
+
+  editingSystemId=id;
+
+  const button=document.getElementById("saveSystemButton");
+  if(button)button.textContent="Wijzigingen opslaan";
+
+  if(!document.getElementById("cancelEditButton")){
+    const cancel=document.createElement("button");
+    cancel.id="cancelEditButton";
+    cancel.type="button";
+    cancel.className="cancel-edit-button";
+    cancel.style.width="auto";
+    cancel.textContent="Annuleren";
+    cancel.onclick=resetSystemForm;
+    button.insertAdjacentElement("afterend",cancel);
+  }
+
+  document.getElementById("toolName").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+async function deleteSystem(id,name){
+  const session=getStoredAdminSession();
+  const organizationId=getActiveOrganizationId();
+
+  if(!session?.access_token||!organizationId){
+    alert("Log opnieuw in en selecteer een organisatie.");
+    return;
+  }
+
+  if(!confirm(`Weet je zeker dat je ${name} wilt verwijderen?`))return;
+
+  setRegisterStatus(`${name} wordt verwijderd...`);
+
+  try{
+    const response=await fetch(
+      `${SUPABASE_URL}/rest/v1/organization_ai_systems?id=eq.${encodeURIComponent(id)}&organization_id=eq.${encodeURIComponent(organizationId)}`,
+      {
+        method:"DELETE",
+        headers:{
+          apikey:SUPABASE_PUBLISHABLE_KEY,
+          Authorization:`Bearer ${session.access_token}`,
+          Prefer:"return=minimal"
+        }
+      }
+    );
+
+    if(!response.ok){
+      const raw=await response.text();
+      let result={};
+      try{result=raw?JSON.parse(raw):{};}catch(_error){}
+      throw new Error(result?.message||result?.hint||`Verwijderen is mislukt (${response.status}).`);
+    }
+
+    if(String(editingSystemId)===String(id)){
+      resetSystemForm();
+    }
+
+    await loadOrganizationSystemsReadOnly();
+  }catch(error){
+    setRegisterStatus(error?.message||"Verwijderen is mislukt.","error");
+  }
+}
+
 async function addItem(){
  const session=getStoredAdminSession();
  const organizationId=getActiveOrganizationId();
@@ -307,10 +414,15 @@ async function addItem(){
    setRegisterStatus("AI-systeem wordt opgeslagen...");
 
    try{
+     const isEditing=editingSystemId!==null;
+     const endpoint=isEditing
+       ?`${SUPABASE_URL}/rest/v1/organization_ai_systems?id=eq.${encodeURIComponent(editingSystemId)}&organization_id=eq.${encodeURIComponent(organizationId)}`
+       :`${SUPABASE_URL}/rest/v1/organization_ai_systems`;
+
      const response=await fetch(
-       `${SUPABASE_URL}/rest/v1/organization_ai_systems`,
+       endpoint,
        {
-         method:"POST",
+         method:isEditing?"PATCH":"POST",
          headers:{
            apikey:SUPABASE_PUBLISHABLE_KEY,
            Authorization:`Bearer ${session.access_token}`,
@@ -329,11 +441,7 @@ async function addItem(){
        throw new Error(result?.message||result?.hint||`Opslaan is mislukt (${response.status}).`);
      }
 
-     ["toolName","supplier","category","department","owner","purpose","dataType","users","cost","source"]
-       .forEach(id=>document.getElementById(id).value="");
-
-     document.getElementById("detectionResult").style.display="none";
-
+     resetSystemForm();
      await loadOrganizationSystemsReadOnly();
      return;
    }catch(error){
@@ -342,7 +450,7 @@ async function addItem(){
    }
  }
 const nameValue=document.getElementById("toolName").value.trim();if(!nameValue){alert("Vul minimaal de naam van de AI-tool in.");return;}const item={name:nameValue,supplier:document.getElementById("supplier").value.trim(),category:document.getElementById("category").value.trim(),department:document.getElementById("department").value.trim(),owner:document.getElementById("owner").value.trim(),purpose:document.getElementById("purpose").value.trim(),dataType:document.getElementById("dataType").value.trim(),users:Number(document.getElementById("users").value||0),cost:Number(document.getElementById("cost").value||0),status:document.getElementById("status").value,risk:document.getElementById("risk").value,aiAct:document.getElementById("aiAct").value,source:document.getElementById("source").value.trim()||"Handmatig",knownTool:!!findKnownTool(nameValue)};data.push(item);save();render();["toolName","supplier","category","department","owner","purpose","dataType","users","cost","source"].forEach(id=>document.getElementById(id).value="");document.getElementById("detectionResult").style.display="none";}
-function render(){const tbody=document.getElementById("tableBody");tbody.innerHTML="";let total=0,shadow=0,high=0;data.forEach(item=>{total+=Number(item.cost||0);if(item.status==="Shadow AI"||!item.owner||item.knownTool===false)shadow++;if(item.risk==="Hoog")high++;tbody.innerHTML+="<tr><td><strong>"+escapeHtml(item.name)+"</strong><br><span class='small'>"+escapeHtml(item.purpose||"-")+"</span></td><td>"+escapeHtml(item.supplier||"-")+"</td><td>"+escapeHtml(item.category||"-")+"</td><td>"+escapeHtml(item.department||"-")+"</td><td>"+(item.owner?escapeHtml(item.owner):"<span class='badge shadow'>Geen eigenaar</span>")+"</td><td>"+Number(item.users||0)+"</td><td>€"+Number(item.cost||0)+"</td><td><span class='badge "+badgeClass(item.status)+"'>"+escapeHtml(item.status)+"</span></td><td><span class='badge "+badgeClass(item.risk)+"'>"+escapeHtml(item.risk)+"</span></td><td><span class='badge "+badgeClass(item.aiAct)+"'>"+escapeHtml(item.aiAct)+"</span></td></tr>";});document.getElementById("totalSystems").innerText=data.length;document.getElementById("shadowSystems").innerText=shadow;document.getElementById("highRiskSystems").innerText=high;document.getElementById("monthlyCosts").innerText="€"+total;renderRadar();renderRisk();renderKnowledge();}
+function render(){const tbody=document.getElementById("tableBody");tbody.innerHTML="";let total=0,shadow=0,high=0;data.forEach(item=>{total+=Number(item.cost||0);if(item.status==="Shadow AI"||!item.owner||item.knownTool===false)shadow++;if(item.risk==="Hoog")high++;tbody.innerHTML+="<tr><td><strong>"+escapeHtml(item.name)+"</strong><br><span class='small'>"+escapeHtml(item.purpose||"-")+"</span></td><td>"+escapeHtml(item.supplier||"-")+"</td><td>"+escapeHtml(item.category||"-")+"</td><td>"+escapeHtml(item.department||"-")+"</td><td>"+(item.owner?escapeHtml(item.owner):"<span class='badge shadow'>Geen eigenaar</span>")+"</td><td>"+Number(item.users||0)+"</td><td>€"+Number(item.cost||0)+"</td><td><span class='badge "+badgeClass(item.status)+"'>"+escapeHtml(item.status)+"</span></td><td><span class='badge "+badgeClass(item.risk)+"'>"+escapeHtml(item.risk)+"</span></td><td><span class='badge "+badgeClass(item.aiAct)+"'>"+escapeHtml(item.aiAct)+"</span></td><td><div class='table-action-buttons'><button class='edit-button' onclick='startEditSystem("+JSON.stringify(item.id)+")'>Bewerken</button><button class='delete-button' onclick='deleteSystem("+JSON.stringify(item.id)+","+JSON.stringify(item.name)+")'>Verwijderen</button></div></td></tr>";});document.getElementById("totalSystems").innerText=data.length;document.getElementById("shadowSystems").innerText=shadow;document.getElementById("highRiskSystems").innerText=high;document.getElementById("monthlyCosts").innerText="€"+total;renderRadar();renderRisk();renderKnowledge();}
 
 function getActiveOrganizationId(){
   return localStorage.getItem("heisterlux_active_organization_id")||"";
