@@ -168,7 +168,7 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
       <div class="auth-grid">
         <input id="adminEmail" class="full" type="email" autocomplete="username" placeholder="E-mailadres">
         <input id="adminPassword" class="full" type="password" autocomplete="current-password" placeholder="Wachtwoord">
-        <button class="full" type="button" onclick="adminLogin()">Inloggen</button>
+        <button id="adminLoginButton" class="full" type="button" onclick="adminLogin()">Inloggen</button>
       </div>
       <div id="authMessage" class="auth-message"></div>
     </div>
@@ -716,12 +716,43 @@ async function fetchAdminUser(accessToken){
   if(!response.ok)throw new Error("Sessie is niet geldig.");
   return response.json();
 }
+function authRequestWithTimeout(email,password){
+  return new Promise((resolve,reject)=>{
+    const xhr=new XMLHttpRequest();
+    xhr.open("POST",`${SUPABASE_URL}/auth/v1/token?grant_type=password`,true);
+    xhr.timeout=12000;
+    xhr.setRequestHeader("apikey",SUPABASE_PUBLISHABLE_KEY);
+    xhr.setRequestHeader("Content-Type","application/json");
+
+    xhr.onload=()=>{
+      let data={};
+      try{data=xhr.responseText?JSON.parse(xhr.responseText):{};}catch(_error){}
+      if(xhr.status>=200&&xhr.status<300){
+        resolve(data);
+      }else{
+        reject(new Error(
+          data?.msg||
+          data?.error_description||
+          data?.message||
+          `Inloggen is mislukt (${xhr.status}).`
+        ));
+      }
+    };
+
+    xhr.onerror=()=>reject(new Error("De browser kon Supabase niet bereiken."));
+    xhr.ontimeout=()=>reject(new Error("Supabase reageerde niet binnen 12 seconden."));
+    xhr.onabort=()=>reject(new Error("De inlogpoging is afgebroken."));
+
+    xhr.send(JSON.stringify({email,password}));
+  });
+}
+
 async function adminLogin(){
   clearAuthMessage();
 
   const email=document.getElementById("adminEmail")?.value.trim();
   const password=document.getElementById("adminPassword")?.value||"";
-  const button=document.querySelector('#loginCard button');
+  const button=document.getElementById("adminLoginButton");
 
   if(!email||!password){
     setAuthMessage("Vul je e-mailadres en wachtwoord in.");
@@ -732,34 +763,10 @@ async function adminLogin(){
     button.disabled=true;
     button.textContent="Bezig met inloggen...";
   }
-  setAuthMessage("Bezig met inloggen...","success");
+  setAuthMessage("Verbinding maken met Supabase...","success");
 
   try{
-    const response=await fetchWithTimeout(
-      `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
-      {
-        method:"POST",
-        headers:{
-          apikey:SUPABASE_PUBLISHABLE_KEY,
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({email,password})
-      },
-      12000
-    );
-
-    const raw=await response.text();
-    let data={};
-    try{data=raw?JSON.parse(raw):{};}catch(_error){}
-
-    if(!response.ok){
-      throw new Error(
-        data?.msg||
-        data?.error_description||
-        data?.message||
-        `Inloggen is mislukt (${response.status}).`
-      );
-    }
+    const data=await authRequestWithTimeout(email,password);
 
     if(!data?.access_token||!data?.user){
       throw new Error("Supabase gaf geen geldige inlogsessie terug.");
@@ -770,17 +777,11 @@ async function adminLogin(){
     clearAuthMessage();
     document.getElementById("adminPassword").value="";
 
-    // Load organization data after the login screen has already changed.
     setTimeout(()=>loadOrganizations(),0);
   }catch(error){
     clearAdminSession();
     showLoggedOutAdmin();
-
-    const message=error?.name==="AbortError"
-      ?"Supabase reageerde niet binnen 12 seconden. Controleer de verbinding en probeer opnieuw."
-      :(error?.message||"Inloggen is mislukt.");
-
-    setAuthMessage(message);
+    setAuthMessage(error?.message||"Inloggen is mislukt.");
   }finally{
     if(button){
       button.disabled=false;
@@ -788,7 +789,6 @@ async function adminLogin(){
     }
   }
 }
-
 async function adminLogout(){
   const session=getStoredAdminSession();
 
