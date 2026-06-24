@@ -128,10 +128,7 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 <div style="display:flex;gap:10px;flex-wrap:wrap">
 <button style="width:auto" onclick="addItem()">Toevoegen</button>
 <button style="width:auto;background:var(--purple)" onclick="simulateUnknownTool()">Simuleer onbekende AI-tool</button>
-<button id="resetRegisterButton" style="width:auto;background:var(--red)" onclick="resetDemo()">Reset demo</button>
-<div id="registerDataStatus" class="notice" style="margin-top:12px">
-Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisatieregister te gebruiken.
-</div>
+<button style="width:auto;background:var(--red)" onclick="resetDemo()">Reset demo</button>
 </div>
 </div>
 <div class="tablewrap"><table><thead><tr><th>Naam</th><th>Leverancier</th><th>Categorie</th><th>Afdeling</th><th>Eigenaar</th><th>Gebruikers</th><th>Kosten</th><th>Status</th><th>Risico</th><th>AI Act</th></tr></thead><tbody id="tableBody"></tbody></table></div>
@@ -168,7 +165,7 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
       <div class="auth-grid">
         <input id="adminEmail" class="full" type="email" autocomplete="username" placeholder="E-mailadres">
         <input id="adminPassword" class="full" type="password" autocomplete="current-password" placeholder="Wachtwoord">
-        <button id="adminLoginButton" class="full" type="button" onclick="adminLogin()">Inloggen</button>
+        <button class="full" type="button" onclick="adminLogin()">Inloggen</button>
       </div>
       <div id="authMessage" class="auth-message"></div>
     </div>
@@ -208,7 +205,6 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
 <script>
 const SUPABASE_URL = "https://sgixvphwhaocvgfisodc.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_2Y20F3aHXEGwinpPInXOyw_pQ7kXm7N";
-
 let knowledgeTools = [];
 
 const aiToolDB = {
@@ -275,190 +271,10 @@ const starterData=[
 {name:"n8n Workflow",supplier:"n8n",category:"Workflow / Agent Platform",department:"Operations",owner:"Procesmanager",purpose:"Automatisering",dataType:"Interne data",users:3,cost:50,status:"Beoordelen",risk:"Hoog",aiAct:"Nog niet beoordeeld",source:"CSV",knownTool:true}
 ];
 let data=JSON.parse(localStorage.getItem("heisterlux_ai_demo"))||starterData;
-let registerUsesSupabase=false;
-
-function save(){
-  if(!registerUsesSupabase){
-    localStorage.setItem("heisterlux_ai_demo",JSON.stringify(data));
-  }
-}
-
-function getActiveOrganizationId(){
-  return localStorage.getItem("heisterlux_active_organization_id")||"";
-}
-
-function setRegisterStatus(message,type="notice"){
-  const el=document.getElementById("registerDataStatus");
-  if(!el)return;
-  el.className=type==="error"?"warning":type==="success"?"notice":"notice";
-  el.style.background=type==="error"?"#fee2e2":type==="success"?"#dcfce7":"#e0f2fe";
-  el.textContent=message;
-}
-
-function dbRowToRegisterItem(row){
-  return {
-    id:row.id,
-    name:row.name,
-    supplier:row.vendor||"",
-    category:row.category||"",
-    department:row.department||"",
-    owner:row.owner_name||"",
-    purpose:row.purpose||"",
-    dataType:row.data_used||"",
-    users:Number(row.users_count||0),
-    cost:Number(row.monthly_cost||0),
-    status:row.status||"Beoordelen",
-    risk:row.risk_level||"Middel",
-    aiAct:row.ai_act_classification||"Nog niet beoordeeld",
-    source:row.source||"Handmatig",
-    knownTool:!!findKnownTool(row.name)
-  };
-}
-
-async function loadOrganizationSystems(){
-  const accessToken=getCurrentAccessToken();
-  const organizationId=getActiveOrganizationId();
-  const resetButton=document.getElementById("resetRegisterButton");
-
-  if(!accessToken||!organizationId){
-    registerUsesSupabase=false;
-    data=JSON.parse(localStorage.getItem("heisterlux_ai_demo"))||starterData;
-    if(resetButton)resetButton.style.display="";
-    setRegisterStatus("Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisatieregister te gebruiken.");
-    render();
-    return;
-  }
-
-  registerUsesSupabase=true;
-  if(resetButton)resetButton.style.display="none";
-  setRegisterStatus("Centraal organisatieregister wordt geladen…");
-
-  try{
-    const columns="id,name,vendor,category,department,owner_name,purpose,data_used,users_count,monthly_cost,status,risk_level,ai_act_classification,source,created_at";
-    const response=await fetch(
-      `${SUPABASE_URL}/rest/v1/organization_ai_systems?organization_id=eq.${encodeURIComponent(organizationId)}&select=${columns}&order=created_at.asc`,
-      {
-        headers:{
-          apikey:SUPABASE_PUBLISHABLE_KEY,
-          Authorization:`Bearer ${accessToken}`,
-          Accept:"application/json"
-        }
-      }
-    );
-    const result=await response.json();
-    if(!response.ok){
-      throw new Error(result?.message||result?.hint||"Het organisatieregister kon niet worden geladen.");
-    }
-    data=(Array.isArray(result)?result:[]).map(dbRowToRegisterItem);
-    setRegisterStatus(`Live register van Heisterlux Demo · ${data.length} AI-systemen geladen`,"success");
-    render();
-  }catch(error){
-    data=[];
-    setRegisterStatus(error.message||"Het organisatieregister kon niet worden geladen.","error");
-    render();
-  }
-}
-
-async function addItem(){
-  const nameValue=document.getElementById("toolName").value.trim();
-  if(!nameValue){
-    alert("Vul minimaal de naam van de AI-tool in.");
-    return;
-  }
-
-  const item={
-    name:nameValue,
-    supplier:document.getElementById("supplier").value.trim(),
-    category:document.getElementById("category").value.trim(),
-    department:document.getElementById("department").value.trim(),
-    owner:document.getElementById("owner").value.trim(),
-    purpose:document.getElementById("purpose").value.trim(),
-    dataType:document.getElementById("dataType").value.trim(),
-    users:Number(document.getElementById("users").value||0),
-    cost:Number(document.getElementById("cost").value||0),
-    status:document.getElementById("status").value,
-    risk:document.getElementById("risk").value,
-    aiAct:document.getElementById("aiAct").value,
-    source:document.getElementById("source").value.trim()||"Handmatig",
-    knownTool:!!findKnownTool(nameValue)
-  };
-
-  if(registerUsesSupabase){
-    const accessToken=getCurrentAccessToken();
-    const organizationId=getActiveOrganizationId();
-    if(!accessToken||!organizationId){
-      alert("Log opnieuw in en selecteer een organisatie.");
-      return;
-    }
-
-    setRegisterStatus("AI-systeem wordt opgeslagen…");
-    const payload={
-      organization_id:Number(organizationId),
-      name:item.name,
-      vendor:item.supplier||null,
-      category:item.category||null,
-      department:item.department||null,
-      owner_name:item.owner||null,
-      purpose:item.purpose||null,
-      data_used:item.dataType||null,
-      users_count:item.users,
-      monthly_cost:item.cost,
-      status:item.status,
-      risk_level:item.risk,
-      ai_act_classification:item.aiAct,
-      source:item.source
-    };
-
-    try{
-      const response=await fetch(`${SUPABASE_URL}/rest/v1/organization_ai_systems`,{
-        method:"POST",
-        headers:{
-          apikey:SUPABASE_PUBLISHABLE_KEY,
-          Authorization:`Bearer ${accessToken}`,
-          "Content-Type":"application/json",
-          Prefer:"return=representation"
-        },
-        body:JSON.stringify(payload)
-      });
-      const result=await response.json();
-      if(!response.ok){
-        throw new Error(result?.message||result?.hint||"Opslaan is mislukt.");
-      }
-      await loadOrganizationSystems();
-    }catch(error){
-      setRegisterStatus(error.message||"Opslaan is mislukt.","error");
-      return;
-    }
-  }else{
-    data.push(item);
-    save();
-    render();
-  }
-
-  ["toolName","supplier","category","department","owner","purpose","dataType","users","cost","source"]
-    .forEach(id=>document.getElementById(id).value="");
-  document.getElementById("detectionResult").style.display="none";
-}
-
-function render(){
-  const tbody=document.getElementById("tableBody");
-  tbody.innerHTML="";
-  let total=0,shadow=0,high=0;
-  data.forEach(item=>{
-    total+=Number(item.cost||0);
-    if(item.status==="Shadow AI"||!item.owner||item.knownTool===false)shadow++;
-    if(item.risk==="Hoog")high++;
-    tbody.innerHTML+="<tr><td><strong>"+escapeHtml(item.name)+"</strong><br><span class='small'>"+escapeHtml(item.purpose||"-")+"</span></td><td>"+escapeHtml(item.supplier||"-")+"</td><td>"+escapeHtml(item.category||"-")+"</td><td>"+escapeHtml(item.department||"-")+"</td><td>"+(item.owner?escapeHtml(item.owner):"<span class='badge shadow'>Geen eigenaar</span>")+"</td><td>"+Number(item.users||0)+"</td><td>€"+Number(item.cost||0)+"</td><td><span class='badge "+badgeClass(item.status)+"'>"+escapeHtml(item.status)+"</span></td><td><span class='badge "+badgeClass(item.risk)+"'>"+escapeHtml(item.risk)+"</span></td><td><span class='badge "+badgeClass(item.aiAct)+"'>"+escapeHtml(item.aiAct)+"</span></td></tr>";
-  });
-  document.getElementById("totalSystems").innerText=data.length;
-  document.getElementById("shadowSystems").innerText=shadow;
-  document.getElementById("highRiskSystems").innerText=high;
-  document.getElementById("monthlyCosts").innerText="€"+total;
-  renderRadar();
-  renderRisk();
-  renderKnowledge();
-}
-
+function save(){localStorage.setItem("heisterlux_ai_demo",JSON.stringify(data));}
+function badgeClass(value){const v=norm(value);if(v.includes("shadow")||v.includes("unknown")||v.includes("onbekend")||v.includes("critical")||v.includes("prohibited"))return "shadow";if(v.includes("hoog")||v.includes("high"))return "high";if(v.includes("middel")||v.includes("medium")||v.includes("beoordelen")||v.includes("limited"))return "medium";if(v.includes("laag")||v.includes("low")||v.includes("minimal")||v.includes("goedgekeurd"))return "low";if(v.includes("general")||v.includes("act"))return "gpa";return "medium";}
+function addItem(){const nameValue=document.getElementById("toolName").value.trim();if(!nameValue){alert("Vul minimaal de naam van de AI-tool in.");return;}const item={name:nameValue,supplier:document.getElementById("supplier").value.trim(),category:document.getElementById("category").value.trim(),department:document.getElementById("department").value.trim(),owner:document.getElementById("owner").value.trim(),purpose:document.getElementById("purpose").value.trim(),dataType:document.getElementById("dataType").value.trim(),users:Number(document.getElementById("users").value||0),cost:Number(document.getElementById("cost").value||0),status:document.getElementById("status").value,risk:document.getElementById("risk").value,aiAct:document.getElementById("aiAct").value,source:document.getElementById("source").value.trim()||"Handmatig",knownTool:!!findKnownTool(nameValue)};data.push(item);save();render();["toolName","supplier","category","department","owner","purpose","dataType","users","cost","source"].forEach(id=>document.getElementById(id).value="");document.getElementById("detectionResult").style.display="none";}
+function render(){const tbody=document.getElementById("tableBody");tbody.innerHTML="";let total=0,shadow=0,high=0;data.forEach(item=>{total+=Number(item.cost||0);if(item.status==="Shadow AI"||!item.owner||item.knownTool===false)shadow++;if(item.risk==="Hoog")high++;tbody.innerHTML+="<tr><td><strong>"+escapeHtml(item.name)+"</strong><br><span class='small'>"+escapeHtml(item.purpose||"-")+"</span></td><td>"+escapeHtml(item.supplier||"-")+"</td><td>"+escapeHtml(item.category||"-")+"</td><td>"+escapeHtml(item.department||"-")+"</td><td>"+(item.owner?escapeHtml(item.owner):"<span class='badge shadow'>Geen eigenaar</span>")+"</td><td>"+Number(item.users||0)+"</td><td>€"+Number(item.cost||0)+"</td><td><span class='badge "+badgeClass(item.status)+"'>"+escapeHtml(item.status)+"</span></td><td><span class='badge "+badgeClass(item.risk)+"'>"+escapeHtml(item.risk)+"</span></td><td><span class='badge "+badgeClass(item.aiAct)+"'>"+escapeHtml(item.aiAct)+"</span></td></tr>";});document.getElementById("totalSystems").innerText=data.length;document.getElementById("shadowSystems").innerText=shadow;document.getElementById("highRiskSystems").innerText=high;document.getElementById("monthlyCosts").innerText="€"+total;renderRadar();renderRisk();renderKnowledge();}
 function renderRadar(){const list=document.getElementById("radarList");const findings=data.filter(item=>item.status==="Shadow AI"||!item.owner||item.aiAct==="Nog niet beoordeeld"||item.knownTool===false);list.innerHTML=findings.length?findings.map(item=>"<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>"+escapeHtml(item.name)+"</strong> · "+escapeHtml(item.department||"Onbekende afdeling")+"<br><span class='small'>Bron: "+escapeHtml(item.source||"-")+" · Categorie: "+escapeHtml(item.category||"-")+" · Eigenaar: "+escapeHtml(item.owner||"ontbreekt")+" · AI Act: "+escapeHtml(item.aiAct)+"</span></div>").join(""):"<p>Geen shadow AI-signalen gevonden.</p>";}
 function renderRisk(){const list=document.getElementById("riskList");list.innerHTML=data.map(item=>{let points=0;if(item.risk==="Hoog")points+=35;if(item.status==="Shadow AI")points+=25;if(!item.owner)points+=20;if(item.aiAct==="Nog niet beoordeeld")points+=10;if(item.knownTool===false)points+=10;if(norm(item.dataType).includes("persoons"))points+=10;if(norm(item.dataType).includes("broncode"))points+=10;const label=points>=60?"Hoog":points>=30?"Middel":"Laag";return "<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>"+escapeHtml(item.name)+"</strong> <span class='badge "+badgeClass(label)+"'>"+label+" risico · "+points+"/100</span><br><span class='small'>Categorie: "+escapeHtml(item.category||"-")+" · Datagebruik: "+escapeHtml(item.dataType||"onbekend")+" · Status: "+escapeHtml(item.status)+" · Eigenaar: "+escapeHtml(item.owner||"ontbreekt")+"</span></div>";}).join("");}
 
@@ -563,18 +379,7 @@ function renderKnowledge(){
  }).join("");
 }
 function showTab(id,button){document.querySelectorAll(".panel").forEach(panel=>panel.classList.remove("active"));document.querySelectorAll(".tab").forEach(tab=>tab.classList.remove("active"));document.getElementById(id).classList.add("active");button.classList.add("active");if(id==="databasepanel"&&!knowledgeTools.length)loadKnowledgeBase();}
-function resetDemo(){
-  if(registerUsesSupabase){
-    alert("De centrale organisatiedata kan niet met Reset demo worden verwijderd.");
-    return;
-  }
-  if(confirm("Weet je zeker dat je de lokale demo-data wilt herstellen?")){
-    localStorage.removeItem("heisterlux_ai_demo");
-    data=[...starterData];
-    save();
-    render();
-  }
-}
+function resetDemo(){if(confirm("Weet je zeker dat je de demo-data wilt herstellen?")){localStorage.removeItem("heisterlux_ai_demo");data=[...starterData];save();render();}}
 
 populateOptions();
 render();
@@ -656,19 +461,8 @@ function setActiveOrganization(id){
   }
   localStorage.setItem(ACTIVE_ORG_STORAGE_KEY,String(organization.id));
   if(status)status.textContent=`Actieve organisatie: ${organization.name}`;
-  loadOrganizationSystems();
 }
 
-
-async function fetchWithTimeout(url,options={},timeoutMs=15000){
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),timeoutMs);
-  try{
-    return await fetch(url,{...options,signal:controller.signal});
-  }finally{
-    clearTimeout(timer);
-  }
-}
 
 function setAuthMessage(message,type="error"){
   const el=document.getElementById("authMessage");
@@ -716,130 +510,74 @@ async function fetchAdminUser(accessToken){
   if(!response.ok)throw new Error("Sessie is niet geldig.");
   return response.json();
 }
-function authRequestWithTimeout(email,password){
-  return new Promise((resolve,reject)=>{
-    const xhr=new XMLHttpRequest();
-    xhr.open("POST",`${SUPABASE_URL}/auth/v1/token?grant_type=password`,true);
-    xhr.timeout=12000;
-    xhr.setRequestHeader("apikey",SUPABASE_PUBLISHABLE_KEY);
-    xhr.setRequestHeader("Content-Type","application/json");
-
-    xhr.onload=()=>{
-      let data={};
-      try{data=xhr.responseText?JSON.parse(xhr.responseText):{};}catch(_error){}
-      if(xhr.status>=200&&xhr.status<300){
-        resolve(data);
-      }else{
-        reject(new Error(
-          data?.msg||
-          data?.error_description||
-          data?.message||
-          `Inloggen is mislukt (${xhr.status}).`
-        ));
-      }
-    };
-
-    xhr.onerror=()=>reject(new Error("De browser kon Supabase niet bereiken."));
-    xhr.ontimeout=()=>reject(new Error("Supabase reageerde niet binnen 12 seconden."));
-    xhr.onabort=()=>reject(new Error("De inlogpoging is afgebroken."));
-
-    xhr.send(JSON.stringify({email,password}));
-  });
-}
-
 async function adminLogin(){
   clearAuthMessage();
-
   const email=document.getElementById("adminEmail")?.value.trim();
   const password=document.getElementById("adminPassword")?.value||"";
-  const button=document.getElementById("adminLoginButton");
-
   if(!email||!password){
     setAuthMessage("Vul je e-mailadres en wachtwoord in.");
     return;
   }
-
-  if(button){
-    button.disabled=true;
-    button.textContent="Bezig met inloggen...";
-  }
-  setAuthMessage("Verbinding maken met Supabase...","success");
-
+  setAuthMessage("Bezig met inloggen...","success");
   try{
-    const data=await authRequestWithTimeout(email,password);
-
-    if(!data?.access_token||!data?.user){
-      throw new Error("Supabase gaf geen geldige inlogsessie terug.");
-    }
-
+    const response=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+      method:"POST",
+      headers:{
+        apikey:SUPABASE_PUBLISHABLE_KEY,
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({email,password})
+    });
+    const data=await response.json();
+    if(!response.ok)throw new Error(data?.msg||data?.error_description||"Inloggen is mislukt.");
     storeAdminSession(data);
     showLoggedInAdmin(data.user);
+    await loadOrganizations();
     clearAuthMessage();
     document.getElementById("adminPassword").value="";
-
-    setTimeout(()=>loadOrganizations(),0);
   }catch(error){
     clearAdminSession();
     showLoggedOutAdmin();
-    setAuthMessage(error?.message||"Inloggen is mislukt.");
-  }finally{
-    if(button){
-      button.disabled=false;
-      button.textContent="Inloggen";
-    }
+    setAuthMessage(error.message||"Inloggen is mislukt.");
   }
 }
 async function adminLogout(){
   const session=getStoredAdminSession();
-
   try{
     if(session?.access_token){
-      await fetchWithTimeout(
-        `${SUPABASE_URL}/auth/v1/logout`,
-        {
-          method:"POST",
-          headers:{
-            apikey:SUPABASE_PUBLISHABLE_KEY,
-            Authorization:`Bearer ${session.access_token}`
-          }
-        },
-        8000
-      );
+      await fetch(`${SUPABASE_URL}/auth/v1/logout`,{
+        method:"POST",
+        headers:{
+          apikey:SUPABASE_PUBLISHABLE_KEY,
+          Authorization:`Bearer ${session.access_token}`
+        }
+      });
     }
   }catch(_error){}
-
   clearAdminSession();
   clearOrganizationUi();
   showLoggedOutAdmin();
-  loadOrganizationSystems();
   clearAuthMessage();
 }
-
 async function restoreAdminSession(){
   const session=getStoredAdminSession();
-
   if(!session?.access_token){
     showLoggedOutAdmin();
     return;
   }
-
   try{
     const user=await fetchAdminUser(session.access_token);
     showLoggedInAdmin(user);
-    setTimeout(()=>loadOrganizations(),0);
+    await loadOrganizations();
   }catch(_error){
     clearAdminSession();
-    clearOrganizationUi();
     showLoggedOutAdmin();
   }
 }
 function showAdminSection(){
   setTimeout(()=>document.getElementById("beheer")?.scrollIntoView({behavior:"smooth"}),0);
 }
-document.addEventListener("DOMContentLoaded",async()=>{
-  await restoreAdminSession();
-  await loadOrganizationSystems();
-});
+document.addEventListener("DOMContentLoaded",restoreAdminSession);
 
 </script>
 </body>
