@@ -128,7 +128,10 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 <div style="display:flex;gap:10px;flex-wrap:wrap">
 <button style="width:auto" onclick="addItem()">Toevoegen</button>
 <button style="width:auto;background:var(--purple)" onclick="simulateUnknownTool()">Simuleer onbekende AI-tool</button>
-<button style="width:auto;background:var(--red)" onclick="resetDemo()">Reset demo</button>
+<button id="resetRegisterButton" style="width:auto;background:var(--red)" onclick="resetDemo()">Reset demo</button>
+<div id="registerDataStatus" class="notice" style="margin-top:12px">
+Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisatieregister te bekijken.
+</div>
 </div>
 </div>
 <div class="tablewrap"><table><thead><tr><th>Naam</th><th>Leverancier</th><th>Categorie</th><th>Afdeling</th><th>Eigenaar</th><th>Gebruikers</th><th>Kosten</th><th>Status</th><th>Risico</th><th>AI Act</th></tr></thead><tbody id="tableBody"></tbody></table></div>
@@ -273,8 +276,92 @@ const starterData=[
 let data=JSON.parse(localStorage.getItem("heisterlux_ai_demo"))||starterData;
 function save(){localStorage.setItem("heisterlux_ai_demo",JSON.stringify(data));}
 function badgeClass(value){const v=norm(value);if(v.includes("shadow")||v.includes("unknown")||v.includes("onbekend")||v.includes("critical")||v.includes("prohibited"))return "shadow";if(v.includes("hoog")||v.includes("high"))return "high";if(v.includes("middel")||v.includes("medium")||v.includes("beoordelen")||v.includes("limited"))return "medium";if(v.includes("laag")||v.includes("low")||v.includes("minimal")||v.includes("goedgekeurd"))return "low";if(v.includes("general")||v.includes("act"))return "gpa";return "medium";}
-function addItem(){const nameValue=document.getElementById("toolName").value.trim();if(!nameValue){alert("Vul minimaal de naam van de AI-tool in.");return;}const item={name:nameValue,supplier:document.getElementById("supplier").value.trim(),category:document.getElementById("category").value.trim(),department:document.getElementById("department").value.trim(),owner:document.getElementById("owner").value.trim(),purpose:document.getElementById("purpose").value.trim(),dataType:document.getElementById("dataType").value.trim(),users:Number(document.getElementById("users").value||0),cost:Number(document.getElementById("cost").value||0),status:document.getElementById("status").value,risk:document.getElementById("risk").value,aiAct:document.getElementById("aiAct").value,source:document.getElementById("source").value.trim()||"Handmatig",knownTool:!!findKnownTool(nameValue)};data.push(item);save();render();["toolName","supplier","category","department","owner","purpose","dataType","users","cost","source"].forEach(id=>document.getElementById(id).value="");document.getElementById("detectionResult").style.display="none";}
+function addItem(){
+ const session=getStoredAdminSession();
+ const organizationId=getActiveOrganizationId();
+ if(session?.access_token&&organizationId){
+   alert("In deze teststap is het centrale register alleen-lezen. Toevoegen koppelen we pas nadat het uitlezen stabiel werkt.");
+   return;
+ }
+const nameValue=document.getElementById("toolName").value.trim();if(!nameValue){alert("Vul minimaal de naam van de AI-tool in.");return;}const item={name:nameValue,supplier:document.getElementById("supplier").value.trim(),category:document.getElementById("category").value.trim(),department:document.getElementById("department").value.trim(),owner:document.getElementById("owner").value.trim(),purpose:document.getElementById("purpose").value.trim(),dataType:document.getElementById("dataType").value.trim(),users:Number(document.getElementById("users").value||0),cost:Number(document.getElementById("cost").value||0),status:document.getElementById("status").value,risk:document.getElementById("risk").value,aiAct:document.getElementById("aiAct").value,source:document.getElementById("source").value.trim()||"Handmatig",knownTool:!!findKnownTool(nameValue)};data.push(item);save();render();["toolName","supplier","category","department","owner","purpose","dataType","users","cost","source"].forEach(id=>document.getElementById(id).value="");document.getElementById("detectionResult").style.display="none";}
 function render(){const tbody=document.getElementById("tableBody");tbody.innerHTML="";let total=0,shadow=0,high=0;data.forEach(item=>{total+=Number(item.cost||0);if(item.status==="Shadow AI"||!item.owner||item.knownTool===false)shadow++;if(item.risk==="Hoog")high++;tbody.innerHTML+="<tr><td><strong>"+escapeHtml(item.name)+"</strong><br><span class='small'>"+escapeHtml(item.purpose||"-")+"</span></td><td>"+escapeHtml(item.supplier||"-")+"</td><td>"+escapeHtml(item.category||"-")+"</td><td>"+escapeHtml(item.department||"-")+"</td><td>"+(item.owner?escapeHtml(item.owner):"<span class='badge shadow'>Geen eigenaar</span>")+"</td><td>"+Number(item.users||0)+"</td><td>€"+Number(item.cost||0)+"</td><td><span class='badge "+badgeClass(item.status)+"'>"+escapeHtml(item.status)+"</span></td><td><span class='badge "+badgeClass(item.risk)+"'>"+escapeHtml(item.risk)+"</span></td><td><span class='badge "+badgeClass(item.aiAct)+"'>"+escapeHtml(item.aiAct)+"</span></td></tr>";});document.getElementById("totalSystems").innerText=data.length;document.getElementById("shadowSystems").innerText=shadow;document.getElementById("highRiskSystems").innerText=high;document.getElementById("monthlyCosts").innerText="€"+total;renderRadar();renderRisk();renderKnowledge();}
+
+function getActiveOrganizationId(){
+  return localStorage.getItem("heisterlux_active_organization_id")||"";
+}
+
+function setRegisterStatus(message,type="notice"){
+  const el=document.getElementById("registerDataStatus");
+  if(!el)return;
+  el.textContent=message;
+  el.style.background=type==="error"?"#fee2e2":type==="success"?"#dcfce7":"#e0f2fe";
+  el.style.borderLeftColor=type==="error"?"#dc2626":type==="success"?"#16a34a":"#0284c7";
+}
+
+function dbRowToRegisterItem(row){
+  return {
+    id:row.id,
+    name:row.name,
+    supplier:row.vendor||"",
+    category:row.category||"",
+    department:row.department||"",
+    owner:row.owner_name||"",
+    purpose:row.purpose||"",
+    dataType:row.data_used||"",
+    users:Number(row.users_count||0),
+    cost:Number(row.monthly_cost||0),
+    status:row.status||"Beoordelen",
+    risk:row.risk_level||"Middel",
+    aiAct:row.ai_act_classification||"Nog niet beoordeeld",
+    source:row.source||"Handmatig",
+    knownTool:!!findKnownTool(row.name)
+  };
+}
+
+async function loadOrganizationSystemsReadOnly(){
+  const session=getStoredAdminSession();
+  const organizationId=getActiveOrganizationId();
+  const resetButton=document.getElementById("resetRegisterButton");
+
+  if(!session?.access_token||!organizationId){
+    if(resetButton)resetButton.style.display="";
+    data=JSON.parse(localStorage.getItem("heisterlux_ai_demo"))||starterData;
+    setRegisterStatus("Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisatieregister te bekijken.");
+    render();
+    return;
+  }
+
+  if(resetButton)resetButton.style.display="none";
+  setRegisterStatus("Centraal organisatieregister wordt geladen...");
+
+  try{
+    const columns="id,name,vendor,category,department,owner_name,purpose,data_used,users_count,monthly_cost,status,risk_level,ai_act_classification,source,created_at";
+    const response=await fetch(
+      `${SUPABASE_URL}/rest/v1/organization_ai_systems?organization_id=eq.${encodeURIComponent(organizationId)}&select=${columns}&order=created_at.asc`,
+      {
+        headers:{
+          apikey:SUPABASE_PUBLISHABLE_KEY,
+          Authorization:`Bearer ${session.access_token}`,
+          Accept:"application/json"
+        }
+      }
+    );
+
+    const result=await response.json();
+    if(!response.ok){
+      throw new Error(result?.message||result?.hint||"Het centrale register kon niet worden geladen.");
+    }
+
+    data=(Array.isArray(result)?result:[]).map(dbRowToRegisterItem);
+    setRegisterStatus(`Live register van Heisterlux Demo · ${data.length} AI-systemen geladen`,"success");
+    render();
+  }catch(error){
+    data=[];
+    setRegisterStatus(error?.message||"Het centrale register kon niet worden geladen.","error");
+    render();
+  }
+}
+
 function renderRadar(){const list=document.getElementById("radarList");const findings=data.filter(item=>item.status==="Shadow AI"||!item.owner||item.aiAct==="Nog niet beoordeeld"||item.knownTool===false);list.innerHTML=findings.length?findings.map(item=>"<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>"+escapeHtml(item.name)+"</strong> · "+escapeHtml(item.department||"Onbekende afdeling")+"<br><span class='small'>Bron: "+escapeHtml(item.source||"-")+" · Categorie: "+escapeHtml(item.category||"-")+" · Eigenaar: "+escapeHtml(item.owner||"ontbreekt")+" · AI Act: "+escapeHtml(item.aiAct)+"</span></div>").join(""):"<p>Geen shadow AI-signalen gevonden.</p>";}
 function renderRisk(){const list=document.getElementById("riskList");list.innerHTML=data.map(item=>{let points=0;if(item.risk==="Hoog")points+=35;if(item.status==="Shadow AI")points+=25;if(!item.owner)points+=20;if(item.aiAct==="Nog niet beoordeeld")points+=10;if(item.knownTool===false)points+=10;if(norm(item.dataType).includes("persoons"))points+=10;if(norm(item.dataType).includes("broncode"))points+=10;const label=points>=60?"Hoog":points>=30?"Middel":"Laag";return "<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>"+escapeHtml(item.name)+"</strong> <span class='badge "+badgeClass(label)+"'>"+label+" risico · "+points+"/100</span><br><span class='small'>Categorie: "+escapeHtml(item.category||"-")+" · Datagebruik: "+escapeHtml(item.dataType||"onbekend")+" · Status: "+escapeHtml(item.status)+" · Eigenaar: "+escapeHtml(item.owner||"ontbreekt")+"</span></div>";}).join("");}
 
@@ -379,7 +466,20 @@ function renderKnowledge(){
  }).join("");
 }
 function showTab(id,button){document.querySelectorAll(".panel").forEach(panel=>panel.classList.remove("active"));document.querySelectorAll(".tab").forEach(tab=>tab.classList.remove("active"));document.getElementById(id).classList.add("active");button.classList.add("active");if(id==="databasepanel"&&!knowledgeTools.length)loadKnowledgeBase();}
-function resetDemo(){if(confirm("Weet je zeker dat je de demo-data wilt herstellen?")){localStorage.removeItem("heisterlux_ai_demo");data=[...starterData];save();render();}}
+function resetDemo(){
+  const session=getStoredAdminSession();
+  const organizationId=getActiveOrganizationId();
+  if(session?.access_token&&organizationId){
+    alert("Het centrale register is alleen-lezen in deze teststap. Reset demo is alleen voor lokale demodata.");
+    return;
+  }
+  if(confirm("Weet je zeker dat je de lokale demo-data wilt herstellen?")){
+    localStorage.removeItem("heisterlux_ai_demo");
+    data=[...starterData];
+    save();
+    render();
+  }
+}
 
 populateOptions();
 render();
@@ -461,6 +561,7 @@ function setActiveOrganization(id){
   }
   localStorage.setItem(ACTIVE_ORG_STORAGE_KEY,String(organization.id));
   if(status)status.textContent=`Actieve organisatie: ${organization.name}`;
+  loadOrganizationSystemsReadOnly();
 }
 
 
@@ -557,6 +658,7 @@ async function adminLogout(){
   clearAdminSession();
   clearOrganizationUi();
   showLoggedOutAdmin();
+  loadOrganizationSystemsReadOnly();
   clearAuthMessage();
 }
 async function restoreAdminSession(){
@@ -577,7 +679,10 @@ async function restoreAdminSession(){
 function showAdminSection(){
   setTimeout(()=>document.getElementById("beheer")?.scrollIntoView({behavior:"smooth"}),0);
 }
-document.addEventListener("DOMContentLoaded",restoreAdminSession);
+document.addEventListener("DOMContentLoaded",async()=>{
+  await restoreAdminSession();
+  await loadOrganizationSystemsReadOnly();
+});
 
 </script>
 </body>
