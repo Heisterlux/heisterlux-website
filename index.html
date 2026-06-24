@@ -79,6 +79,11 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 .delete-button{background:#dc2626}
 .cancel-edit-button{background:#64748b}
 
+
+.risk-factors{margin:12px 0 0;padding-left:20px}
+.risk-factors li{margin:5px 0}
+.risk-advice{margin-top:12px;padding:10px 12px;border-radius:8px;background:#f8fafc;border-left:4px solid #64748b}
+
 </style>
 </head>
 <body>
@@ -538,7 +543,73 @@ async function loadOrganizationSystemsReadOnly(){
 }
 
 function renderRadar(){const list=document.getElementById("radarList");const findings=data.filter(item=>item.status==="Shadow AI"||!item.owner||item.aiAct==="Nog niet beoordeeld"||item.knownTool===false);list.innerHTML=findings.length?findings.map(item=>"<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>"+escapeHtml(item.name)+"</strong> · "+escapeHtml(item.department||"Onbekende afdeling")+"<br><span class='small'>Bron: "+escapeHtml(item.source||"-")+" · Categorie: "+escapeHtml(item.category||"-")+" · Eigenaar: "+escapeHtml(item.owner||"ontbreekt")+" · AI Act: "+escapeHtml(item.aiAct)+"</span></div>").join(""):"<p>Geen shadow AI-signalen gevonden.</p>";}
-function renderRisk(){const list=document.getElementById("riskList");list.innerHTML=data.map(item=>{let points=0;if(item.risk==="Hoog")points+=35;if(item.status==="Shadow AI")points+=25;if(!item.owner)points+=20;if(item.aiAct==="Nog niet beoordeeld")points+=10;if(item.knownTool===false)points+=10;if(norm(item.dataType).includes("persoons"))points+=10;if(norm(item.dataType).includes("broncode"))points+=10;const label=points>=60?"Hoog":points>=30?"Middel":"Laag";return "<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'><strong>"+escapeHtml(item.name)+"</strong> <span class='badge "+badgeClass(label)+"'>"+label+" risico · "+points+"/100</span><br><span class='small'>Categorie: "+escapeHtml(item.category||"-")+" · Datagebruik: "+escapeHtml(item.dataType||"onbekend")+" · Status: "+escapeHtml(item.status)+" · Eigenaar: "+escapeHtml(item.owner||"ontbreekt")+"</span></div>";}).join("");}
+function calculateRisk(item){
+ let points=0;
+ const factors=[];
+ const risk=norm(item.risk);
+ const status=norm(item.status);
+ const aiAct=norm(item.aiAct);
+ const dataType=norm(item.dataType);
+ const users=Number(item.users||0);
+
+ const add=(score,label)=>{points+=score;factors.push({score,label});};
+
+ if(risk.includes("kritiek")||risk.includes("critical"))add(35,"Opgegeven risiconiveau: kritiek");
+ else if(risk.includes("hoog")||risk.includes("high"))add(25,"Opgegeven risiconiveau: hoog");
+ else if(risk.includes("middel")||risk.includes("medium"))add(15,"Opgegeven risiconiveau: middel");
+ else add(5,"Opgegeven risiconiveau: laag");
+
+ if(status.includes("shadow"))add(20,"Niet-goedgekeurd gebruik (Shadow AI)");
+ else if(status.includes("beoordelen"))add(8,"Nog in beoordeling");
+
+ if(!String(item.owner||"").trim())add(15,"Geen eigenaar aangewezen");
+
+ if(aiAct.includes("prohibited")||aiAct.includes("verboden"))add(25,"AI Act: verboden categorie");
+ else if(aiAct.includes("high risk")||aiAct.includes("hoog risico"))add(20,"AI Act: hoog risico");
+ else if(aiAct.includes("nog niet")||aiAct.includes("not assessed"))add(12,"AI Act-classificatie ontbreekt");
+ else if(aiAct.includes("general purpose")||aiAct.includes("limited"))add(8,"AI Act: aanvullende transparantie/governance nodig");
+
+ if(dataType.includes("bijzondere persoonsgegevens")||dataType.includes("gezond")||dataType.includes("biometr"))add(25,"Zeer gevoelige persoonsgegevens");
+ else if(dataType.includes("persoons"))add(15,"Persoonsgegevens worden gebruikt");
+ else if(dataType.includes("financ"))add(15,"Financiële gegevens worden gebruikt");
+ else if(dataType.includes("vertrouw")||dataType.includes("confident"))add(12,"Vertrouwelijke gegevens worden gebruikt");
+ else if(dataType.includes("broncode")||dataType.includes("source code"))add(12,"Broncode wordt gebruikt");
+ else if(!dataType||dataType==="onbekend"||dataType==="unknown")add(8,"Datagebruik is onbekend");
+
+ if(item.knownTool===false)add(10,"Tool ontbreekt in de AI Knowledge Base");
+ if(!String(item.supplier||"").trim()||norm(item.supplier).includes("onbekend"))add(8,"Leverancier is onbekend");
+
+ if(users>=100)add(10,"Groot bereik: 100 of meer gebruikers");
+ else if(users>=25)add(6,"Breed gebruik: 25 of meer gebruikers");
+ else if(users>=5)add(3,"Meerdere gebruikers");
+
+ points=Math.min(100,points);
+ const label=points>=70?"Hoog":points>=40?"Middel":"Laag";
+ const advice=points>=70
+  ?"Direct beoordelen, eigenaar aanwijzen en gebruik zo nodig tijdelijk beperken."
+  :points>=40
+   ?"Aanvullende beoordeling uitvoeren en ontbrekende governance-informatie aanvullen."
+   :"Regulier monitoren en periodiek opnieuw beoordelen.";
+ return {points,label,factors,advice};
+}
+function renderRisk(){
+ const list=document.getElementById("riskList");
+ if(!data.length){list.innerHTML="<p>Geen AI-systemen beschikbaar voor risicobeoordeling.</p>";return;}
+ list.innerHTML=data.map(item=>{
+  const result=calculateRisk(item);
+  const factors=result.factors
+   .sort((a,b)=>b.score-a.score)
+   .map(f=>`<li>${escapeHtml(f.label)} <strong>+${f.score}</strong></li>`)
+   .join("");
+  return `<div class='card' style='margin:12px 0;box-shadow:none;border:1px solid #e5e7eb'>
+   <strong>${escapeHtml(item.name)}</strong>
+   <span class='badge ${badgeClass(result.label)}'>${result.label} risico · ${result.points}/100</span>
+   <br><span class='small'>Categorie: ${escapeHtml(item.category||"-")} · Datagebruik: ${escapeHtml(item.dataType||"onbekend")} · Status: ${escapeHtml(item.status)} · Eigenaar: ${escapeHtml(item.owner||"ontbreekt")}</span>
+   <ul class='risk-factors'>${factors}</ul>
+   <div class='risk-advice'><strong>Advies:</strong> ${escapeHtml(result.advice)}</div>
+  </div>`;
+ }).join("");
+}
 
 async function loadKnowledgeBase(){
  const status=document.getElementById("databaseStatus");
