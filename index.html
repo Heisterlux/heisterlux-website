@@ -205,21 +205,10 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
 </section>
 
 <footer>© 2026 Heisterlux · AI Discovery & Governance Platform</footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://sgixvphwhaocvgfisodc.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_2Y20F3aHXEGwinpPInXOyw_pQ7kXm7N";
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY,
-  {
-    auth:{
-      persistSession:true,
-      autoRefreshToken:true,
-      detectSessionInUrl:true
-    }
-  }
-);
+
 let knowledgeTools = [];
 
 const aiToolDB = {
@@ -729,78 +718,118 @@ async function fetchAdminUser(accessToken){
 }
 async function adminLogin(){
   clearAuthMessage();
+
   const email=document.getElementById("adminEmail")?.value.trim();
   const password=document.getElementById("adminPassword")?.value||"";
+  const button=document.querySelector('#loginCard button');
 
   if(!email||!password){
     setAuthMessage("Vul je e-mailadres en wachtwoord in.");
     return;
   }
 
+  if(button){
+    button.disabled=true;
+    button.textContent="Bezig met inloggen...";
+  }
   setAuthMessage("Bezig met inloggen...","success");
 
-  const timeout=new Promise((_,reject)=>{
-    setTimeout(()=>reject(new Error("De verbinding met Supabase duurde te lang. Probeer het opnieuw.")),15000);
-  });
-
   try{
-    const loginRequest=supabaseClient.auth.signInWithPassword({email,password});
-    const {data:authData,error}=await Promise.race([loginRequest,timeout]);
+    const response=await fetchWithTimeout(
+      `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+      {
+        method:"POST",
+        headers:{
+          apikey:SUPABASE_PUBLISHABLE_KEY,
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({email,password})
+      },
+      12000
+    );
 
-    if(error)throw error;
-    if(!authData?.session||!authData?.user){
-      throw new Error("Er is geen geldige sessie ontvangen.");
+    const raw=await response.text();
+    let data={};
+    try{data=raw?JSON.parse(raw):{};}catch(_error){}
+
+    if(!response.ok){
+      throw new Error(
+        data?.msg||
+        data?.error_description||
+        data?.message||
+        `Inloggen is mislukt (${response.status}).`
+      );
     }
 
-    storeAdminSession({
-      access_token:authData.session.access_token,
-      refresh_token:authData.session.refresh_token,
-      expires_at:authData.session.expires_at,
-      user:authData.user
-    });
+    if(!data?.access_token||!data?.user){
+      throw new Error("Supabase gaf geen geldige inlogsessie terug.");
+    }
 
-    showLoggedInAdmin(authData.user);
+    storeAdminSession(data);
+    showLoggedInAdmin(data.user);
     clearAuthMessage();
     document.getElementById("adminPassword").value="";
-    loadOrganizations();
+
+    // Load organization data after the login screen has already changed.
+    setTimeout(()=>loadOrganizations(),0);
   }catch(error){
     clearAdminSession();
     showLoggedOutAdmin();
-    setAuthMessage(error?.message||"Inloggen is mislukt.");
+
+    const message=error?.name==="AbortError"
+      ?"Supabase reageerde niet binnen 12 seconden. Controleer de verbinding en probeer opnieuw."
+      :(error?.message||"Inloggen is mislukt.");
+
+    setAuthMessage(message);
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent="Inloggen";
+    }
   }
 }
+
 async function adminLogout(){
+  const session=getStoredAdminSession();
+
   try{
-    await supabaseClient.auth.signOut();
+    if(session?.access_token){
+      await fetchWithTimeout(
+        `${SUPABASE_URL}/auth/v1/logout`,
+        {
+          method:"POST",
+          headers:{
+            apikey:SUPABASE_PUBLISHABLE_KEY,
+            Authorization:`Bearer ${session.access_token}`
+          }
+        },
+        8000
+      );
+    }
   }catch(_error){}
+
   clearAdminSession();
   clearOrganizationUi();
   showLoggedOutAdmin();
   loadOrganizationSystems();
   clearAuthMessage();
 }
+
 async function restoreAdminSession(){
+  const session=getStoredAdminSession();
+
+  if(!session?.access_token){
+    showLoggedOutAdmin();
+    return;
+  }
+
   try{
-    const {data,error}=await supabaseClient.auth.getSession();
-    if(error)throw error;
-
-    if(!data?.session?.user){
-      clearAdminSession();
-      showLoggedOutAdmin();
-      return;
-    }
-
-    storeAdminSession({
-      access_token:data.session.access_token,
-      refresh_token:data.session.refresh_token,
-      expires_at:data.session.expires_at,
-      user:data.session.user
-    });
-
-    showLoggedInAdmin(data.session.user);
-    await loadOrganizations();
+    const user=await fetchAdminUser(session.access_token);
+    showLoggedInAdmin(user);
+    setTimeout(()=>loadOrganizations(),0);
   }catch(_error){
     clearAdminSession();
+    clearOrganizationUi();
     showLoggedOutAdmin();
   }
 }
