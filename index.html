@@ -66,6 +66,12 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 .admin-badge{display:inline-block;background:#dcfce7;color:#166534;padding:6px 10px;border-radius:999px;font-weight:bold}
 @media(max-width:700px){.auth-grid{grid-template-columns:1fr}}
 
+
+.organization-card{margin-top:20px;padding:18px;border:1px solid #dbeafe;border-radius:12px;background:#f8fbff}
+.organization-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.organization-row select{margin:0;max-width:420px}
+.organization-status{margin-top:10px;font-weight:bold}
+
 </style>
 </head>
 <body>
@@ -175,8 +181,22 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
       </div>
       <hr style="margin:22px 0;border:0;border-top:1px solid #e5e7eb">
       <h3>Beheeromgeving actief</h3>
-      <p>De beveiligde login werkt. In de volgende stap koppelen we hier het centrale organisatieregister aan Supabase.</p>
-      <div class="notice">Nog geen organisatiegegevens gekoppeld. Deze omgeving is nu alleen een veilige toegangslaag.</div>
+      <p>De beveiligde login werkt. Hieronder wordt jouw organisatie live uit Supabase geladen.</p>
+
+      <div class="organization-card">
+        <h3 style="margin-top:0">Organisatie</h3>
+        <div class="organization-row">
+          <select id="organizationSelect" onchange="setActiveOrganization(this.value)">
+            <option value="">Organisatie laden...</option>
+          </select>
+          <button type="button" onclick="loadOrganizations()">Vernieuwen</button>
+        </div>
+        <div id="organizationStatus" class="organization-status">Nog geen organisatie geladen.</div>
+      </div>
+
+      <div class="notice" style="margin-top:18px">
+        In de volgende stap koppelen we het Register aan de actieve organisatie.
+      </div>
     </div>
   </div>
 </section>
@@ -367,6 +387,83 @@ loadKnowledgeBase();
 
 const AUTH_STORAGE_KEY="heisterlux_admin_session";
 
+const ACTIVE_ORG_STORAGE_KEY="heisterlux_active_organization_id";
+let organizationsCache=[];
+
+function getCurrentAccessToken(){
+  return getStoredAdminSession()?.access_token||"";
+}
+
+function clearOrganizationUi(){
+  organizationsCache=[];
+  localStorage.removeItem(ACTIVE_ORG_STORAGE_KEY);
+  const select=document.getElementById("organizationSelect");
+  const status=document.getElementById("organizationStatus");
+  if(select)select.innerHTML='<option value="">Geen organisatie geladen</option>';
+  if(status)status.textContent="Nog geen organisatie geladen.";
+}
+
+async function loadOrganizations(){
+  const accessToken=getCurrentAccessToken();
+  const select=document.getElementById("organizationSelect");
+  const status=document.getElementById("organizationStatus");
+  if(!accessToken){
+    clearOrganizationUi();
+    return;
+  }
+  if(select)select.innerHTML='<option value="">Organisatie laden...</option>';
+  if(status)status.textContent="Organisaties ophalen...";
+  try{
+    const response=await fetch(
+      `${SUPABASE_URL}/rest/v1/organizations?select=id,name,created_at&order=name.asc`,
+      {
+        headers:{
+          apikey:SUPABASE_PUBLISHABLE_KEY,
+          Authorization:`Bearer ${accessToken}`,
+          Accept:"application/json"
+        }
+      }
+    );
+    const data=await response.json();
+    if(!response.ok){
+      throw new Error(data?.message||data?.hint||"Organisaties konden niet worden geladen.");
+    }
+
+    organizationsCache=Array.isArray(data)?data:[];
+    if(!organizationsCache.length){
+      if(select)select.innerHTML='<option value="">Geen organisaties gevonden</option>';
+      if(status)status.textContent="Er is nog geen organisatie aan dit account gekoppeld.";
+      return;
+    }
+
+    const storedId=localStorage.getItem(ACTIVE_ORG_STORAGE_KEY);
+    const active=organizationsCache.find(org=>String(org.id)===String(storedId))||organizationsCache[0];
+
+    if(select){
+      select.innerHTML=organizationsCache
+        .map(org=>`<option value="${escapeHtml(org.id)}">${escapeHtml(org.name)}</option>`)
+        .join("");
+      select.value=String(active.id);
+    }
+    setActiveOrganization(active.id);
+  }catch(error){
+    if(select)select.innerHTML='<option value="">Laden mislukt</option>';
+    if(status)status.textContent=error.message||"Organisaties konden niet worden geladen.";
+  }
+}
+
+function setActiveOrganization(id){
+  const organization=organizationsCache.find(org=>String(org.id)===String(id));
+  const status=document.getElementById("organizationStatus");
+  if(!organization){
+    if(status)status.textContent="Geen actieve organisatie geselecteerd.";
+    return;
+  }
+  localStorage.setItem(ACTIVE_ORG_STORAGE_KEY,String(organization.id));
+  if(status)status.textContent=`Actieve organisatie: ${organization.name}`;
+}
+
+
 function setAuthMessage(message,type="error"){
   const el=document.getElementById("authMessage");
   if(!el)return;
@@ -435,6 +532,7 @@ async function adminLogin(){
     if(!response.ok)throw new Error(data?.msg||data?.error_description||"Inloggen is mislukt.");
     storeAdminSession(data);
     showLoggedInAdmin(data.user);
+    await loadOrganizations();
     clearAuthMessage();
     document.getElementById("adminPassword").value="";
   }catch(error){
@@ -457,6 +555,7 @@ async function adminLogout(){
     }
   }catch(_error){}
   clearAdminSession();
+  clearOrganizationUi();
   showLoggedOutAdmin();
   clearAuthMessage();
 }
@@ -469,6 +568,7 @@ async function restoreAdminSession(){
   try{
     const user=await fetchAdminUser(session.access_token);
     showLoggedInAdmin(user);
+    await loadOrganizations();
   }catch(_error){
     clearAdminSession();
     showLoggedOutAdmin();
