@@ -481,6 +481,20 @@ async function addItem(){
        throw new Error(result?.message||result?.hint||`Opslaan is mislukt (${response.status}).`);
      }
 
+     if(isEditing){
+       const savedRow=Array.isArray(result)?result[0]:null;
+       if(!savedRow){
+         throw new Error("De wijziging is niet door Supabase bevestigd.");
+       }
+
+       const expectedCountry=payload.application_country;
+       const savedCountry=savedRow.application_country;
+
+       if(savedCountry!==expectedCountry){
+         throw new Error(`Land is niet opgeslagen. Verwacht: ${expectedCountry}, ontvangen: ${savedCountry||"leeg"}.`);
+       }
+     }
+
      resetSystemForm();
      await loadOrganizationSystemsReadOnly();
      return;
