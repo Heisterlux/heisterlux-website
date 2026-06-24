@@ -205,9 +205,21 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
 </section>
 
 <footer>© 2026 Heisterlux · AI Discovery & Governance Platform</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://sgixvphwhaocvgfisodc.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_2Y20F3aHXEGwinpPInXOyw_pQ7kXm7N";
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth:{
+      persistSession:true,
+      autoRefreshToken:true,
+      detectSessionInUrl:true
+    }
+  }
+);
 let knowledgeTools = [];
 
 const aiToolDB = {
@@ -719,48 +731,47 @@ async function adminLogin(){
   clearAuthMessage();
   const email=document.getElementById("adminEmail")?.value.trim();
   const password=document.getElementById("adminPassword")?.value||"";
+
   if(!email||!password){
     setAuthMessage("Vul je e-mailadres en wachtwoord in.");
     return;
   }
+
   setAuthMessage("Bezig met inloggen...","success");
+
+  const timeout=new Promise((_,reject)=>{
+    setTimeout(()=>reject(new Error("De verbinding met Supabase duurde te lang. Probeer het opnieuw.")),15000);
+  });
+
   try{
-    const response=await fetchWithTimeout(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
-      method:"POST",
-      headers:{
-        apikey:SUPABASE_PUBLISHABLE_KEY,
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({email,password})
-    },15000);
-    const data=await response.json();
-    if(!response.ok)throw new Error(data?.msg||data?.error_description||"Inloggen is mislukt.");
-    storeAdminSession(data);
-    showLoggedInAdmin(data.user);
+    const loginRequest=supabaseClient.auth.signInWithPassword({email,password});
+    const {data:authData,error}=await Promise.race([loginRequest,timeout]);
+
+    if(error)throw error;
+    if(!authData?.session||!authData?.user){
+      throw new Error("Er is geen geldige sessie ontvangen.");
+    }
+
+    storeAdminSession({
+      access_token:authData.session.access_token,
+      refresh_token:authData.session.refresh_token,
+      expires_at:authData.session.expires_at,
+      user:authData.user
+    });
+
+    showLoggedInAdmin(authData.user);
     clearAuthMessage();
     document.getElementById("adminPassword").value="";
     loadOrganizations();
   }catch(error){
     clearAdminSession();
     showLoggedOutAdmin();
-    const message=error?.name==="AbortError"
-      ?"De verbinding met Supabase duurde te lang. Probeer het opnieuw."
-      :(error.message||"Inloggen is mislukt.");
-    setAuthMessage(message);
+    setAuthMessage(error?.message||"Inloggen is mislukt.");
   }
 }
 async function adminLogout(){
-  const session=getStoredAdminSession();
   try{
-    if(session?.access_token){
-      await fetch(`${SUPABASE_URL}/auth/v1/logout`,{
-        method:"POST",
-        headers:{
-          apikey:SUPABASE_PUBLISHABLE_KEY,
-          Authorization:`Bearer ${session.access_token}`
-        }
-      });
-    }
+    await supabaseClient.auth.signOut();
   }catch(_error){}
   clearAdminSession();
   clearOrganizationUi();
@@ -769,14 +780,24 @@ async function adminLogout(){
   clearAuthMessage();
 }
 async function restoreAdminSession(){
-  const session=getStoredAdminSession();
-  if(!session?.access_token){
-    showLoggedOutAdmin();
-    return;
-  }
   try{
-    const user=await fetchAdminUser(session.access_token);
-    showLoggedInAdmin(user);
+    const {data,error}=await supabaseClient.auth.getSession();
+    if(error)throw error;
+
+    if(!data?.session?.user){
+      clearAdminSession();
+      showLoggedOutAdmin();
+      return;
+    }
+
+    storeAdminSession({
+      access_token:data.session.access_token,
+      refresh_token:data.session.refresh_token,
+      expires_at:data.session.expires_at,
+      user:data.session.user
+    });
+
+    showLoggedInAdmin(data.session.user);
     await loadOrganizations();
   }catch(_error){
     clearAdminSession();
