@@ -659,6 +659,16 @@ function setActiveOrganization(id){
 }
 
 
+async function fetchWithTimeout(url,options={},timeoutMs=15000){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),timeoutMs);
+  try{
+    return await fetch(url,{...options,signal:controller.signal});
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
 function setAuthMessage(message,type="error"){
   const el=document.getElementById("authMessage");
   if(!el)return;
@@ -715,25 +725,28 @@ async function adminLogin(){
   }
   setAuthMessage("Bezig met inloggen...","success");
   try{
-    const response=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+    const response=await fetchWithTimeout(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
       method:"POST",
       headers:{
         apikey:SUPABASE_PUBLISHABLE_KEY,
         "Content-Type":"application/json"
       },
       body:JSON.stringify({email,password})
-    });
+    },15000);
     const data=await response.json();
     if(!response.ok)throw new Error(data?.msg||data?.error_description||"Inloggen is mislukt.");
     storeAdminSession(data);
     showLoggedInAdmin(data.user);
-    await loadOrganizations();
     clearAuthMessage();
     document.getElementById("adminPassword").value="";
+    loadOrganizations();
   }catch(error){
     clearAdminSession();
     showLoggedOutAdmin();
-    setAuthMessage(error.message||"Inloggen is mislukt.");
+    const message=error?.name==="AbortError"
+      ?"De verbinding met Supabase duurde te lang. Probeer het opnieuw."
+      :(error.message||"Inloggen is mislukt.");
+    setAuthMessage(message);
   }
 }
 async function adminLogout(){
