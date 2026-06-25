@@ -233,6 +233,46 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
           <button type="button" onclick="loadOrganizations()">Vernieuwen</button>
         </div>
         <div id="organizationStatus" class="organization-status">Nog geen organisatie geladen.</div>
+
+        <div id="organizationProfile" style="margin-top:18px;display:none">
+          <h3>Standaardinstellingen organisatie</h3>
+          <p class="small">Nieuwe AI-systemen nemen deze waarden automatisch over. Per systeem kun je daarna afwijken.</p>
+          <div class="form-grid">
+            <select id="organizationDefaultCountry">
+              <option value="Nederland">Nederland</option>
+              <option value="België">België</option>
+              <option value="Duitsland">Duitsland</option>
+              <option value="Frankrijk">Frankrijk</option>
+              <option value="Verenigd Koninkrijk">Verenigd Koninkrijk</option>
+              <option value="Verenigde Staten">Verenigde Staten</option>
+              <option value="Indonesië">Indonesië</option>
+              <option value="Zuid-Afrika">Zuid-Afrika</option>
+              <option value="Anders">Anders</option>
+            </select>
+
+            <select id="organizationDefaultRegion">
+              <option value="Europese Unie">Europese Unie</option>
+              <option value="Europa buiten EU">Europa buiten EU</option>
+              <option value="Noord-Amerika">Noord-Amerika</option>
+              <option value="Azië-Pacific">Azië-Pacific</option>
+              <option value="Afrika">Afrika</option>
+              <option value="Wereldwijd">Wereldwijd</option>
+            </select>
+
+            <select id="organizationDefaultSector">
+              <option value="Overig">Overig</option>
+              <option value="Onderwijs">Onderwijs</option>
+              <option value="Overheid">Overheid</option>
+              <option value="Zorg">Zorg</option>
+              <option value="Financiële dienstverlening">Financiële dienstverlening</option>
+              <option value="HR en recruitment">HR en recruitment</option>
+              <option value="Veiligheid en handhaving">Veiligheid en handhaving</option>
+              <option value="Technologie">Technologie</option>
+            </select>
+          </div>
+          <button type="button" style="margin-top:12px" onclick="saveOrganizationProfile()">Organisatieprofiel opslaan</button>
+          <div id="organizationProfileMessage" class="organization-status" style="margin-top:10px"></div>
+        </div>
       </div>
 
       <div class="notice" style="margin-top:18px">
@@ -327,6 +367,7 @@ function resetSystemForm(){
   document.getElementById("applicationCountry").value="Nederland";
   document.getElementById("regulatoryRegion").value="Europese Unie";
   document.getElementById("sector").value="Overig";
+  applyOrganizationDefaultsToNewSystem();
   document.getElementById("detectionResult").style.display="none";
 
   editingSystemId=null;
@@ -799,6 +840,8 @@ function clearOrganizationUi(){
   const status=document.getElementById("organizationStatus");
   if(select)select.innerHTML='<option value="">Geen organisatie geladen</option>';
   if(status)status.textContent="Nog geen organisatie geladen.";
+  const profile=document.getElementById("organizationProfile");
+  if(profile)profile.style.display="none";
 }
 
 async function loadOrganizations(){
@@ -813,7 +856,7 @@ async function loadOrganizations(){
   if(status)status.textContent="Organisaties ophalen...";
   try{
     const response=await fetch(
-      `${SUPABASE_URL}/rest/v1/organizations?select=id,name,created_at&order=name.asc`,
+      `${SUPABASE_URL}/rest/v1/organizations?select=id,name,created_at,default_country,default_regulatory_region,default_sector&order=name.asc`,
       {
         headers:{
           apikey:SUPABASE_PUBLISHABLE_KEY,
@@ -850,6 +893,89 @@ async function loadOrganizations(){
   }
 }
 
+
+function getActiveOrganization(){
+  const id=localStorage.getItem(ACTIVE_ORG_STORAGE_KEY);
+  return organizationsCache.find(org=>String(org.id)===String(id))||null;
+}
+
+function applyOrganizationDefaultsToNewSystem(){
+  if(editingSystemId!==null)return;
+  const organization=getActiveOrganization();
+  if(!organization)return;
+
+  document.getElementById("applicationCountry").value=organization.default_country||"Nederland";
+  document.getElementById("regulatoryRegion").value=organization.default_regulatory_region||"Europese Unie";
+  document.getElementById("sector").value=organization.default_sector||"Overig";
+}
+
+function showOrganizationProfile(organization){
+  const panel=document.getElementById("organizationProfile");
+  const message=document.getElementById("organizationProfileMessage");
+  if(!panel)return;
+
+  panel.style.display="block";
+  document.getElementById("organizationDefaultCountry").value=organization.default_country||"Nederland";
+  document.getElementById("organizationDefaultRegion").value=organization.default_regulatory_region||"Europese Unie";
+  document.getElementById("organizationDefaultSector").value=organization.default_sector||"Overig";
+  if(message)message.textContent="";
+}
+
+async function saveOrganizationProfile(){
+  const session=getStoredAdminSession();
+  const organization=getActiveOrganization();
+  const message=document.getElementById("organizationProfileMessage");
+
+  if(!session?.access_token||!organization){
+    if(message)message.textContent="Log opnieuw in en selecteer een organisatie.";
+    return;
+  }
+
+  const payload={
+    default_country:document.getElementById("organizationDefaultCountry").value,
+    default_regulatory_region:document.getElementById("organizationDefaultRegion").value,
+    default_sector:document.getElementById("organizationDefaultSector").value
+  };
+
+  if(message)message.textContent="Organisatieprofiel wordt opgeslagen...";
+
+  try{
+    const response=await fetch(
+      `${SUPABASE_URL}/rest/v1/organizations?id=eq.${encodeURIComponent(organization.id)}`,
+      {
+        method:"PATCH",
+        headers:{
+          apikey:SUPABASE_PUBLISHABLE_KEY,
+          Authorization:`Bearer ${session.access_token}`,
+          "Content-Type":"application/json",
+          Prefer:"return=representation"
+        },
+        body:JSON.stringify(payload)
+      }
+    );
+
+    const raw=await response.text();
+    let result=[];
+    try{result=raw?JSON.parse(raw):[];}catch(_error){}
+
+    if(!response.ok){
+      throw new Error(result?.message||result?.hint||`Opslaan is mislukt (${response.status}).`);
+    }
+
+    const saved=Array.isArray(result)?result[0]:null;
+    if(!saved){
+      throw new Error("Supabase heeft de wijziging niet bevestigd.");
+    }
+
+    Object.assign(organization,saved);
+    showOrganizationProfile(organization);
+    applyOrganizationDefaultsToNewSystem();
+    if(message)message.textContent="Organisatieprofiel opgeslagen.";
+  }catch(error){
+    if(message)message.textContent=error?.message||"Opslaan is mislukt.";
+  }
+}
+
 function setActiveOrganization(id){
   const organization=organizationsCache.find(org=>String(org.id)===String(id));
   const status=document.getElementById("organizationStatus");
@@ -859,6 +985,8 @@ function setActiveOrganization(id){
   }
   localStorage.setItem(ACTIVE_ORG_STORAGE_KEY,String(organization.id));
   if(status)status.textContent=`Actieve organisatie: ${organization.name}`;
+  showOrganizationProfile(organization);
+  applyOrganizationDefaultsToNewSystem();
   loadOrganizationSystemsReadOnly();
 }
 
@@ -979,6 +1107,7 @@ function showAdminSection(){
 }
 document.addEventListener("DOMContentLoaded",async()=>{
   await restoreAdminSession();
+  applyOrganizationDefaultsToNewSystem();
   await loadOrganizationSystemsReadOnly();
 });
 
