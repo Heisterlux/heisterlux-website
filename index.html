@@ -84,6 +84,17 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 .risk-factors li{margin:5px 0}
 .risk-advice{margin-top:12px;padding:10px 12px;border-radius:8px;background:#f8fafc;border-left:4px solid #64748b}
 
+
+.form-grid label{
+  display:block;
+  margin:0 0 6px;
+  color:var(--muted);
+  font-size:14px;
+}
+.form-grid > div{
+  min-width:0;
+}
+
 </style>
 </head>
 <body>
@@ -135,32 +146,41 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 <select id="risk"><option value="Laag">Laag risico</option><option value="Middel">Middel risico</option><option value="Hoog">Hoog risico</option></select>
 <select id="aiAct"><option value="Nog niet beoordeeld">AI Act: nog niet beoordeeld</option><option value="Laag risico">AI Act: laag risico</option><option value="Hoog risico">AI Act: hoog risico</option><option value="General Purpose AI">AI Act: General Purpose AI</option></select>
 <input id="source" placeholder="Bron, bijv. survey / browserlog / CSV">
+<div>
+<label for="applicationCountry"><strong>Land van toepassing</strong></label>
 <select id="applicationCountry">
-  <option value="Nederland">Land van toepassing: Nederland</option>
-  <option value="België">Land van toepassing: België</option>
-  <option value="Duitsland">Land van toepassing: Duitsland</option>
-  <option value="Frankrijk">Land van toepassing: Frankrijk</option>
-  <option value="Verenigd Koninkrijk">Land van toepassing: Verenigd Koninkrijk</option>
-  <option value="Verenigde Staten">Land van toepassing: Verenigde Staten</option>
-  <option value="Anders">Land van toepassing: Anders</option>
+  <option value="Nederland">Nederland</option>
+  <option value="België">België</option>
+  <option value="Duitsland">Duitsland</option>
+  <option value="Frankrijk">Frankrijk</option>
+  <option value="Verenigd Koninkrijk">Verenigd Koninkrijk</option>
+  <option value="Verenigde Staten">Verenigde Staten</option>
+  <option value="Anders">Anders</option>
 </select>
+</div>
+<div>
+<label for="regulatoryRegion"><strong>Regelgevingsregio</strong></label>
 <select id="regulatoryRegion">
-  <option value="Europese Unie">Regio: Europese Unie</option>
-  <option value="Europa buiten EU">Regio: Europa buiten EU</option>
-  <option value="Noord-Amerika">Regio: Noord-Amerika</option>
-  <option value="Azië-Pacific">Regio: Azië-Pacific</option>
-  <option value="Wereldwijd">Regio: Wereldwijd</option>
+  <option value="Europese Unie">Europese Unie</option>
+  <option value="Europa buiten EU">Europa buiten EU</option>
+  <option value="Noord-Amerika">Noord-Amerika</option>
+  <option value="Azië-Pacific">Azië-Pacific</option>
+  <option value="Wereldwijd">Wereldwijd</option>
 </select>
+</div>
+<div>
+<label for="sector"><strong>Sector</strong></label>
 <select id="sector">
-  <option value="Overig">Sector: Overig</option>
-  <option value="Onderwijs">Sector: Onderwijs</option>
-  <option value="Overheid">Sector: Overheid</option>
-  <option value="Zorg">Sector: Zorg</option>
-  <option value="Financiële dienstverlening">Sector: Financiële dienstverlening</option>
-  <option value="HR en recruitment">Sector: HR en recruitment</option>
-  <option value="Veiligheid en handhaving">Sector: Veiligheid en handhaving</option>
-  <option value="Technologie">Sector: Technologie</option>
+  <option value="Overig">Overig</option>
+  <option value="Onderwijs">Onderwijs</option>
+  <option value="Overheid">Overheid</option>
+  <option value="Zorg">Zorg</option>
+  <option value="Financiële dienstverlening">Financiële dienstverlening</option>
+  <option value="HR en recruitment">HR en recruitment</option>
+  <option value="Veiligheid en handhaving">Veiligheid en handhaving</option>
+  <option value="Technologie">Technologie</option>
 </select>
+</div>
 </div>
 <div id="detectionResult" class="result" style="display:none"></div>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -238,7 +258,9 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
           <h3>Standaardinstellingen organisatie</h3>
           <p class="small">Nieuwe AI-systemen nemen deze waarden automatisch over. Per systeem kun je daarna afwijken.</p>
           <div class="form-grid">
-            <select id="organizationDefaultCountry">
+            <div>
+              <label for="organizationDefaultCountry"><strong>Standaardland</strong></label>
+              <select id="organizationDefaultCountry">
               <option value="Nederland">Nederland</option>
               <option value="België">België</option>
               <option value="Duitsland">Duitsland</option>
@@ -248,18 +270,24 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
               <option value="Indonesië">Indonesië</option>
               <option value="Zuid-Afrika">Zuid-Afrika</option>
               <option value="Anders">Anders</option>
-            </select>
+              </select>
+            </div>
 
-            <select id="organizationDefaultRegion">
+            <div>
+              <label for="organizationDefaultRegion"><strong>Standaardregio</strong></label>
+              <select id="organizationDefaultRegion">
               <option value="Europese Unie">Europese Unie</option>
               <option value="Europa buiten EU">Europa buiten EU</option>
               <option value="Noord-Amerika">Noord-Amerika</option>
               <option value="Azië-Pacific">Azië-Pacific</option>
               <option value="Afrika">Afrika</option>
               <option value="Wereldwijd">Wereldwijd</option>
-            </select>
+              </select>
+            </div>
 
-            <select id="organizationDefaultSector">
+            <div>
+              <label for="organizationDefaultSector"><strong>Standaardsector</strong></label>
+              <select id="organizationDefaultSector">
               <option value="Overig">Overig</option>
               <option value="Onderwijs">Onderwijs</option>
               <option value="Overheid">Overheid</option>
@@ -268,7 +296,8 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
               <option value="HR en recruitment">HR en recruitment</option>
               <option value="Veiligheid en handhaving">Veiligheid en handhaving</option>
               <option value="Technologie">Technologie</option>
-            </select>
+              </select>
+            </div>
           </div>
           <button type="button" style="margin-top:12px" onclick="saveOrganizationProfile()">Organisatieprofiel opslaan</button>
           <div id="organizationProfileMessage" class="organization-status" style="margin-top:10px"></div>
