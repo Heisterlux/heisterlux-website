@@ -102,6 +102,10 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 .location-meta{color:var(--muted);margin-top:6px;font-size:14px}
 .location-empty{padding:14px;border-radius:12px;background:#f8fafc;border:1px dashed #cbd5e1;color:var(--muted)}
 
+
+table td:first-child{min-width:240px}
+table td{vertical-align:top}
+
 </style>
 </head>
 <body>
@@ -191,7 +195,8 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
 
 <div>
 <label for="systemLocation"><strong>Vestiging</strong></label>
-<select id="systemLocation">
+<span class="small">Bij keuze worden land, regio en sector automatisch overgenomen.</span>
+<select id="systemLocation" onchange="applyLocationToSystemFields()">
   <option value="">Organisatiebreed / geen specifieke vestiging</option>
 </select>
 </div>
@@ -206,7 +211,7 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
 </div>
 </div>
 </div>
-<div class="tablewrap"><table><thead><tr><th>Naam</th><th>Leverancier</th><th>Categorie</th><th>Afdeling</th><th>Eigenaar</th><th>Gebruikers</th><th>Kosten</th><th>Status</th><th>Risico</th><th>AI Act</th><th>Vestiging</th><th>Land</th><th>Regio</th><th>Sector</th><th>Acties</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>Naam</th><th>Vestiging</th><th>Eigenaar</th><th>Gebruikers</th><th>Kosten</th><th>Status</th><th>Risico</th><th>AI Act</th><th>Acties</th></tr></thead><tbody id="tableBody"></tbody></table></div>
 </div>
 <div id="radar" class="panel"><div class="card"><h3>Shadow AI Radar</h3><div id="radarList"></div></div></div>
 <div id="riskpanel" class="panel"><div class="card"><h3>Risk Engine</h3><div id="riskList"></div></div></div>
@@ -673,7 +678,7 @@ function render(){
      ?"Het AI-register wordt live geladen uit Supabase voor de actieve organisatie."
      :"Het AI-register van deze demo gebruikt lokale browseropslag. De AI Database-tab wordt live en alleen-lezen geladen uit Supabase.";
  }
- const tbody=document.getElementById("tableBody");tbody.innerHTML="";let total=0,shadow=0,high=0;data.forEach(item=>{total+=Number(item.cost||0);if(item.status==="Shadow AI"||!item.owner||item.knownTool===false)shadow++;if(item.risk==="Hoog")high++;tbody.innerHTML+="<tr><td><strong>"+escapeHtml(item.name)+"</strong><br><span class='small'>"+escapeHtml(item.purpose||"-")+"</span></td><td>"+escapeHtml(item.supplier||"-")+"</td><td>"+escapeHtml(item.category||"-")+"</td><td>"+escapeHtml(item.department||"-")+"</td><td>"+(item.owner?escapeHtml(item.owner):"<span class='badge shadow'>Geen eigenaar</span>")+"</td><td>"+Number(item.users||0)+"</td><td>€"+Number(item.cost||0)+"</td><td><span class='badge "+badgeClass(item.status)+"'>"+escapeHtml(item.status)+"</span></td><td><span class='badge "+badgeClass(item.risk)+"'>"+escapeHtml(item.risk)+"</span></td><td><span class='badge "+badgeClass(item.aiAct)+"'>"+escapeHtml(item.aiAct)+"</span></td><td>"+escapeHtml(getLocationNameById(item.locationId))+"</td><td>"+escapeHtml(item.applicationCountry||"Nederland")+"</td><td>"+escapeHtml(item.regulatoryRegion||"Europese Unie")+"</td><td>"+escapeHtml(item.sector||"Overig")+"</td><td><div class='table-action-buttons'><button type='button' class='edit-button' onclick='startEditSystem("+JSON.stringify(item.id)+")'>Bewerken</button><button type='button' class='delete-button' onclick='deleteSystem("+JSON.stringify(item.id)+","+JSON.stringify(item.name)+")'>Verwijderen</button></div></td></tr>";});document.getElementById("totalSystems").innerText=data.length;document.getElementById("shadowSystems").innerText=shadow;document.getElementById("highRiskSystems").innerText=high;document.getElementById("monthlyCosts").innerText="€"+total;renderRadar();renderRisk();renderKnowledge();}
+ const tbody=document.getElementById("tableBody");tbody.innerHTML="";let total=0,shadow=0,high=0;data.forEach(item=>{total+=Number(item.cost||0);if(item.status==="Shadow AI"||!item.owner||item.knownTool===false)shadow++;if(item.risk==="Hoog")high++;tbody.innerHTML+="<tr><td><strong>"+escapeHtml(item.name)+"</strong><br><span class='small'>"+escapeHtml(item.supplier||"-")+" · "+escapeHtml(item.category||"-")+" · "+escapeHtml(item.department||"-")+"</span><br><span class='small'>"+escapeHtml(item.applicationCountry||"Nederland")+" · "+escapeHtml(item.regulatoryRegion||"Europese Unie")+" · "+escapeHtml(item.sector||"Overig")+"</span></td><td>"+escapeHtml(getLocationNameById(item.locationId))+"</td><td>"+(item.owner?escapeHtml(item.owner):"<span class='badge shadow'>Geen eigenaar</span>")+"</td><td>"+Number(item.users||0)+"</td><td>€"+Number(item.cost||0)+"</td><td><span class='badge "+badgeClass(item.status)+"'>"+escapeHtml(item.status)+"</span></td><td><span class='badge "+badgeClass(item.risk)+"'>"+escapeHtml(item.risk)+"</span></td><td><span class='badge "+badgeClass(item.aiAct)+"'>"+escapeHtml(item.aiAct)+"</span></td><td><div class='table-action-buttons'><button type='button' class='edit-button' onclick='startEditSystem("+JSON.stringify(item.id)+")'>Bewerken</button><button type='button' class='delete-button' onclick='deleteSystem("+JSON.stringify(item.id)+","+JSON.stringify(item.name)+")'>Verwijderen</button></div></td></tr>";});document.getElementById("totalSystems").innerText=data.length;document.getElementById("shadowSystems").innerText=shadow;document.getElementById("highRiskSystems").innerText=high;document.getElementById("monthlyCosts").innerText="€"+total;renderRadar();renderRisk();renderKnowledge();}
 
 function getActiveOrganizationId(){
   return localStorage.getItem("heisterlux_active_organization_id")||"";
@@ -1027,6 +1032,19 @@ function getLocationNameById(id){
   return location?location.name:"Onbekende vestiging";
 }
 
+
+function applyLocationToSystemFields(){
+  const select=document.getElementById("systemLocation");
+  if(!select||!select.value)return;
+
+  const location=locationsCache.find(item=>String(item.id)===String(select.value));
+  if(!location)return;
+
+  document.getElementById("applicationCountry").value=location.country||"Nederland";
+  document.getElementById("regulatoryRegion").value=location.regulatory_region||"Europese Unie";
+  document.getElementById("sector").value=location.sector||"Overig";
+}
+
 function populateSystemLocationSelect(selectedId=""){
   const select=document.getElementById("systemLocation");
   if(!select)return;
@@ -1039,7 +1057,7 @@ function populateSystemLocationSelect(selectedId=""){
     .forEach(location=>{
       const option=document.createElement("option");
       option.value=String(location.id);
-      option.textContent=`${location.name} (${location.country})`;
+      option.textContent=`${location.name}${location.city?` - ${location.city}`:""} (${location.country})`;
       select.appendChild(option);
     });
 
