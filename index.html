@@ -95,6 +95,13 @@ footer{background:var(--dark);color:white;text-align:center;padding:30px;margin-
   min-width:0;
 }
 
+
+.location-list{display:grid;gap:10px;margin-top:12px}
+.location-card{border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff}
+.location-card strong{color:var(--dark)}
+.location-meta{color:var(--muted);margin-top:6px;font-size:14px}
+.location-empty{padding:14px;border-radius:12px;background:#f8fafc;border:1px dashed #cbd5e1;color:var(--muted)}
+
 </style>
 </head>
 <body>
@@ -301,6 +308,77 @@ Openbare demo-data uit deze browser. Log in bij Beheer om het centrale organisat
           </div>
           <button type="button" style="margin-top:12px" onclick="saveOrganizationProfile()">Organisatieprofiel opslaan</button>
           <div id="organizationProfileMessage" class="organization-status" style="margin-top:10px"></div>
+        </div>
+
+        <div id="locationsPanel" style="margin-top:24px;display:none">
+          <h3>Vestigingen</h3>
+          <p class="small">Voeg vestigingen toe zodat AI-systemen later per locatie én organisatiebreed kunnen worden bekeken.</p>
+
+          <div class="form-grid">
+            <div>
+              <label for="locationName"><strong>Naam vestiging</strong></label>
+              <input id="locationName" placeholder="Bijv. Leeuwarden of Bali">
+            </div>
+
+            <div>
+              <label for="locationCity"><strong>Stad / plaats</strong></label>
+              <input id="locationCity" placeholder="Bijv. Leeuwarden">
+            </div>
+
+            <div>
+              <label for="locationCountry"><strong>Land</strong></label>
+              <select id="locationCountry">
+                <option value="Nederland">Nederland</option>
+                <option value="België">België</option>
+                <option value="Duitsland">Duitsland</option>
+                <option value="Frankrijk">Frankrijk</option>
+                <option value="Verenigd Koninkrijk">Verenigd Koninkrijk</option>
+                <option value="Verenigde Staten">Verenigde Staten</option>
+                <option value="Indonesië">Indonesië</option>
+                <option value="Zuid-Afrika">Zuid-Afrika</option>
+                <option value="Anders">Anders</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="locationRegion"><strong>Regelgevingsregio</strong></label>
+              <select id="locationRegion">
+                <option value="Europese Unie">Europese Unie</option>
+                <option value="Europa buiten EU">Europa buiten EU</option>
+                <option value="Noord-Amerika">Noord-Amerika</option>
+                <option value="Azië-Pacific">Azië-Pacific</option>
+                <option value="Afrika">Afrika</option>
+                <option value="Wereldwijd">Wereldwijd</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="locationSector"><strong>Sector</strong></label>
+              <select id="locationSector">
+                <option value="Overig">Overig</option>
+                <option value="Onderwijs">Onderwijs</option>
+                <option value="Overheid">Overheid</option>
+                <option value="Zorg">Zorg</option>
+                <option value="Financiële dienstverlening">Financiële dienstverlening</option>
+                <option value="HR en recruitment">HR en recruitment</option>
+                <option value="Veiligheid en handhaving">Veiligheid en handhaving</option>
+                <option value="Technologie">Technologie</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="locationHeadquarters"><strong>Hoofdkantoor</strong></label>
+              <select id="locationHeadquarters">
+                <option value="false">Nee</option>
+                <option value="true">Ja</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="button" style="margin-top:12px" onclick="addLocation()">Vestiging toevoegen</button>
+          <div id="locationsMessage" class="organization-status" style="margin-top:10px"></div>
+
+          <div id="locationsList" style="margin-top:16px"></div>
         </div>
       </div>
 
@@ -871,6 +949,9 @@ function clearOrganizationUi(){
   if(status)status.textContent="Nog geen organisatie geladen.";
   const profile=document.getElementById("organizationProfile");
   if(profile)profile.style.display="none";
+  const locations=document.getElementById("locationsPanel");
+  if(locations)locations.style.display="none";
+  locationsCache=[];
 }
 
 async function loadOrganizations(){
@@ -922,6 +1003,157 @@ async function loadOrganizations(){
   }
 }
 
+
+
+let locationsCache=[];
+
+function applyOrganizationDefaultsToLocationForm(){
+  const organization=getActiveOrganization();
+  if(!organization)return;
+
+  const country=document.getElementById("locationCountry");
+  const region=document.getElementById("locationRegion");
+  const sector=document.getElementById("locationSector");
+
+  if(country)country.value=organization.default_country||"Nederland";
+  if(region)region.value=organization.default_regulatory_region||"Europese Unie";
+  if(sector)sector.value=organization.default_sector||"Overig";
+}
+
+function clearLocationForm(){
+  document.getElementById("locationName").value="";
+  document.getElementById("locationCity").value="";
+  document.getElementById("locationHeadquarters").value="false";
+  applyOrganizationDefaultsToLocationForm();
+}
+
+function renderLocations(){
+  const list=document.getElementById("locationsList");
+  if(!list)return;
+
+  if(!locationsCache.length){
+    list.innerHTML='<div class="location-empty">Nog geen vestigingen toegevoegd.</div>';
+    return;
+  }
+
+  list.innerHTML='<div class="location-list">'+locationsCache.map(location=>{
+    const hq=location.is_headquarters?' · Hoofdkantoor':'';
+    const active=location.is_active?'Actief':'Inactief';
+    return `
+      <div class="location-card">
+        <strong>${escapeHtml(location.name)}</strong>${hq}
+        <div class="location-meta">
+          ${escapeHtml(location.city||"-")} · ${escapeHtml(location.country)} · ${escapeHtml(location.regulatory_region)} · ${escapeHtml(location.sector||"Overig")} · ${active}
+        </div>
+      </div>
+    `;
+  }).join("")+'</div>';
+}
+
+async function loadLocations(){
+  const session=getStoredAdminSession();
+  const organization=getActiveOrganization();
+  const panel=document.getElementById("locationsPanel");
+  const message=document.getElementById("locationsMessage");
+
+  if(!panel)return;
+
+  if(!session?.access_token||!organization){
+    panel.style.display="none";
+    locationsCache=[];
+    renderLocations();
+    return;
+  }
+
+  panel.style.display="block";
+  applyOrganizationDefaultsToLocationForm();
+  if(message)message.textContent="Vestigingen worden geladen...";
+
+  try{
+    const response=await fetch(
+      `${SUPABASE_URL}/rest/v1/organization_locations?organization_id=eq.${encodeURIComponent(organization.id)}&select=id,name,city,country,regulatory_region,sector,is_headquarters,is_active,created_at&order=created_at.asc`,
+      {
+        headers:{
+          apikey:SUPABASE_PUBLISHABLE_KEY,
+          Authorization:`Bearer ${session.access_token}`,
+          Accept:"application/json"
+        }
+      }
+    );
+
+    const result=await response.json();
+    if(!response.ok){
+      throw new Error(result?.message||result?.hint||"Vestigingen konden niet worden geladen.");
+    }
+
+    locationsCache=Array.isArray(result)?result:[];
+    if(message)message.textContent=`${locationsCache.length} vestiging(en) geladen.`;
+    renderLocations();
+  }catch(error){
+    locationsCache=[];
+    if(message)message.textContent=error?.message||"Vestigingen konden niet worden geladen.";
+    renderLocations();
+  }
+}
+
+async function addLocation(){
+  const session=getStoredAdminSession();
+  const organization=getActiveOrganization();
+  const message=document.getElementById("locationsMessage");
+
+  if(!session?.access_token||!organization){
+    if(message)message.textContent="Log opnieuw in en selecteer een organisatie.";
+    return;
+  }
+
+  const name=document.getElementById("locationName").value.trim();
+  if(!name){
+    if(message)message.textContent="Vul minimaal de naam van de vestiging in.";
+    return;
+  }
+
+  const payload={
+    organization_id:Number(organization.id),
+    name,
+    city:document.getElementById("locationCity").value.trim()||null,
+    country:document.getElementById("locationCountry").value,
+    regulatory_region:document.getElementById("locationRegion").value,
+    sector:document.getElementById("locationSector").value,
+    is_headquarters:document.getElementById("locationHeadquarters").value==="true",
+    is_active:true
+  };
+
+  if(message)message.textContent="Vestiging wordt opgeslagen...";
+
+  try{
+    const response=await fetch(
+      `${SUPABASE_URL}/rest/v1/organization_locations`,
+      {
+        method:"POST",
+        headers:{
+          apikey:SUPABASE_PUBLISHABLE_KEY,
+          Authorization:`Bearer ${session.access_token}`,
+          "Content-Type":"application/json",
+          Prefer:"return=representation"
+        },
+        body:JSON.stringify(payload)
+      }
+    );
+
+    const raw=await response.text();
+    let result={};
+    try{result=raw?JSON.parse(raw):{};}catch(_error){}
+
+    if(!response.ok){
+      throw new Error(result?.message||result?.hint||`Opslaan is mislukt (${response.status}).`);
+    }
+
+    clearLocationForm();
+    await loadLocations();
+  }catch(error){
+    if(message)message.textContent=error?.message||"Opslaan is mislukt.";
+  }
+}
 
 function getActiveOrganization(){
   const id=localStorage.getItem(ACTIVE_ORG_STORAGE_KEY);
@@ -999,6 +1231,7 @@ async function saveOrganizationProfile(){
     Object.assign(organization,saved);
     showOrganizationProfile(organization);
     applyOrganizationDefaultsToNewSystem();
+    applyOrganizationDefaultsToLocationForm();
     if(message)message.textContent="Organisatieprofiel opgeslagen.";
   }catch(error){
     if(message)message.textContent=error?.message||"Opslaan is mislukt.";
@@ -1016,6 +1249,7 @@ function setActiveOrganization(id){
   if(status)status.textContent=`Actieve organisatie: ${organization.name}`;
   showOrganizationProfile(organization);
   applyOrganizationDefaultsToNewSystem();
+  loadLocations();
   loadOrganizationSystemsReadOnly();
 }
 
@@ -1137,6 +1371,7 @@ function showAdminSection(){
 document.addEventListener("DOMContentLoaded",async()=>{
   await restoreAdminSession();
   applyOrganizationDefaultsToNewSystem();
+  await loadLocations();
   await loadOrganizationSystemsReadOnly();
 });
 
