@@ -1035,6 +1035,17 @@ function getLocationNameById(id){
 }
 
 
+function ensureSelectOption(select,value){
+  if(!select||!value)return;
+  const exists=Array.from(select.options).some(option=>option.value===value);
+  if(!exists){
+    const option=document.createElement("option");
+    option.value=value;
+    option.textContent=value;
+    select.appendChild(option);
+  }
+}
+
 function applyLocationToSystemFields(){
   const select=document.getElementById("systemLocation");
   if(!select||!select.value)return;
@@ -1042,9 +1053,17 @@ function applyLocationToSystemFields(){
   const location=locationsCache.find(item=>String(item.id)===String(select.value));
   if(!location)return;
 
-  document.getElementById("applicationCountry").value=location.country||"Nederland";
-  document.getElementById("regulatoryRegion").value=location.regulatory_region||"Europese Unie";
-  document.getElementById("sector").value=location.sector||"Overig";
+  const country=document.getElementById("applicationCountry");
+  const region=document.getElementById("regulatoryRegion");
+  const sector=document.getElementById("sector");
+
+  ensureSelectOption(country,location.country);
+  ensureSelectOption(region,location.regulatory_region);
+  ensureSelectOption(sector,location.sector);
+
+  country.value=location.country||"Nederland";
+  region.value=location.regulatory_region||"Europese Unie";
+  sector.value=location.sector||"Overig";
 }
 
 function populateSystemLocationSelect(selectedId=""){
