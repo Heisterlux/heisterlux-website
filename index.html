@@ -1037,12 +1037,15 @@ function getActiveOrganizationName(){
 function formatLocationLabel(location){
   if(!location) return "Organisatiebreed";
 
-  const organizationName = getActiveOrganizationName();
-  const locationName = location.name || location.city || "Vestiging";
+  const locationName = location.name || "Vestiging";
+  const cityName = location.city || location.country || "";
 
-  return `${organizationName} - ${locationName}`;
+  if(cityName && !locationName.toLowerCase().includes(cityName.toLowerCase())){
+    return `${locationName} - ${cityName}`;
+  }
+
+  return locationName;
 }
-
 function getLocationNameById(id){
   if(!id) return "Organisatiebreed";
 
