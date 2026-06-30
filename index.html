@@ -1028,10 +1028,29 @@ async function loadOrganizations(){
 let locationsCache=[];
 
 
+function getActiveOrganizationName(){
+  const activeId = getActiveOrganizationId();
+  const organization = organizationsCache.find(org => String(org.id) === String(activeId));
+  return organization?.name || "Organisatie";
+}
+
+function formatLocationLabel(location){
+  if(!location) return "Organisatiebreed";
+
+  const organizationName = getActiveOrganizationName();
+  const locationName = location.name || location.city || "Vestiging";
+
+  return `${organizationName} - ${locationName}`;
+}
+
 function getLocationNameById(id){
-  if(!id)return "Organisatiebreed";
-  const location=locationsCache.find(item=>String(item.id)===String(id));
-  return location?location.name:"Onbekende vestiging";
+  if(!id) return "Organisatiebreed";
+
+  const location = locationsCache.find(location => String(location.id) === String(id));
+
+  if(!location) return "Onbekende vestiging";
+
+  return formatLocationLabel(location);
 }
 
 
