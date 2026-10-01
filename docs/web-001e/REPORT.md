@@ -5,8 +5,8 @@ Branch `web-001e/astro-site` · draft PR #1 · Verdict: **READY WITH OPEN LAUNCH
 |  |  |
 | --- | --- |
 | Reviewed head (before R1) | `0e83c6d8a9fd1fb8fe21eb4d693c7bca4aa940d0` |
-| Code-bearing head for R1 | `{{CODE_SHA}}` (a docs-only commit that adds this SHA may follow; code is identical) |
-| Protected preview of that head | `{{PREVIEW_URL}}` (Vercel SSO-protected; protection unchanged) |
+| Code-bearing head for R1 | `63370aa60a4aec7bfaedd73f6513631c3d8d1b83` (the docs-only commit that records this SHA comes right after it; code is identical) |
+| Protected preview of that head | `https://heisterlux-website-81c0l7je7-heisterlux-s-projects.vercel.app (immutable preview of that commit; branch alias https://heisterlux-website-git-web-001e-as-ca1bde-heisterlux-s-projects.vercel.app follows the latest push)` (Vercel SSO-protected; protection unchanged) |
 | Merged / public / DNS / Vercel settings / live provider | **no** — none of these was touched |
 
 Everything below separates what was **executed and observed** from what is **not done**.

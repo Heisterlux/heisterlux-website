@@ -1,0 +1,37 @@
+Content check on the protected preview (commit 63370aa, deployment dpl_HWDTZzyN7kWVTQPDWhSccdMUrUYJ); share link not recorded
+
+roadmap HTTP 200
+  contains 'Proportionate next steps': 1
+  contains 'Impact view': 1
+  contains 'Built so far (internal)': 1
+  contains 'Still to build': 1
+  contains 'Customer use today': 1
+  contains 'No capability is Available yet': 1
+  contains 'do not buy control over the roadmap': 1
+  status badges in 'In development' group (count of 'In development' labels): 7; 'Up next' badges: 0; 'Available' badges: 0
+home HTTP 200
+  contains 'rests on': 1
+  contains 'described by': 1
+  contains 'not a chain': 1
+  contains 'inviting organizations to help us understand': 1
+  contains 'may be affected': 1
+  absent 'small number of organizations': 0
+  absent 'records them separately': 0
+  absent 'accessed through': 0
+trust HTTP 200
+  contains 'Explainability': 1
+  contains 'Evidence and provenance': 1
+  contains 'Historical justification': 1
+  contains 'Uncertainty': 1
+  contains 'Human authority': 1
+  contains 'Customer data ownership': 1
+  contains 'Recoverability': 1
+  contains 'hard product gate': 1
+  contains 'Nothing is claimed as proven yet': 1
+pricing HTTP 200: 'Pricing has not been decided' 1; 'working out pricing' 0
+article HTTP 200: '2026/1744' 1; 'Proposal' 1
+duplicate ids on article page: 0
+sitemap HTTP 200: urls 15; ai-literacy article listed: 3
+robots.txt HTTP 200: User-agent: * Disallow: / 
+legacy strings (supabase|AI Discovery Demo) in homepage: 0
+/legacy path HTTP 404
