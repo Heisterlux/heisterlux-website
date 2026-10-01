@@ -1,0 +1,61 @@
+WEB-001E-R1 — disabled-form flow on the protected Vercel preview
+Deployment: dpl_GTayXxupw2dYp8U4yUeWWiupcWdp  commit 4cbbda6b5086593db39d70dd9ea73726c1b05ce4  target: preview (SSO-protected, protection unchanged)
+Access: temporary Vercel share link (expires after 23 h; not recorded here). Input: synthetic values only (synthetic-r1-test@example.invalid, marker SYNTHETIC-R1-MARKER-7731).
+FORMS_MODE is not set on this deployment (default = disabled).
+
+== access check ==
+GET share link (sets bypass cookie) -> final HTTP 200
+GET /en/early-access/ -> HTTP 200
+   fieldset disabled count in page: 2  | sandbox notice present: 0 | keep-informed hint present: 1
+
+== POST attempts (each expected: 503, disabled page, no success text) ==
+keep-informed valid synthetic -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+early-access valid synthetic -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+contact valid synthetic -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+contact invalid (bad email) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+unknown field -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+honeypot filled -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+keep-informed again (burst check, 3rd+) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+JSON content-type POST -> HTTP 503
+cross-origin POST -> HTTP 403
+GET submit route -> HTTP 303, Location: Location: /en/contact/
+
+== response headers of the last disabled POST response ==
+HTTP/1.1 503 Service Unavailable
+Cache-Control: no-store
+Content-Security-Policy: default-src 'self';img-src 'self' data:;font-src 'self';connect-src 'self';object-src 'none';base-uri 'none';frame-ancestors 'none';form-action 'self';manifest-src 'self';upgrade-insecure-requests; script-src 'self' 'sha256-BF0290pkb3j
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=(), browsing-topics=()
+Referrer-Policy: strict-origin-when-cross-origin
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Robots-Tag: noindex, nofollow
+(set-cookie lines above, if any, would be Vercel's; none expected from the app)
+
+== static page headers (GET /en/early-access/) ==
+HTTP/1.1 200 OK
+Cache-Control: public, max-age=0, must-revalidate
+Content-Security-Policy: default-src 'self';img-src 'self' data:;font-src 'self';connect-src 'self';object-src 'none';base-uri 'none';frame-ancestors 'none';form-action 'self';manifest-src 'self';upgr
+Referrer-Policy: strict-origin-when-cross-origin
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Robots-Tag: noindex
+
+== Vercel runtime logs for the deployment (queried via the Vercel tooling, window 20 min) ==
+Each refused POST produced exactly one log line, all of this shape and nothing else:
+  {"event":"form-submission","form":"<form>","outcome":"disabled","status":503,"mode":"disabled"}
+  (8 such lines for the 8 same-origin POSTs; the cross-origin POST and the GET redirect show only the platform line)
+Full-text search of the deployment's runtime logs for "SYNTHETIC" and for "example.invalid": no matches.
+No provider call: in disabled mode the provider object is null and the handler returns before reading the body
+(unit-tested: request.bodyUsed === false). No real provider is implemented at all.
+
+== Result ==
+POST stays refused (503) for valid, invalid, unknown-field and honeypot input: PASS
+No fake success text on any response: PASS
+No provider call possible / no personal data in logs: PASS (logs inspected)
+Cache and security headers on the dynamic response (no-store, noindex, CSP, HSTS, X-Frame-Options, nosniff,
+Referrer-Policy, Permissions-Policy, COOP/CORP, no Set-Cookie): PASS
+Not verified here: durability of any rate limit (none is active in disabled mode, by design).

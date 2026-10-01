@@ -14,7 +14,7 @@ export const en: ResourceContent = {
     'Article 4 of the EU AI Act has applied since 2 February 2025. Regulation (EU) 2026/1744 replaced its text; it was published in the Official Journal on 24 July 2026 and entered into force on 27 July 2026. This article separates the proposal, the adopted amendment and the obligation that applies, and says what it cannot conclude for your organization.',
   sections: [
     {
-      anchor: 'sources',
+      anchor: 'official-text',
       heading: 'What is official and what is commentary',
       paragraphs: [
         'The statements about the law in this article follow the official text of Regulation (EU) 2026/1744 and of the original AI Act, Regulation (EU) 2024/1689, both on EUR-Lex.',

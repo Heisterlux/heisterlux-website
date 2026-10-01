@@ -1,5 +1,5 @@
 import { DEFAULT_LOCALE, PUBLISHED_LOCALES, type LocaleCode } from '../i18n/locales.ts';
-import { RESOURCES } from './resources/index.ts';
+import { RESOURCES, type ResourceArticle } from './resources/index.ts';
 import { RELEASES } from './releases.ts';
 
 /**
@@ -189,21 +189,26 @@ const STATIC_ROUTES: RouteDef[] = [
   },
 ];
 
-const RESOURCE_ROUTES: RouteDef[] = RESOURCES.map((article) => ({
-  id: `resource:${article.id}`,
-  kind: 'resource-article' as const,
-  articleId: article.id,
-  datePublished: article.datePublished,
-  dateReviewed: article.dateReviewed,
-  copyStatus: article.copyStatus,
-  enabled: true,
-  locales: Object.fromEntries(
-    Object.entries(article.locales).map(([locale, content]) => [
-      locale,
-      { slug: `resources/${content.slug}`, title: content.title, description: content.description },
-    ]),
-  ),
-}));
+/** One route per resource article; a draft article (published: false) gets a disabled route. */
+export function buildResourceRoutes(articles: readonly ResourceArticle[]): RouteDef[] {
+  return articles.map((article) => ({
+    id: `resource:${article.id}`,
+    kind: 'resource-article' as const,
+    articleId: article.id,
+    datePublished: article.datePublished,
+    dateReviewed: article.dateReviewed,
+    copyStatus: article.copyStatus,
+    enabled: article.published,
+    locales: Object.fromEntries(
+      Object.entries(article.locales).map(([locale, content]) => [
+        locale,
+        { slug: `resources/${content.slug}`, title: content.title, description: content.description },
+      ]),
+    ),
+  }));
+}
+
+const RESOURCE_ROUTES: RouteDef[] = buildResourceRoutes(RESOURCES);
 
 export const ROUTES: readonly RouteDef[] = [...STATIC_ROUTES, ...RESOURCE_ROUTES];
 

@@ -1,0 +1,107 @@
+WEB-001E-R1 keyboard walkthrough (real key events via CDP, headless browser; NOT a screen-reader test)
+Browser: C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe
+Artifact: http://localhost:4330 (built output with real CSP)   Sandbox: http://localhost:4322 (local simulator)
+
+== A. Desktop home: skip link, header navigation ==
+-- header and hero: 11 × Tab
+    1. a "Skip to content" → #main  [focus-visible:true outline:solid 3px in-view:true]
+    2. a "Heisterlux home" → /en/  [focus-visible:true outline:solid 3px in-view:true]
+    3. a "Product" → /en/product/  [focus-visible:true outline:solid 3px in-view:true]
+    4. a "How it works" → /en/how-it-works/  [focus-visible:true outline:solid 3px in-view:true]
+    5. a "Roadmap" → /en/roadmap/  [focus-visible:true outline:solid 3px in-view:true]
+    6. a "Trust" → /en/trust/  [focus-visible:true outline:solid 3px in-view:true]
+    7. a "Pricing" → /en/pricing/  [focus-visible:true outline:solid 3px in-view:true]
+    8. a "Resources" → /en/resources/  [focus-visible:true outline:solid 3px in-view:true]
+    9. a "Request early access" → /en/early-access/  [focus-visible:true outline:solid 3px in-view:true]
+   10. a "Request early access" → /en/early-access/  [focus-visible:true outline:solid 3px in-view:true]
+   11. a "See how it works" → /en/how-it-works/  [focus-visible:true outline:solid 3px in-view:true]
+PASS  first Tab stop is the skip link
+PASS  every stop is scrolled into view
+PASS  every stop shows a visible focus outline (solid, non-zero)
+PASS  header order is logical: Heisterlux home > Product > How it works > Roadmap > Trust > Pricing > Resources > Request early access
+PASS  no focus trap: all 11 stops are different elements (header and hero CTA are two separate links to the same page)
+   after Enter on skip link: main#main "Pre-launchKnow where your organization relie"  [focus-visible:true outline:none 3px in-view:true]
+PASS  skip link moves focus to <main id="main">
+   next Tab after skipping: a "Request early access" → /en/early-access/  [focus-visible:true outline:solid 3px in-view:true]
+PASS  next Tab lands in the page content, not back in the header
+
+== B. 375 px: menu operable by keyboard without JavaScript ==
+-- skip link, brand, menu: 3 × Tab
+    1. a "Skip to content" → #main  [focus-visible:true outline:solid 3px in-view:true]
+    2. a "Heisterlux home" → /en/  [focus-visible:true outline:solid 3px in-view:true]
+    3. summary "Menu"  [focus-visible:true outline:solid 3px in-view:true]
+PASS  third stop is the Menu control
+PASS  Menu shows a visible focus outline
+PASS  Enter opens the menu
+-- inside the opened menu: 3 × Tab
+    1. a "Product" → /en/product/  [focus-visible:true outline:solid 3px in-view:true]
+    2. a "How it works" → /en/how-it-works/  [focus-visible:true outline:solid 3px in-view:true]
+    3. a "Roadmap" → /en/roadmap/  [focus-visible:true outline:solid 3px in-view:true]
+PASS  menu links follow in order
+-- reload: 3 × Tab
+    1. a "Skip to content" → #main  [focus-visible:true outline:solid 3px in-view:true]
+    2. a "Heisterlux home" → /en/  [focus-visible:true outline:solid 3px in-view:true]
+    3. summary "Menu"  [focus-visible:true outline:solid 3px in-view:true]
+PASS  Space also opens the menu
+
+== C. Early access page, forms disabled (as on the Vercel preview) ==
+   {"fieldsets":2,"disabled":2,"notice":true,"noticeText":"Submissions are not open yet. This form is not accepting submissions yet. We are still setting up email, privacy and processing arrangements"}
+PASS  both forms are disabled fieldsets
+-- tab order across the whole page (focus leaves the document after the last link, then returns to the skip link): 24 × Tab
+    1. a "Skip to content" → #main  [focus-visible:true outline:solid 3px in-view:true]
+    2. a "Heisterlux home" → /en/  [focus-visible:true outline:solid 3px in-view:true]
+    3. a "Product" → /en/product/  [focus-visible:true outline:solid 3px in-view:true]
+    4. a "How it works" → /en/how-it-works/  [focus-visible:true outline:solid 3px in-view:true]
+    5. a "Roadmap" → /en/roadmap/  [focus-visible:true outline:solid 3px in-view:true]
+    6. a "Trust" → /en/trust/  [focus-visible:true outline:solid 3px in-view:true]
+    7. a "Pricing" → /en/pricing/  [focus-visible:true outline:solid 3px in-view:true]
+    8. a "Resources" → /en/resources/  [focus-visible:true outline:solid 3px in-view:true]
+    9. a "Request early access" → /en/early-access/  [focus-visible:true outline:solid 3px in-view:true]
+   10. a "Privacy" → /en/privacy/  [focus-visible:true outline:solid 3px in-view:true]
+   11. a "Product" → /en/product/  [focus-visible:true outline:solid 3px in-view:true]
+   12. a "How it works" → /en/how-it-works/  [focus-visible:true outline:solid 3px in-view:true]
+   13. a "Roadmap" → /en/roadmap/  [focus-visible:true outline:solid 3px in-view:true]
+   14. a "Trust" → /en/trust/  [focus-visible:true outline:solid 3px in-view:true]
+   15. a "Pricing" → /en/pricing/  [focus-visible:true outline:solid 3px in-view:true]
+   16. a "Resources" → /en/resources/  [focus-visible:true outline:solid 3px in-view:true]
+   17. a "Early access" → /en/early-access/  [focus-visible:true outline:solid 3px in-view:true]
+   18. a "About" → /en/about/  [focus-visible:true outline:solid 3px in-view:true]
+   19. a "Contact" → /en/contact/  [focus-visible:true outline:solid 3px in-view:true]
+   20. a "Privacy" → /en/privacy/  [focus-visible:true outline:solid 3px in-view:true]
+   21. a "Legal" → /en/legal/  [focus-visible:true outline:solid 3px in-view:true]
+   22. a "English (Current language)" → /en/early-access/  [focus-visible:true outline:solid 3px in-view:true]
+   23. body "Skip to contentHeisterluxPre-launchProductHo"  [focus-visible:false outline:none 3px in-view:true]
+   24. a "Skip to content" → #main  [focus-visible:true outline:solid 3px in-view:true]
+PASS  disabled controls are skipped by Tab (no dead focus stops)
+PASS  every stop is scrolled into view
+PASS  every in-page stop shows a visible focus outline
+PASS  after the last footer link focus leaves the document (browser UI) and returns to the skip link: no trap
+PASS  each in-page element receives focus exactly once per cycle
+PASS  page links (privacy) remain reachable with the forms disabled
+PASS  a visible notice states that the form is not accepting submissions
+
+== D. Local sandbox: keyboard form flow with errors (simulator, no real email) ==
+   hints on page: ["We use this to reply to your early access request.","A few sentences is plenty. Please do not include confidential information.","We use this to send you a confirmation email. Only if you confirm it do we use it for launch updates."]
+PASS  hints are purpose-bound per form
+PASS  Keep me informed email field reachable by Tab
+PASS  next stop is the consent checkbox
+   focus now: button "Keep me informed"  [focus-visible:true outline:solid 3px in-view:true]
+PASS  next stop is the submit button (honeypot is not a tab stop)
+   after submit with errors: div "There is a problem with your submissionWork "  [focus-visible:true outline:solid 3px in-view:true]
+PASS  focus lands on the error summary (role=alert)
+   error summary links: [{"text":"Work email: Enter an email address like name@example.com.","href":"#keep-informed-email"},{"text":"Yes, email me about the Heisterlux launch. I can unsubscribe at any time.: This field is required.","href":"#keep-informed-consent"}]
+PASS  summary lists each problem as a link
+PASS  invalid field has aria-invalid and an associated error message
+PASS  entered value is kept after the error
+   Tab from summary: a "Work email: Enter an email address like name" → #keep-informed-email  [focus-visible:true outline:solid 3px in-view:true]
+PASS  Tab moves into the first summary link
+   after Enter on the link: input#keep-informed-email "email"  [focus-visible:true outline:solid 3px in-view:true]
+PASS  Enter on the summary link moves focus to the field in error
+
+== E. Local sandbox: recover and succeed ==
+PASS  Space ticks the consent checkbox
+   result: {"h1":"Thank you","notice":"Local test mode: submissions go to an in-memory test simulator on this machine. No real provider is used and no real email is sent."}
+PASS  success page names itself as local test mode (cannot be mistaken for a real confirmation)
+
+RESULT: all keyboard checks passed
+Not covered: screen readers (NVDA/JAWS/VoiceOver/Narrator), switch access, voice control, other browsers.

@@ -1,3 +1,5 @@
+NOTE (WEB-001E-R1): everything below ran against a SELF-BUILT IN-MEMORY SIMULATOR on a local dev server (FORMS_MODE=sandbox). It is not a test of Brevo or any real provider and says nothing about a provider's behaviour. Wording of some messages has changed since (see docs/web-001e/REPORT.md section 4). The simulator can no longer run on Vercel at all.
+
 == DISABLED mode (FORMS_MODE unset), http://localhost:4321 ==
 keep-informed valid POST -> HTTP 503 | h1: Submissions are not open yet
 GET submit redirects to form -> HTTP 303 | h1: 

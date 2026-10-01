@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-01T08:41:38.267Z",
+  "generatedAt": "2026-10-01T08:59:46.313Z",
   "launchMode": false,
   "pages": 16,
   "clientJsFiles": 0,
@@ -47,19 +47,19 @@
     },
     {
       "url": "/en/how-it-works/",
-      "htmlGzip": 4330,
+      "htmlGzip": 4325,
       "cssGzip": 3849,
       "jsGzip": 0,
-      "transfer": 8179,
+      "transfer": 8174,
       "robots": "noindex, nofollow",
       "pending": 0
     },
     {
       "url": "/en/",
-      "htmlGzip": 4200,
+      "htmlGzip": 4196,
       "cssGzip": 3849,
       "jsGzip": 0,
-      "transfer": 8049,
+      "transfer": 8045,
       "robots": "noindex, nofollow",
       "pending": 0
     },
@@ -101,10 +101,10 @@
     },
     {
       "url": "/en/resources/ai-literacy-under-the-eu-ai-act/",
-      "htmlGzip": 4016,
+      "htmlGzip": 4025,
       "cssGzip": 3849,
       "jsGzip": 0,
-      "transfer": 7865,
+      "transfer": 7874,
       "robots": "noindex, nofollow",
       "pending": 0
     },

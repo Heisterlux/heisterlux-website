@@ -67,6 +67,9 @@ for (const file of htmlFiles) {
   const head = html.slice(0, html.indexOf('</head>'));
 
   // Structure
+  const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]!);
+  const dup = ids.filter((id, i) => ids.indexOf(id) !== i);
+  if (dup.length) fail(`${url}: duplicate id(s): ${[...new Set(dup)].join(', ')}`);
   const h1s = html.match(/<h1[\s>]/g)?.length ?? 0;
   if (h1s !== 1) fail(`${url}: expected exactly one <h1>, found ${h1s}`);
   if (!/<title>[^<]{5,}<\/title>/.test(head)) fail(`${url}: missing <title>`);

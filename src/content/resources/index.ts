@@ -36,6 +36,11 @@ export interface ResourceContent {
 
 export interface ResourceArticle {
   id: string;
+  /**
+   * false = kept as a draft: no route, no navigation entry, no sitemap entry, no listing, no hreflang.
+   * Use it when a statement cannot be verified against a primary source; other articles are unaffected.
+   */
+  published: boolean;
   datePublished: string;
   dateReviewed: string;
   copyStatus: CopyStatus;
@@ -43,9 +48,9 @@ export interface ResourceArticle {
 }
 
 export const RESOURCES: readonly ResourceArticle[] = [
-  { id: 'four-layers', datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: fourLayersEn } },
-  { id: 'when-ai-changes', datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: whenAiChangesEn } },
-  { id: 'ai-literacy-eu', datePublished: '2026-09-30', dateReviewed: '2026-10-01', copyStatus: 'new-draft', locales: { en: aiLiteracyEn } },
+  { id: 'four-layers', published: true, datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: fourLayersEn } },
+  { id: 'when-ai-changes', published: true, datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: whenAiChangesEn } },
+  { id: 'ai-literacy-eu', published: true, datePublished: '2026-09-30', dateReviewed: '2026-10-01', copyStatus: 'new-draft', locales: { en: aiLiteracyEn } },
 ];
 
 {
@@ -53,7 +58,8 @@ export const RESOURCES: readonly ResourceArticle[] = [
     for (const [locale, c] of Object.entries(a.locales)) {
       if (c.sources.length === 0) throw new Error(`Resource ${a.id}/${locale} has no sources`);
       if (c.limitations.length === 0) throw new Error(`Resource ${a.id}/${locale} has no limitations`);
-      const anchors = new Set<string>();
+      // Ids the article template renders itself; section anchors must not collide with them.
+      const anchors = new Set<string>(['limitations', 'sources', 'toc-heading', 'main']);
       for (const s of c.sections) {
         if (anchors.has(s.anchor)) throw new Error(`Duplicate anchor ${s.anchor} in ${a.id}/${locale}`);
         anchors.add(s.anchor);

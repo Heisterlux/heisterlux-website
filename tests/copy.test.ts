@@ -4,7 +4,7 @@ import { CLAIM_RULES, findClaimViolations } from '../scripts/claim-lint.ts';
 import { CAPABILITIES } from '../src/content/capabilities.ts';
 import { en as copyEn } from '../src/content/copy/en.ts';
 import { RESOURCES } from '../src/content/resources/index.ts';
-import { ROUTES } from '../src/content/routes.ts';
+import { buildResourceRoutes, isLive, ROUTES } from '../src/content/routes.ts';
 import { en as uiEn } from '../src/i18n/ui/en.ts';
 
 const allText = JSON.stringify({ copyEn, uiEn, resources: RESOURCES, caps: CAPABILITIES.map((c) => c.text) });
@@ -92,4 +92,11 @@ test('AI literacy article is based on the official regulation and keeps the thre
     assert.ok(text.includes(part), part);
   }
   assert.ok(ROUTES.some((r) => r.articleId === 'ai-literacy-eu' && r.enabled), 'verified article stays routed (it would be removed from routes if it were not verifiable)');
+});
+
+test('a resource article set to draft disappears from routes, listing and sitemap inputs; the others are unaffected', () => {
+  const [first, second] = RESOURCES;
+  const routes = buildResourceRoutes([{ ...first!, published: false }, second!]);
+  assert.equal(isLive(routes[0]!, 'en'), false);
+  assert.equal(isLive(routes[1]!, 'en'), true);
 });

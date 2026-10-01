@@ -15,6 +15,11 @@ npm run build          # deployable artifact in .vercel/output
 npm run verify         # astro check + unit tests + contrast + build + dist verification
 npm run serve:output   # serve the built artifact locally with its real headers (port 4330)
 node scripts/verify-dist.ts --launch   # launch gate: fails while unconfirmed items or noindex remain
+
+# Browser checks against the served artifact (headless Edge/Chrome over CDP, no downloads):
+node scripts/a11y-axe.ts http://localhost:4330 evidence/axe-results.txt          # axe-core, all pages, light/dark, 1280/320 px
+node scripts/keyboard-walkthrough.ts http://localhost:4330 http://localhost:4322 evidence/keyboard-walkthrough.txt
+node scripts/capture-screenshots.ts http://localhost:4330 evidence/screenshots /en/,/en/trust/
 ```
 
 Node 24.x. On Windows machines where Smart App Control blocks Astro's native compiler binding,
@@ -41,6 +46,9 @@ install the official WASI fallback locally without saving it:
 - `available` capability status requires a customer release with production evidence, audience,
   support route and publication approval; internal merges/migrations/DEV tests never count.
 - Builds are `noindex` unless `VERCEL_ENV=production` **and** `PUBLIC_SITE_INDEXABLE=true`.
-- Forms are disabled unless `FORMS_MODE=sandbox` outside Vercel production. No live provider is wired.
+- Forms are disabled. The only alternative is `FORMS_MODE=sandbox`, an in-memory simulator that runs **only locally**
+  (never on Vercel, including previews). It is not a test of any real provider. No live provider is wired and the
+  in-memory rate limiter is a test helper, not a production facility.
+- Claims are linted (`scripts/claim-lint.ts`) in tests and on the rendered HTML.
 
 Delivery report, open launch gates and the release/rollback plan: `docs/web-001e/`.
