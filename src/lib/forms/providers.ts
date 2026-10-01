@@ -38,17 +38,27 @@ export interface LeadProvider {
 export type FormsMode = 'disabled' | 'sandbox';
 
 /**
- * Any unknown or missing value means disabled. Sandbox is refused on Vercel production so that
- * a misconfiguration can never make production appear to accept submissions.
+ * Any unknown or missing value means disabled. The sandbox simulator only runs when it is asked
+ * for explicitly AND the code is not running on Vercel at all (no `VERCEL`, `VERCEL_ENV` or
+ * `VERCEL_URL`). A preview or production deployment therefore never accepts personal data
+ * through the simulator, whatever its environment variables say.
  */
-export function resolveFormsMode(env: { FORMS_MODE?: string | undefined; VERCEL_ENV?: string | undefined }): FormsMode {
-  if (env.FORMS_MODE === 'sandbox' && env.VERCEL_ENV !== 'production') return 'sandbox';
+export function resolveFormsMode(env: {
+  FORMS_MODE?: string | undefined;
+  VERCEL?: string | undefined;
+  VERCEL_ENV?: string | undefined;
+  VERCEL_URL?: string | undefined;
+}): FormsMode {
+  const onVercel = Boolean(env.VERCEL || env.VERCEL_ENV || env.VERCEL_URL);
+  if (env.FORMS_MODE === 'sandbox' && !onVercel) return 'sandbox';
   return 'disabled';
 }
 
 // ---------------------------------------------------------------------------------------------
-// Sandbox provider: models double opt-in, duplicates, unsubscribe/suppression and failures.
-// Emails are never sent; an outbox records what would have been sent, for tests.
+// Sandbox provider: a SELF-BUILT, IN-MEMORY SIMULATOR of double opt-in, duplicates,
+// unsubscribe/suppression and failures. It is NOT a test of Brevo or any real provider and proves
+// nothing about a provider's behaviour. Emails are never sent; an outbox records what would have
+// been sent, for tests. It only runs locally (see resolveFormsMode).
 // ---------------------------------------------------------------------------------------------
 
 type SubscriberState = 'pending' | 'confirmed';

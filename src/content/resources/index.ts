@@ -45,7 +45,7 @@ export interface ResourceArticle {
 export const RESOURCES: readonly ResourceArticle[] = [
   { id: 'four-layers', datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: fourLayersEn } },
   { id: 'when-ai-changes', datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: whenAiChangesEn } },
-  { id: 'ai-literacy-eu', datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: aiLiteracyEn } },
+  { id: 'ai-literacy-eu', datePublished: '2026-09-30', dateReviewed: '2026-10-01', copyStatus: 'new-draft', locales: { en: aiLiteracyEn } },
 ];
 
 {

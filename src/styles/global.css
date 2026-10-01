@@ -916,3 +916,34 @@ th {
   block-size: auto;
   color: var(--c-text-muted);
 }
+
+/* ---------- Trust topics and capability detail rows: stacked label/value ---------- */
+.trust-topic,
+.capability dl {
+  display: block;
+  margin: 0;
+}
+
+.trust-topic dt,
+.capability dl dt {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-text-muted);
+  margin-block-start: var(--s-3);
+}
+
+.trust-topic dd,
+.capability dl dd {
+  margin: 0;
+  font-size: var(--fs-sm);
+  max-inline-size: var(--measure);
+}
+
+.trust-topic dd {
+  font-size: var(--fs-base);
+}
+
+.trust-topic dt:first-child,
+.capability dl dt:first-child {
+  margin-block-start: 0;
+}

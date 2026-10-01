@@ -19,9 +19,9 @@ export const en: ResourceContent = {
     {
       anchor: 'kinds-of-change',
       heading: 'Kinds of change to watch for',
-      paragraphs: ['Mapped to the four layers of AI use:'],
+      paragraphs: ['Mapped to the four distinctions in AI use:'],
       list: [
-        'AI system: a model version is deprecated, retired or replaced; behaviour changes between versions.',
+        'AI system or capability: a model version is deprecated, retired or replaced; behaviour changes between versions.',
         'Deployment Context: a licence, plan or agreement changes — including what happens to the data you send.',
         'Application: a tool you already use adds, removes or changes an AI feature.',
         'Reliance: your own use drifts — the AI is used for something more consequential than when it was first accepted.',

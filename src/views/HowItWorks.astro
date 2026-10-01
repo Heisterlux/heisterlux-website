@@ -1,6 +1,6 @@
 ---
 import FlowDiagram from '../components/FlowDiagram.astro';
-import LayersDiagram from '../components/LayersDiagram.astro';
+import Distinctions from '../components/Distinctions.astro';
 import { copy } from '../content/copy/index.ts';
 import { pathFor } from '../content/routes.ts';
 import type { LocaleCode } from '../i18n/locales.ts';
@@ -36,16 +36,7 @@ const details = c.stepDetails as Record<string, string>;
 
   <section aria-labelledby="layers-heading">
     <h2 id="layers-heading">{c.layersHeading}</h2>
-    <LayersDiagram layers={home.layers} connectors={home.layerConnectors} label={home.layers.map((l) => l.title).join(', ')} describedBy="how-layers" />
-    <dl id="how-layers">
-      {home.layers.map((l) => (
-        <>
-          <dt><strong>{l.title}</strong></dt>
-          <dd>{l.text}</dd>
-        </>
-      ))}
-    </dl>
-    <p class="notice">{home.layersNote}</p>
+    <Distinctions locale={locale} idPrefix="how-layers" variant="list" />
   </section>
 
   <section aria-labelledby="example-heading">

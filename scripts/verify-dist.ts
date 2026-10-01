@@ -10,6 +10,7 @@
 import { readFileSync, readdirSync, statSync, writeFileSync, existsSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { findClaimViolations } from './claim-lint.ts';
 
 const OUT = '.vercel/output';
 const STATIC = join(OUT, 'static');
@@ -125,6 +126,11 @@ for (const file of htmlFiles) {
 
   // Legacy remnants
   for (const re of FORBIDDEN_TEXT) if (re.test(html)) fail(`${url}: legacy/forbidden text ${re}`);
+
+  // Claim lint on the rendered page (visible text and attributes)
+  for (const hit of findClaimViolations(html)) {
+    fail(`${url}: claim lint "${hit.match}" — ${hit.why}`);
+  }
 
   // Internal links
   for (const m of html.matchAll(/<a\b[^>]*\shref="([^"]+)"/g)) {

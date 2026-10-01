@@ -1,16 +1,17 @@
 /**
  * Rate limiting.
  *
- * The in-memory limiter only protects a single process; on serverless it is per-instance and
- * NOT durable. A durable, project-scoped store (or a platform firewall rule) is required before
- * forms are enabled anywhere public — launch gate G-RATELIMIT.
+ * The in-memory limiter is a TEST HELPER, not a finished production facility. It only counts within
+ * one process; on serverless it would be per-instance and not durable. A durable, project-scoped
+ * store (or a platform firewall rule) must exist and be authorized before forms are enabled
+ * anywhere public — launch gate G-RATELIMIT.
  */
 
 export interface RateLimiter {
   hit(key: string): Promise<{ allowed: boolean; retryAfterSeconds: number }>;
 }
 
-export class MemoryRateLimiter implements RateLimiter {
+export class InMemoryTestRateLimiter implements RateLimiter {
   private readonly windows = new Map<string, { start: number; count: number }>();
   private readonly limit: number;
   private readonly windowMs: number;

@@ -18,6 +18,26 @@ const c = copy(locale).trust;
     <p class="lead">{c.lead}</p>
   </header>
 
+  <section aria-labelledby="principles-heading">
+    <h2 id="principles-heading">{c.principlesHeading}</h2>
+    <p>{c.principlesIntro}</p>
+    <ul class="grid">
+      {c.topics.map((topic) => (
+        <li class="card" id={topic.id}>
+          <h3>{topic.title}</h3>
+          <dl class="trust-topic">
+            <dt>{c.principlesLegend.principle}</dt>
+            <dd>{topic.principle}</dd>
+            <dt>{c.principlesLegend.today}</dt>
+            <dd>{topic.today ?? c.nothingYet}</dd>
+            <dt>{c.principlesLegend.before}</dt>
+            <dd>{topic.before}</dd>
+          </dl>
+        </li>
+      ))}
+    </ul>
+  </section>
+
   <section aria-labelledby="site-heading">
     <h2 id="site-heading">{c.siteHeading}</h2>
     <ul>{c.siteItems.map((i) => <li>{i}</li>)}</ul>

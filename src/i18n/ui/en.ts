@@ -22,6 +22,10 @@ export const en = {
   onThisPage: 'On this page',
   status: 'Status',
   scope: 'Scope',
+  builtSoFar: 'Built so far (internal)',
+  stillToBuild: 'Still to build',
+  customerToday: 'Customer use today',
+  notAvailable: 'Not available',
   pendingPrefix: 'To be confirmed before launch:',
   footerTagline: 'Confidence is earned. Not generated.',
   footerCopyright: '© {year} Heisterlux',
@@ -34,9 +38,9 @@ export const en = {
   formErrorSummary: 'There is a problem with your submission',
   formsDisabledTitle: 'Submissions are not open yet',
   formsDisabledBody:
-    'This form is not accepting submissions yet. We are still setting up email, privacy and processing arrangements. Nothing you enter here is sent or stored.',
+    'This form is not accepting submissions yet. We are still setting up email, privacy and processing arrangements. Please come back after launch; submitting this form does nothing for now.',
   formsSandboxNotice:
-    'Sandbox mode: submissions go to a local test provider. No real email is sent.',
+    'Local test mode: submissions go to an in-memory test simulator on this machine. No real provider is used and no real email is sent.',
   backToForm: 'Back to the form',
   capabilityStatus: {
     available: 'Available',

@@ -12,12 +12,31 @@ test('the shipped registry is valid and claims nothing as Available', () => {
   assert.equal(CAPABILITIES.filter((c) => c.status === 'available').length, 0);
 });
 
+test('R1: proportional-action and impact-view are In development, with the original classification kept in history', () => {
+  const byId = (id: string) => CAPABILITIES.find((c) => c.id === id)!;
+  const pa = byId('proportional-action');
+  assert.equal(pa.status, 'in-development');
+  assert.deepEqual(pa.history.map((h) => h.status), ['exploring', 'in-development']);
+  const iv = byId('impact-view');
+  assert.equal(iv.status, 'in-development');
+  assert.deepEqual(iv.history.map((h) => h.status), ['up-next', 'in-development']);
+  assert.equal(byId('change-sources').status, 'exploring');
+  for (const c of CAPABILITIES) {
+    const t = c.text.en!;
+    assert.ok(t.built.length > 0 && t.toBuild.length > 0, c.id);
+  }
+  // Internal foundation is not presented as customer use.
+  assert.match(pa.text.en!.built, /internal only/);
+  assert.match(pa.text.en!.scope, /not a decision, and not enforced/);
+  assert.match(iv.text.en!.limitations.join(' '), /does not by itself show/);
+});
+
 const base: CapabilityRecord = {
   id: 'x',
   stage: 'visibility',
   status: 'available',
   reviewedOn: '2026-09-30',
-  text: { en: { name: 'X', summary: 's', scope: 's', limitations: [] } },
+  text: { en: { name: 'X', summary: 's', scope: 's', built: 'b', toBuild: 't', limitations: [] } },
   internalEvidence: ['merged to main', 'migration applied on DEV', 'DEV tests pass'],
   history: [{ on: '2026-09-30', status: 'available', note: '' }],
 };

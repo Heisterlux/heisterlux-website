@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { handleSubmission, type HandlerDeps } from '../src/lib/forms/handler.ts';
 import { resolveFormsMode, SandboxProvider } from '../src/lib/forms/providers.ts';
-import { MemoryRateLimiter, rateLimitKey } from '../src/lib/forms/ratelimit.ts';
+import { InMemoryTestRateLimiter, rateLimitKey } from '../src/lib/forms/ratelimit.ts';
 import { isValidEmail, validateBody } from '../src/lib/forms/schema.ts';
 
 const ORIGIN = 'http://localhost:4321';
@@ -19,7 +19,7 @@ function deps(provider: SandboxProvider | null, overrides: Partial<HandlerDeps> 
   return {
     mode: provider ? 'sandbox' : 'disabled',
     provider,
-    rateLimiter: new MemoryRateLimiter(100, 60_000),
+    rateLimiter: new InMemoryTestRateLimiter(100, 60_000),
     rateLimitSalt: 'test-salt',
     clientAddress: '203.0.113.7',
     ...overrides,
@@ -35,9 +35,12 @@ test('forms are disabled by default and for unknown values', () => {
   assert.equal(resolveFormsMode({ FORMS_MODE: 'SANDBOX' }), 'disabled');
 });
 
-test('sandbox mode is refused on Vercel production', () => {
-  assert.equal(resolveFormsMode({ FORMS_MODE: 'sandbox', VERCEL_ENV: 'production' }), 'disabled');
-  assert.equal(resolveFormsMode({ FORMS_MODE: 'sandbox', VERCEL_ENV: 'preview' }), 'sandbox');
+test('the sandbox simulator only runs locally: refused on Vercel in every environment', () => {
+  assert.equal(resolveFormsMode({ FORMS_MODE: 'sandbox' }), 'sandbox');
+  for (const vercel of [{ VERCEL_ENV: 'production' }, { VERCEL_ENV: 'preview' }, { VERCEL_ENV: 'development' }, { VERCEL: '1' }, { VERCEL_URL: 'x.vercel.app' }]) {
+    assert.equal(resolveFormsMode({ FORMS_MODE: 'sandbox', ...vercel }), 'disabled', JSON.stringify(vercel));
+  }
+  assert.equal(resolveFormsMode({ VERCEL_ENV: 'preview' }), 'disabled');
 });
 
 test('disabled mode refuses without reading the body and without fake success', async () => {
@@ -183,7 +186,7 @@ test('honeypot looks like success but does nothing', async () => {
 // ---------- Rate limit ----------
 test('rate limit blocks after the limit with Retry-After and resets after the window', async () => {
   let now = 0;
-  const limiter = new MemoryRateLimiter(2, 60_000, () => now);
+  const limiter = new InMemoryTestRateLimiter(2, 60_000, () => now);
   const p = new SandboxProvider();
   const d = deps(p, { rateLimiter: limiter });
   const send = () => handleSubmission(post('keep-informed', keepInformed('r@example.com')), 'keep-informed', 'en', d);

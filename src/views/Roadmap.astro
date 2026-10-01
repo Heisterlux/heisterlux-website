@@ -23,6 +23,7 @@ const noneAvailable = !active.some((cap) => cap.status === 'available');
     <h1>{c.heading}</h1>
     <p class="lead">{c.lead}</p>
     {noneAvailable && <p class="notice">{c.noneAvailable}</p>}
+    <p class="muted">{c.maturityNote}</p>
   </header>
 
   <section aria-labelledby="legend-heading">

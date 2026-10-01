@@ -1,6 +1,6 @@
 ---
 import FlowDiagram from '../components/FlowDiagram.astro';
-import LayersDiagram from '../components/LayersDiagram.astro';
+import Distinctions from '../components/Distinctions.astro';
 import { copy } from '../content/copy/index.ts';
 import { pathFor } from '../content/routes.ts';
 import { ui } from '../i18n/index.ts';
@@ -42,21 +42,7 @@ const t = ui(locale);
   <div class="container">
     <h2 id="layers-heading">{c.layersHeading}</h2>
     <p>{c.layersIntro}</p>
-    <LayersDiagram
-      layers={c.layers}
-      connectors={c.layerConnectors}
-      label={c.layers.map((l) => l.title).join(', ')}
-      describedBy="layers-list"
-    />
-    <ul class="grid" id="layers-list">
-      {c.layers.map((l) => (
-        <li class="card">
-          <h3>{l.title}</h3>
-          <p>{l.text}</p>
-        </li>
-      ))}
-    </ul>
-    <p class="notice">{c.layersNote}</p>
+    <Distinctions locale={locale} idPrefix="home-layers" variant="cards" />
   </div>
 </section>
 

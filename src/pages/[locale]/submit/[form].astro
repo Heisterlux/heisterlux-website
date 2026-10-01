@@ -65,6 +65,7 @@ const accepted = r.accepted as Record<FormId, string>;
     <header class="page-head">
       <h1>{title}</h1>
     </header>
+    {FORMS_MODE === 'sandbox' && <div class="notice"><p>{ui(locale).formsSandboxNotice}</p></div>}
     {outcome.kind === 'accepted' && (
       <>
         <p>{accepted[formId]}</p>

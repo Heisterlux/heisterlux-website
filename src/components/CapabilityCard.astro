@@ -25,6 +25,12 @@ const Heading = headingLevel;
   <dl>
     <dt>{t.scope}</dt>
     <dd>{text.scope}</dd>
+    <dt>{t.builtSoFar}</dt>
+    <dd>{text.built}</dd>
+    <dt>{t.stillToBuild}</dt>
+    <dd>{text.toBuild}</dd>
+    <dt>{t.customerToday}</dt>
+    <dd>{capability.status === 'available' ? t.capabilityStatus.available : t.notAvailable}</dd>
     <dt>{t.reviewed}</dt>
     <dd><time datetime={capability.reviewedOn}>{formatDate(locale, capability.reviewedOn)}</time></dd>
   </dl>

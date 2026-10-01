@@ -12,7 +12,12 @@ interface Props {
 }
 const { locale } = Astro.props;
 const c = copy(locale).contact;
-const mode = resolveFormsMode({ FORMS_MODE: process.env.FORMS_MODE, VERCEL_ENV: process.env.VERCEL_ENV });
+const mode = resolveFormsMode({
+  FORMS_MODE: process.env.FORMS_MODE,
+  VERCEL: process.env.VERCEL,
+  VERCEL_ENV: process.env.VERCEL_ENV,
+  VERCEL_URL: process.env.VERCEL_URL,
+});
 ---
 
 <div class="container">

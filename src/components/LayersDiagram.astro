@@ -1,47 +1,90 @@
 ---
 /**
- * The four layers, linked but separate. Summary image only; the page renders the full text
- * explanation as a visible list referenced by aria-describedby.
+ * Model of the four distinctions. An organizational use and reliance rests on a concrete use;
+ * that concrete use is described by three separate things (AI capability, Deployment Context,
+ * application/service). The three are drawn as siblings on a spine, never as a chain, so the
+ * diagram does not suggest one-to-one relations or that one layer contains another.
+ *
+ * Summary image only: the complete text equivalent is the visible list and relations that the
+ * page renders after the figure (referenced by aria-describedby), plus the figcaption.
  */
-interface Props {
-  layers: readonly { id: string; title: string }[];
-  connectors: readonly string[];
-  label: string;
-  describedBy: string;
+interface Part {
+  id: string;
+  title: string;
+  sub: string;
 }
-const { layers, connectors, label, describedBy } = Astro.props;
-const H = 60;
-const GAP = 44;
-const total = layers.length * H + (layers.length - 1) * GAP;
+interface Props {
+  reliance: { title: string; sub: string };
+  use: { title: string; sub: string };
+  parts: readonly Part[];
+  rests: string;
+  describedBy: string;
+  label: string;
+  caption: string;
+  describedById: string;
+}
+const { reliance, use, parts, rests, describedBy, label, caption, describedById } = Astro.props;
+
+const W = 360;
+const BOX_H = 62;
+const TOP_H = 66;
+const GAP_TOP = 40;
+const USE_Y = TOP_H + GAP_TOP;
+const SPINE_X = 22;
+const PARTS_X = 46;
+const PARTS_W = W - PARTS_X - 1;
+const PARTS_Y0 = USE_Y + TOP_H + 34;
+const PART_STEP = BOX_H + 14;
+const lastMid = PARTS_Y0 + (parts.length - 1) * PART_STEP + BOX_H / 2;
+const H = PARTS_Y0 + (parts.length - 1) * PART_STEP + BOX_H + 2;
 ---
 
-<figure class="diagram diagram--layers">
-  <svg viewBox={`0 0 360 ${total}`} role="img" aria-label={label} aria-describedby={describedBy}>
+<figure class="diagram diagram--model">
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label} aria-describedby={describedById}>
     <defs>
-      <marker id="layer-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <marker id="model-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path class="d-arrow" d="M0 0 L10 5 L0 10 z"></path>
       </marker>
     </defs>
-    {layers.map((l, i) => {
-      const y = i * (H + GAP);
+
+    <rect class="d-box d-box--accent" x="1" y="1" width={W - 2} height={TOP_H - 2} rx="8"></rect>
+    <text class="d-label" x={W / 2} y="30" text-anchor="middle">{reliance.title}</text>
+    <text class="d-sub" x={W / 2} y="50" text-anchor="middle">{reliance.sub}</text>
+
+    <line class="d-line" x1={W / 2} y1={TOP_H} x2={W / 2} y2={USE_Y - 2} marker-end="url(#model-arrow)"></line>
+    <text class="d-sub" x={W / 2 + 12} y={TOP_H + GAP_TOP / 2 + 4}>{rests}</text>
+
+    <rect class="d-box" x="1" y={USE_Y} width={W - 2} height={TOP_H - 2} rx="8"></rect>
+    <text class="d-label" x={W / 2} y={USE_Y + 29} text-anchor="middle">{use.title}</text>
+    <text class="d-sub" x={W / 2} y={USE_Y + 49} text-anchor="middle">{use.sub}</text>
+
+    <text class="d-sub" x={PARTS_X} y={USE_Y + TOP_H + 22}>{describedBy}</text>
+    <path class="d-line" d={`M${SPINE_X} ${USE_Y + TOP_H - 2} V${lastMid}`}></path>
+    {parts.map((p, i) => {
+      const y = PARTS_Y0 + i * PART_STEP;
       return (
         <g>
-          <rect class={i === layers.length - 1 ? 'd-box d-box--accent' : 'd-box'} x="1" y={y + 1} width="358" height={H - 2} rx="8"></rect>
-          <text class="d-label" x="180" y={y + H / 2 + 5} text-anchor="middle">{l.title}</text>
-          {i < layers.length - 1 && (
-            <g>
-              <line class="d-line" x1="60" y1={y + H} x2="60" y2={y + H + GAP - 2} marker-end="url(#layer-arrow)"></line>
-              <text class="d-sub" x="76" y={y + H + GAP / 2 + 4}>{connectors[i]}</text>
-            </g>
-          )}
+          <path class="d-line" d={`M${SPINE_X} ${y + BOX_H / 2} H${PARTS_X - 2}`} marker-end="url(#model-arrow)"></path>
+          <rect class="d-box" x={PARTS_X} y={y} width={PARTS_W} height={BOX_H} rx="8"></rect>
+          <text class="d-label" x={PARTS_X + PARTS_W / 2} y={y + 28} text-anchor="middle">{p.title}</text>
+          <text class="d-sub" x={PARTS_X + PARTS_W / 2} y={y + 48} text-anchor="middle">{p.sub}</text>
         </g>
       );
     })}
   </svg>
+  <figcaption class="diagram-caption">{caption}</figcaption>
 </figure>
 
 <style>
-  .diagram--layers {
+  .diagram--model {
     max-inline-size: 26rem;
+    margin-inline: 0;
+  }
+
+  .diagram-caption {
+    margin-block-start: var(--s-3);
+    font-size: var(--fs-sm);
+    color: var(--c-text-muted);
+    max-inline-size: 40ch;
   }
 </style>
