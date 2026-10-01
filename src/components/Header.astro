@@ -1,0 +1,53 @@
+---
+import BrandMark from './BrandMark.astro';
+import { SIGN_IN_URL } from '../config/site.ts';
+import { ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+import { navRoutes, pathFor } from '../content/routes.ts';
+
+interface Props {
+  locale: LocaleCode;
+  currentRouteId?: string | undefined;
+}
+
+const { locale, currentRouteId } = Astro.props;
+const t = ui(locale);
+// Early Access is the primary CTA; it is kept out of the plain link list to avoid a duplicate.
+const items = navRoutes('primary', locale).filter((r) => r.id !== 'early-access');
+const earlyAccessPath = pathFor('early-access', locale);
+const isCurrent = (id: string) =>
+  id === currentRouteId || (id === 'resources' && currentRouteId?.startsWith('resource:'));
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href={pathFor('home', locale)} aria-label={t.home}>
+      <BrandMark class="brand__mark" />
+      <span>Heisterlux</span>
+    </a>
+    <span class="badge-prelaunch">{t.preLaunch}</span>
+
+    <nav class="nav-desktop" aria-label={t.primaryNav}>
+      <ul class="nav-list">
+        {items.map((r) => (
+          <li><a href={r.path} aria-current={isCurrent(r.id) ? 'page' : undefined}>{r.label}</a></li>
+        ))}
+        {SIGN_IN_URL && <li><a href={SIGN_IN_URL}>{t.signIn}</a></li>}
+        <li><a class="button" href={earlyAccessPath} aria-current={currentRouteId === 'early-access' ? 'page' : undefined}>{t.earlyAccessCta}</a></li>
+      </ul>
+    </nav>
+
+    <details class="nav-mobile">
+      <summary>{t.menu}</summary>
+      <nav aria-label={t.primaryNav}>
+        <ul class="nav-list">
+          {items.map((r) => (
+            <li><a href={r.path} aria-current={isCurrent(r.id) ? 'page' : undefined}>{r.label}</a></li>
+          ))}
+          {SIGN_IN_URL && <li><a href={SIGN_IN_URL}>{t.signIn}</a></li>}
+          <li><a class="button" href={earlyAccessPath}>{t.earlyAccessCta}</a></li>
+        </ul>
+      </nav>
+    </details>
+  </div>
+</header>

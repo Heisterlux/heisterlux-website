@@ -1,0 +1,70 @@
+---
+import CapabilityCard from '../components/CapabilityCard.astro';
+import { CAPABILITIES, type CapabilityStatus } from '../content/capabilities.ts';
+import { copy } from '../content/copy/index.ts';
+import { formatDate, ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const c = copy(locale).roadmap;
+const t = ui(locale);
+const ORDER: CapabilityStatus[] = ['available', 'in-development', 'up-next', 'exploring'];
+const legend = c.legend as Record<CapabilityStatus, string>;
+const active = CAPABILITIES.filter((cap) => !cap.withdrawn);
+const withdrawn = CAPABILITIES.filter((cap) => cap.withdrawn);
+const noneAvailable = !active.some((cap) => cap.status === 'available');
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.lead}</p>
+    {noneAvailable && <p class="notice">{c.noneAvailable}</p>}
+    <p class="muted">{c.maturityNote}</p>
+  </header>
+
+  <section aria-labelledby="legend-heading">
+    <h2 id="legend-heading">{c.legendHeading}</h2>
+    <dl>
+      {ORDER.map((s) => (
+        <>
+          <dt><strong>{t.capabilityStatus[s]}</strong></dt>
+          <dd>{legend[s]}</dd>
+        </>
+      ))}
+    </dl>
+    <p class="muted">{c.disclaimer}</p>
+  </section>
+
+  {ORDER.map((status) => {
+    const caps = active.filter((cap) => cap.status === status);
+    return (
+      <section aria-labelledby={`group-${status}`}>
+        <h2 id={`group-${status}`}>{t.capabilityStatus[status]}</h2>
+        {caps.length === 0 ? (
+          <p class="muted">{c.emptyGroup}</p>
+        ) : (
+          <ul class="grid">
+            {caps.map((cap) => <li><CapabilityCard locale={locale} capability={cap} /></li>)}
+          </ul>
+        )}
+      </section>
+    );
+  })}
+
+  {withdrawn.length > 0 && (
+    <section aria-labelledby="group-withdrawn">
+      <h2 id="group-withdrawn">{c.withdrawnHeading}</h2>
+      <ul>
+        {withdrawn.map((cap) => (
+          <li>
+            <strong>{cap.text[locale]?.name}</strong> — {cap.withdrawn!.reason} (<time datetime={cap.withdrawn!.on}>{formatDate(locale, cap.withdrawn!.on)}</time>)
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</div>

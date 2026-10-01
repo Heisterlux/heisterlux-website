@@ -1,0 +1,60 @@
+---
+import { fill, ui } from '../i18n/index.ts';
+import { getLocale, type LocaleCode } from '../i18n/locales.ts';
+import { alternatesFor, navRoutes } from '../content/routes.ts';
+
+interface Props {
+  locale: LocaleCode;
+  currentRouteId?: string | undefined;
+}
+
+const { locale, currentRouteId } = Astro.props;
+const t = ui(locale);
+const primary = navRoutes('primary', locale);
+const secondary = navRoutes('secondary', locale);
+// Language selector: only published translations of THIS page. Pages without a route ID
+// (404, form results) link to each published locale's home instead.
+const languages = alternatesFor(currentRouteId ?? 'home');
+const year = new Date().getUTCFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div>
+        <p class="footer-tagline">{t.footerTagline}</p>
+        <p class="muted">{t.preLaunchNote}</p>
+      </div>
+      <nav aria-label={t.footerNav}>
+        <h2>Heisterlux</h2>
+        <ul>
+          {primary.map((r) => <li><a href={r.path} aria-current={r.id === currentRouteId ? 'page' : undefined}>{r.label}</a></li>)}
+        </ul>
+      </nav>
+      <nav aria-label={t.footerMore}>
+        <h2>{t.footerMore}</h2>
+        <ul>
+          {secondary.map((r) => <li><a href={r.path} aria-current={r.id === currentRouteId ? 'page' : undefined}>{r.label}</a></li>)}
+        </ul>
+      </nav>
+      <nav aria-label={t.language}>
+        <h2>{t.language}</h2>
+        <ul>
+          {languages.map((l) => {
+            const def = getLocale(l.locale)!;
+            const current = l.locale === locale;
+            return (
+              <li>
+                <a href={l.path} lang={def.bcp47} hreflang={def.bcp47} aria-current={current ? 'true' : undefined}>
+                  {def.nativeName}
+                  {current && <span class="visually-hidden"> ({t.currentLanguage})</span>}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </div>
+    <p class="footer-bottom">{fill(t.footerCopyright, { year })}</p>
+  </div>
+</footer>

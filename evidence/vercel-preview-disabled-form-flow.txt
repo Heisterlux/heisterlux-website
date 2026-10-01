@@ -1,0 +1,65 @@
+Disabled-form flow on the protected Vercel preview (synthetic input only)
+Base: https://heisterlux-website-81c0l7je7-heisterlux-s-projects.vercel.app   Run: 2026-10-01T09:01:07Z
+Access: temporary Vercel share link (not recorded). Values: synthetic-r1-test@example.invalid, marker SYNTHETIC-R1-MARKER-7731
+
+GET via share link -> HTTP 200
+GET /en/early-access/ -> HTTP 200
+  disabled fieldsets: 2 | sandbox notice present: 0
+
+== POST attempts: expected 503, disabled page, no success text ==
+keep-informed valid -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+early-access valid -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+contact valid -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+contact invalid email -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+unknown field -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+honeypot filled -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+repeat #1 (no rate limit may answer; disabled returns first) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+repeat #2 (no rate limit may answer; disabled returns first) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+repeat #3 (no rate limit may answer; disabled returns first) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+repeat #4 (no rate limit may answer; disabled returns first) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+repeat #5 (no rate limit may answer; disabled returns first) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+repeat #6 (no rate limit may answer; disabled returns first) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+repeat #7 (no rate limit may answer; disabled returns first) -> HTTP 503 | h1: Submissions are not open yet | success-text matches: 0
+JSON content-type -> HTTP 503
+cross-origin POST -> HTTP 403
+GET submit route -> HTTP/1.1 303 See Other, Location: /en/contact/
+
+== headers of the last disabled POST response ==
+HTTP/1.1 503 Service Unavailable
+Cache-Control: no-store
+Content-Security-Policy: default-src 'self';img-src 'self' data:;font-src 'self';connect-src 'self';object-src 'none';base-uri 'none';frame-ancestors 'none';form-action 'self';manifest-src 'self';upgr
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=(), browsing-topics=()
+Referrer-Policy: strict-origin-when-cross-origin
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Robots-Tag: noindex, nofollow
+
+== headers of GET /en/early-access/ ==
+HTTP/1.1 200 OK
+Cache-Control: public, max-age=0, must-revalidate
+Content-Security-Policy: default-src 'self';img-src 'self' data:;font-src 'self';connect-src 'self';object-src 'none';base-uri 'none';frame-ancestors 'none';form-action 'self';manifest-src 'self';upgr
+Referrer-Policy: strict-origin-when-cross-origin
+Strict-Transport-Security: max-age=63072000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Robots-Tag: noindex
+share-token occurrences in output (must be 0): 0
+
+== Vercel runtime logs of this deployment (dpl_HWDTZzyN7kWVTQPDWhSccdMUrUYJ, commit 63370aa, 15 min window) ==
+14 same-origin POSTs were refused (3 valid, 1 invalid, 1 unknown field, 1 honeypot, 7 repeats, 1 JSON). Each produced exactly one log line:
+  {"event":"form-submission","form":"<form>","outcome":"disabled","status":503,"mode":"disabled"}
+The cross-origin POST (403, refused by the framework before the handler) and the GET redirect (303) show only the platform line.
+Full-text search of the deployment's runtime logs for "SYNTHETIC" and for "example.invalid": no matches.
+No provider call is possible in this mode: the provider object is null and the handler returns before it reads the body
+(unit-tested: request.bodyUsed === false); no real provider is implemented.
+
+== Result ==
+POST stays refused (503) for valid, invalid, unknown-field, honeypot, repeated and JSON input: PASS
+No fake success text on any response: PASS
+No provider call possible, no personal data in logs: PASS (logs inspected)
+Cache/security headers on the dynamic response (no-store, noindex, CSP, HSTS, X-Frame-Options, nosniff, Referrer-Policy,
+Permissions-Policy, COOP/CORP, no Set-Cookie): PASS
+Deployment content spot-check: see vercel-preview-content-check.txt

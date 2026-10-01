@@ -1,0 +1,57 @@
+NOTE (WEB-001E-R1): everything below ran against a SELF-BUILT IN-MEMORY SIMULATOR on a local dev server (FORMS_MODE=sandbox). It is not a test of Brevo or any real provider and says nothing about a provider's behaviour. Wording of some messages has changed since (see docs/web-001e/REPORT.md section 4). The simulator can no longer run on Vercel at all.
+
+== DISABLED mode (FORMS_MODE unset), http://localhost:4321 ==
+keep-informed valid POST -> HTTP 503 | h1: Submissions are not open yet
+GET submit redirects to form -> HTTP 303 | h1: 
+   GET redirect location: http://localhost:4321/en/contact/
+== SANDBOX mode (FORMS_MODE=sandbox), http://localhost:4322 ==
+keep-informed valid (DOI started) -> HTTP 200 | h1: Thank you
+   body: <p>Please check your inbox and confirm your email address. You will only hear from us after you confirm.
+keep-informed duplicate (same response) -> HTTP 200 | h1: Thank you
+keep-informed missing consent -> HTTP 422 | h1: Please check the form
+   field error: class="error" id="keep-informed-consent-error">This field is required.
+   aria-invalid fields: 1; error summary role=alert: 1; submitted email re-filled: 1
+early-access invalid email -> HTTP 422 | h1: Please check the form
+early-access valid -> HTTP 200 | h1: Thank you
+contact valid -> HTTP 200 | h1: Thank you
+unknown field -> HTTP 400 | h1: This submission could not be processed
+wrong content-type (json) -> HTTP 415 | h1: This submission could not be processed
+oversized body (9KB) -> HTTP 413 | h1: This submission could not be processed
+cross-origin POST -> HTTP 403 | h1: 
+no Origin header -> HTTP 403 | h1: 
+honeypot filled (silent accept) -> HTTP 200 | h1: Thank you
+-- rate limit burst on contact (limit 5 per 10 min per form per client; 1 earlier contact post counted) --
+contact burst #1 -> HTTP 200 | h1: Thank you
+contact burst #2 -> HTTP 200 | h1: Thank you
+contact burst #3 -> HTTP 200 | h1: Thank you
+contact burst #4 -> HTTP 200 | h1: Thank you
+contact burst #5 -> HTTP 429 | h1: Too many attempts
+   header: HTTP/1.1 429 OK
+   header: cache-control: no-store
+   header: referrer-policy: strict-origin-when-cross-origin
+   header: retry-after: 595
+   header: x-content-type-options: nosniff
+   header: x-frame-options: DENY
+   header: x-robots-tag: noindex, nofollow
+unknown form id -> HTTP 404 | h1: Page not found
+unpublished locale /nl/ -> HTTP 404 | h1: Page not found
+-- server log lines (must contain no personal data) --
+{"event":"form-submission","form":"keep-informed","outcome":"accepted","status":200,"mode":"sandbox"}
+{"event":"form-submission","form":"keep-informed","outcome":"accepted","status":200,"mode":"sandbox"}
+{"event":"form-submission","form":"keep-informed","outcome":"invalid","status":422,"mode":"sandbox"}
+{"event":"form-submission","form":"early-access","outcome":"invalid","status":422,"mode":"sandbox"}
+{"event":"form-submission","form":"early-access","outcome":"accepted","status":200,"mode":"sandbox"}
+{"event":"form-submission","form":"contact","outcome":"accepted","status":200,"mode":"sandbox"}
+{"event":"form-submission","form":"keep-informed","outcome":"bad-request","status":400,"mode":"sandbox","reason":"unexpected-fields"}
+{"event":"form-submission","form":"contact","outcome":"bad-request","status":415,"mode":"sandbox"}
+{"event":"form-submission","form":"contact","outcome":"bad-request","status":413,"mode":"sandbox"}
+{"event":"form-submission","form":"keep-informed","outcome":"accepted","status":200,"mode":"sandbox","reason":"honeypot"}
+{"event":"form-submission","form":"contact","outcome":"accepted","status":200,"mode":"sandbox"}  (x4)
+{"event":"form-submission","form":"contact","outcome":"rate-limited","status":429,"mode":"sandbox"}  (x2)
+Note: cross-origin and missing-Origin POSTs were rejected with 403 by Astro's built-in
+security.checkOrigin before reaching the handler (plain-text 403, no handler log line).
+The handler's own Origin/Sec-Fetch-Site check is covered by tests/forms.test.ts.
+Search of the full dev-server log for "example.com", "@", message text: no matches.
+DOI confirm / unsubscribe / suppression / provider failure: covered in tests/forms.test.ts
+(sandbox provider; there are no public HTTP routes for those flows — with a real provider
+they are hosted by the provider).

@@ -1,0 +1,94 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Home from '../../views/Home.astro';
+import Product from '../../views/Product.astro';
+import HowItWorks from '../../views/HowItWorks.astro';
+import Roadmap from '../../views/Roadmap.astro';
+import Trust from '../../views/Trust.astro';
+import Pricing from '../../views/Pricing.astro';
+import Resources from '../../views/Resources.astro';
+import ResourceArticle from '../../views/ResourceArticle.astro';
+import EarlyAccess from '../../views/EarlyAccess.astro';
+import About from '../../views/About.astro';
+import Contact from '../../views/Contact.astro';
+import LegalDoc from '../../views/LegalDoc.astro';
+import { copy } from '../../content/copy/index.ts';
+import { RESOURCES } from '../../content/resources/index.ts';
+import { livePages, metaFor, pathFor, type RouteDef } from '../../content/routes.ts';
+import type { LocaleCode } from '../../i18n/locales.ts';
+import { articleJsonLd, breadcrumbJsonLd, organizationJsonLd, webPageJsonLd, websiteJsonLd } from '../../lib/seo.ts';
+
+export const getStaticPaths = (() =>
+  livePages().map((p) => ({
+    params: { locale: p.locale, slug: p.slug === '' ? undefined : p.slug },
+    props: { route: p.route, locale: p.locale, path: p.path },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  route: RouteDef;
+  locale: LocaleCode;
+  path: string;
+}
+
+const { route, locale, path } = Astro.props;
+const meta = metaFor(route.id, locale);
+const article = route.articleId ? RESOURCES.find((a) => a.id === route.articleId) : undefined;
+const pageCopy = copy(locale);
+
+const pageTypes: Partial<Record<RouteDef['kind'], 'AboutPage' | 'ContactPage' | 'CollectionPage'>> = {
+  about: 'AboutPage',
+  contact: 'ContactPage',
+  resources: 'CollectionPage',
+};
+
+const jsonLd: Record<string, unknown>[] = [organizationJsonLd(), websiteJsonLd(locale)];
+if (article) {
+  const content = article.locales[locale]!;
+  jsonLd.push(
+    articleJsonLd({
+      path,
+      title: content.title,
+      description: content.description,
+      locale,
+      datePublished: article.datePublished,
+      dateModified: article.dateReviewed,
+      citations: content.sources.map((s) => s.url),
+    }),
+    breadcrumbJsonLd([
+      { name: metaFor('home', locale).navLabel ?? 'Home', path: pathFor('home', locale) },
+      { name: metaFor('resources', locale).title, path: pathFor('resources', locale) },
+      { name: content.title, path },
+    ]),
+  );
+} else {
+  const type = pageTypes[route.kind];
+  jsonLd.push(
+    webPageJsonLd({
+      path,
+      title: meta.title,
+      description: meta.description,
+      locale,
+      datePublished: route.datePublished,
+      dateModified: route.dateReviewed,
+      ...(type ? { type } : {}),
+    }),
+  );
+}
+---
+
+<Base locale={locale} routeId={route.id} path={path} title={meta.title} description={meta.description} jsonLd={jsonLd} fullTitle={route.kind === 'home'}>
+  {route.kind === 'home' && <Home locale={locale} />}
+  {route.kind === 'product' && <Product locale={locale} />}
+  {route.kind === 'how-it-works' && <HowItWorks locale={locale} />}
+  {route.kind === 'roadmap' && <Roadmap locale={locale} />}
+  {route.kind === 'trust' && <Trust locale={locale} />}
+  {route.kind === 'pricing' && <Pricing locale={locale} />}
+  {route.kind === 'resources' && <Resources locale={locale} />}
+  {route.kind === 'resource-article' && article && <ResourceArticle locale={locale} article={article} />}
+  {route.kind === 'early-access' && <EarlyAccess locale={locale} />}
+  {route.kind === 'about' && <About locale={locale} />}
+  {route.kind === 'contact' && <Contact locale={locale} />}
+  {route.kind === 'privacy' && <LegalDoc locale={locale} doc={pageCopy.privacy} />}
+  {route.kind === 'legal' && <LegalDoc locale={locale} doc={pageCopy.legal} />}
+</Base>

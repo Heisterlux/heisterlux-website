@@ -1,0 +1,68 @@
+---
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import type { ResourceArticle } from '../content/resources/index.ts';
+import { metaFor, pathFor } from '../content/routes.ts';
+import { formatDate, ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+  article: ResourceArticle;
+}
+const { locale, article } = Astro.props;
+const t = ui(locale);
+const c = article.locales[locale];
+if (!c) throw new Error(`Resource ${article.id} has no "${locale}" content (no silent fallback).`);
+const crumbs = [
+  { name: metaFor('home', locale).navLabel ?? metaFor('home', locale).title, path: pathFor('home', locale) },
+  { name: metaFor('resources', locale).title, path: pathFor('resources', locale) },
+  { name: c.title, path: pathFor(`resource:${article.id}`, locale) },
+];
+---
+
+<div class="container">
+  <header class="page-head">
+    <Breadcrumbs locale={locale} items={crumbs} />
+    <h1>{c.title}</h1>
+    <dl class="article-meta">
+      <div><dt>{t.published}:</dt> <dd><time datetime={article.datePublished}>{formatDate(locale, article.datePublished)}</time></dd></div>
+      <div><dt>{t.reviewed}:</dt> <dd><time datetime={article.dateReviewed}>{formatDate(locale, article.dateReviewed)}</time></dd></div>
+    </dl>
+    <p class="lead">{c.summary}</p>
+  </header>
+
+  <article class="prose">
+    <nav class="toc" aria-label={t.onThisPage}>
+      <p><strong>{t.onThisPage}</strong></p>
+      <ol>
+        {c.sections.map((s) => <li><a href={`#${s.anchor}`}>{s.heading}</a></li>)}
+        <li><a href="#limitations">{t.limitations}</a></li>
+        <li><a href="#sources">{t.sources}</a></li>
+      </ol>
+    </nav>
+
+    {c.sections.map((s) => (
+      <section aria-labelledby={s.anchor}>
+        <h2 id={s.anchor} class="anchor-heading">{s.heading}</h2>
+        {s.paragraphs.map((p) => <p>{p}</p>)}
+        {s.list && <ul>{s.list.map((i) => <li>{i}</li>)}</ul>}
+      </section>
+    ))}
+
+    <section aria-labelledby="limitations">
+      <h2 id="limitations" class="anchor-heading">{t.limitations}</h2>
+      <ul>{c.limitations.map((l) => <li>{l}</li>)}</ul>
+    </section>
+
+    <section aria-labelledby="sources">
+      <h2 id="sources" class="anchor-heading">{t.sources}</h2>
+      <ol class="sources">
+        {c.sources.map((s) => (
+          <li>
+            <a href={s.url} rel="noopener noreferrer">{s.title}</a> — {s.publisher}. {t.reviewed}: <time datetime={s.checkedOn}>{formatDate(locale, s.checkedOn)}</time>.
+          </li>
+        ))}
+      </ol>
+    </section>
+  </article>
+</div>

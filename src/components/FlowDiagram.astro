@@ -1,0 +1,52 @@
+---
+/**
+ * Visibility → Reliance → Change → Impact → Action.
+ * The SVG is a summary image; the full explanation is the visible ordered list rendered
+ * by the page directly after it (referenced via aria-describedby).
+ */
+interface Props {
+  steps: readonly { id: string; title: string }[];
+  label: string;
+  describedBy: string;
+}
+const { steps, label, describedBy } = Astro.props;
+const W = 164;
+const GAP = 20;
+---
+
+<figure class="diagram diagram--flow">
+  <svg class="flow-wide" viewBox={`0 0 ${steps.length * W + (steps.length - 1) * GAP} 72`} role="img" aria-label={label} aria-describedby={describedBy}>
+    <defs>
+      <marker id="flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path class="d-arrow" d="M0 0 L10 5 L0 10 z"></path>
+      </marker>
+    </defs>
+    {steps.map((s, i) => {
+      const x = i * (W + GAP);
+      return (
+        <g>
+          <rect class={i === steps.length - 1 ? 'd-box d-box--accent' : 'd-box'} x={x + 1} y="8" width={W - 2} height="56" rx="8"></rect>
+          <text class="d-label" x={x + W / 2} y="41" text-anchor="middle">{s.title}</text>
+          {i < steps.length - 1 && <line class="d-line" x1={x + W} y1="36" x2={x + W + GAP - 2} y2="36" marker-end="url(#flow-arrow)"></line>}
+        </g>
+      );
+    })}
+  </svg>
+  <svg class="flow-narrow" viewBox={`0 0 240 ${steps.length * 64 + (steps.length - 1) * 20}`} role="img" aria-label={label} aria-describedby={describedBy}>
+    <defs>
+      <marker id="flow-arrow-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path class="d-arrow" d="M0 0 L10 5 L0 10 z"></path>
+      </marker>
+    </defs>
+    {steps.map((s, i) => {
+      const y = i * 84;
+      return (
+        <g>
+          <rect class={i === steps.length - 1 ? 'd-box d-box--accent' : 'd-box'} x="1" y={y + 1} width="238" height="62" rx="8"></rect>
+          <text class="d-label" x="120" y={y + 38} text-anchor="middle">{s.title}</text>
+          {i < steps.length - 1 && <line class="d-line" x1="120" y1={y + 64} x2="120" y2={y + 82} marker-end="url(#flow-arrow-v)"></line>}
+        </g>
+      );
+    })}
+  </svg>
+</figure>

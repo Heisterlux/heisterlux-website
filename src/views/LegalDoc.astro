@@ -1,0 +1,29 @@
+---
+/** Shared renderer for Privacy and Legal. Both are drafts with visible pending items. */
+import Pending from '../components/Pending.astro';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+  doc: {
+    heading: string;
+    draftNotice: string;
+    sections: readonly { anchor: string; heading: string; text: string; pending: string | null }[];
+  };
+}
+const { locale, doc } = Astro.props;
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{doc.heading}</h1>
+    <p class="notice notice--warning">{doc.draftNotice}</p>
+  </header>
+  {doc.sections.map((s) => (
+    <section aria-labelledby={s.anchor}>
+      <h2 id={s.anchor} class="anchor-heading">{s.heading}</h2>
+      <p>{s.text}</p>
+      {s.pending && <p><Pending locale={locale} label={s.pending} /></p>}
+    </section>
+  ))}
+</div>

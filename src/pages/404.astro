@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { copy } from '../content/copy/index.ts';
+import { pathFor } from '../content/routes.ts';
+import { DEFAULT_LOCALE } from '../i18n/locales.ts';
+
+const locale = DEFAULT_LOCALE;
+const c = copy(locale).notFound;
+---
+
+<Base locale={locale} path="/404/" title={c.heading} description={c.text} noindex>
+  <div class="container page-head not-found">
+    <svg viewBox="0 0 96 64" aria-hidden="true" focusable="false">
+      <!-- A small, sleepy sloth hanging from a branch: brand detail, decorative only. -->
+      <path d="M4 10 H92" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"></path>
+      <path d="M34 10 C34 22 36 28 40 32 M62 10 C62 22 60 28 56 32" stroke="currentColor" stroke-width="3" stroke-linecap="round" fill="none"></path>
+      <ellipse cx="48" cy="40" rx="17" ry="14" fill="none" stroke="currentColor" stroke-width="3"></ellipse>
+      <path d="M40 39 q3 2 6 0 M50 39 q3 2 6 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"></path>
+      <path d="M45 46 q3 2 6 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"></path>
+    </svg>
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.text}</p>
+    <p class="muted">{c.butler}</p>
+    <p><a class="button" href={pathFor('home', locale)}>{c.home}</a></p>
+  </div>
+</Base>
