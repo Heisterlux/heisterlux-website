@@ -1,0 +1,157 @@
+{
+  "generatedAt": "2026-10-01T08:01:25.823Z",
+  "launchMode": false,
+  "pages": 16,
+  "clientJsFiles": 0,
+  "fontBytes": 0,
+  "pendingTotal": 7,
+  "sitemapUrls": 15,
+  "errors": [],
+  "warnings": [],
+  "perPage": [
+    {
+      "url": "/404.html",
+      "htmlGzip": 1514,
+      "cssGzip": 3602,
+      "jsGzip": 0,
+      "transfer": 5116,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/about/",
+      "htmlGzip": 2100,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 5839,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/contact/",
+      "htmlGzip": 2162,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 5901,
+      "robots": "noindex, nofollow",
+      "pending": 1
+    },
+    {
+      "url": "/en/early-access/",
+      "htmlGzip": 2617,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 6356,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/how-it-works/",
+      "htmlGzip": 3654,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 7393,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/",
+      "htmlGzip": 3665,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 7404,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/legal/",
+      "htmlGzip": 1921,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 5660,
+      "robots": "noindex, nofollow",
+      "pending": 1
+    },
+    {
+      "url": "/en/pricing/",
+      "htmlGzip": 1874,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 5613,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/privacy/",
+      "htmlGzip": 2371,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 6110,
+      "robots": "noindex, nofollow",
+      "pending": 4
+    },
+    {
+      "url": "/en/product/",
+      "htmlGzip": 3553,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 7292,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/resources/ai-literacy-under-the-eu-ai-act/",
+      "htmlGzip": 3351,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 7090,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/resources/four-layers-of-ai-use/",
+      "htmlGzip": 4072,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 7811,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/resources/",
+      "htmlGzip": 2089,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 5828,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/resources/when-the-ai-you-rely-on-changes/",
+      "htmlGzip": 3488,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 7227,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/roadmap/",
+      "htmlGzip": 3380,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 7119,
+      "robots": "noindex, nofollow",
+      "pending": 0
+    },
+    {
+      "url": "/en/trust/",
+      "htmlGzip": 2340,
+      "cssGzip": 3739,
+      "jsGzip": 0,
+      "transfer": 6079,
+      "robots": "noindex, nofollow",
+      "pending": 1
+    }
+  ]
+}

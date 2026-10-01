@@ -1,0 +1,97 @@
+---
+/**
+ * Server-rendered form. Works without JavaScript: a plain POST to an on-demand route that
+ * validates and renders the result. When submissions are disabled the fields are disabled,
+ * the reason is stated, and the server refuses submissions as well.
+ */
+import { copy } from '../content/copy/index.ts';
+import { ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+import { FORMS, HONEYPOT_FIELD, type FieldErrorCode, type FormId } from '../lib/forms/schema.ts';
+import type { FormsMode } from '../lib/forms/providers.ts';
+
+interface Props {
+  locale: LocaleCode;
+  formId: FormId;
+  mode: FormsMode;
+  values?: Record<string, string>;
+  errors?: Record<string, FieldErrorCode>;
+}
+
+const { locale, formId, mode, values = {}, errors = {} } = Astro.props;
+const t = ui(locale);
+const c = copy(locale).forms;
+const enabled = mode !== 'disabled';
+const fields = FORMS[formId];
+const id = (name: string) => `${formId}-${name}`;
+const hints = c.hints as Record<string, string | undefined>;
+const labels = c.labels as Record<string, string>;
+const errorEntries = Object.entries(errors);
+---
+
+<form class="form" method="post" action={`/${locale}/submit/${formId}/`} novalidate>
+  {!enabled && (
+    <div class="notice notice--warning" role="note" id={`${formId}-disabled`}>
+      <p><strong>{t.formsDisabledTitle}.</strong> {t.formsDisabledBody}</p>
+    </div>
+  )}
+  {mode === 'sandbox' && (
+    <div class="notice" role="note"><p>{t.formsSandboxNotice}</p></div>
+  )}
+  {errorEntries.length > 0 && (
+    <div class="error-summary" role="alert" aria-labelledby={`${formId}-error-summary`} tabindex="-1">
+      <h2 id={`${formId}-error-summary`}>{t.formErrorSummary}</h2>
+      <ul>
+        {errorEntries.map(([name, code]) => (
+          <li><a href={`#${id(name)}`}>{labels[name]}: {c.errors[code]}</a></li>
+        ))}
+      </ul>
+    </div>
+  )}
+  <fieldset disabled={!enabled} aria-describedby={!enabled ? `${formId}-disabled` : undefined}>
+    {fields.map((f) => {
+      const error = errors[f.name];
+      const hint = hints[f.name];
+      const describedBy = [hint ? `${id(f.name)}-hint` : null, error ? `${id(f.name)}-error` : null].filter(Boolean).join(' ') || undefined;
+      if (f.kind === 'checkbox') {
+        return (
+          <div class="field field--checkbox" data-invalid={error ? '' : undefined}>
+            <input type="checkbox" id={id(f.name)} name={f.name} value="yes" checked={values[f.name] === 'yes'} required={f.required} aria-invalid={error ? 'true' : undefined} aria-describedby={describedBy} />
+            <label for={id(f.name)}>{labels[f.name]}{f.required && <span class="req"> ({t.formRequired})</span>}</label>
+            {error && <p class="error" id={`${id(f.name)}-error`}>{c.errors[error]}</p>}
+          </div>
+        );
+      }
+      return (
+        <div class="field" data-invalid={error ? '' : undefined}>
+          <label for={id(f.name)}>{labels[f.name]} <span class="req">({f.required ? t.formRequired : t.formOptional})</span></label>
+          {hint && <p class="hint" id={`${id(f.name)}-hint`}>{hint}</p>}
+          {error && <p class="error" id={`${id(f.name)}-error`}>{c.errors[error]}</p>}
+          {f.kind === 'multiline' ? (
+            <textarea id={id(f.name)} name={f.name} maxlength={f.maxLength} minlength={f.minLength} required={f.required} aria-invalid={error ? 'true' : undefined} aria-describedby={describedBy} rows="6">{values[f.name] ?? ''}</textarea>
+          ) : (
+            <input
+              type={f.kind === 'email' ? 'email' : 'text'}
+              id={id(f.name)}
+              name={f.name}
+              value={values[f.name] ?? ''}
+              maxlength={f.maxLength}
+              required={f.required}
+              autocomplete={f.kind === 'email' ? 'email' : f.name === 'organization' ? 'organization' : f.name === 'role' ? 'organization-title' : 'off'}
+              spellcheck={f.kind === 'email' ? 'false' : undefined}
+              aria-invalid={error ? 'true' : undefined}
+              aria-describedby={describedBy}
+            />
+          )}
+        </div>
+      );
+    })}
+    <div class="hp-field" aria-hidden="true">
+      <label for={id(HONEYPOT_FIELD)}>{c.honeypotLabel}</label>
+      <input type="text" id={id(HONEYPOT_FIELD)} name={HONEYPOT_FIELD} tabindex="-1" autocomplete="off" />
+    </div>
+    <div>
+      <button class="button" type="submit">{c.submit[formId]}</button>
+    </div>
+  </fieldset>
+</form>

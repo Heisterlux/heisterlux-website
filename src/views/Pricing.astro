@@ -1,0 +1,30 @@
+---
+import { copy } from '../content/copy/index.ts';
+import { pathFor } from '../content/routes.ts';
+import { ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const c = copy(locale).pricing;
+const t = ui(locale);
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.lead}</p>
+  </header>
+  {c.body.map((p) => <p>{p}</p>)}
+  <div class="button-row">
+    <a class="button" href={pathFor('early-access', locale)}>{t.earlyAccessCta}</a>
+  </div>
+
+  <section aria-labelledby="impact-heading">
+    <h2 id="impact-heading">{c.impactHeading}</h2>
+    <blockquote class="brand-line">{c.impactQuote}</blockquote>
+    <p class="muted">{c.impactNote}</p>
+  </section>
+</div>

@@ -1,0 +1,14 @@
+---
+import { ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+import type { CapabilityStatus } from '../content/capabilities.ts';
+
+interface Props {
+  locale: LocaleCode;
+  status: CapabilityStatus;
+}
+const { locale, status } = Astro.props;
+const t = ui(locale);
+---
+
+<span class={`status status--${status}`}><span class="visually-hidden">{t.status}: </span>{t.capabilityStatus[status]}</span>

@@ -1,0 +1,49 @@
+﻿┌─────────┬─────────┬───────────────────────────┬───────────────────┬───────┬─────┬────────┬─────────────────────────────────────────┐
+│ (index) │ theme   │ fg                        │ bg                │ ratio │ min │ result │ usage                                   │
+├─────────┼─────────┼───────────────────────────┼───────────────────┼───────┼─────┼────────┼─────────────────────────────────────────┤
+│ 0       │ 'light' │ 'c-text'                  │ 'c-bg'            │ 15.78 │ 4.5 │ 'pass' │ 'body text'                             │
+│ 1       │ 'light' │ 'c-text-muted'            │ 'c-bg'            │ 7.49  │ 4.5 │ 'pass' │ 'muted text / lead'                     │
+│ 2       │ 'light' │ 'c-text-muted'            │ 'c-surface-muted' │ 6.8   │ 4.5 │ 'pass' │ 'muted text on bands and footer'        │
+│ 3       │ 'light' │ 'c-text'                  │ 'c-surface'       │ 16.47 │ 4.5 │ 'pass' │ 'card text, SVG labels'                 │
+│ 4       │ 'light' │ 'c-text-muted'            │ 'c-surface'       │ 7.82  │ 4.5 │ 'pass' │ 'SVG sublabels in boxes'                │
+│ 5       │ 'light' │ 'c-text-muted'            │ 'c-accent-soft'   │ 6.58  │ 4.5 │ 'pass' │ 'SVG text in accent box'                │
+│ 6       │ 'light' │ 'c-text'                  │ 'c-accent-soft'   │ 13.86 │ 4.5 │ 'pass' │ 'SVG label in accent box'               │
+│ 7       │ 'light' │ 'c-accent'                │ 'c-bg'            │ 7.37  │ 4.5 │ 'pass' │ 'links'                                 │
+│ 8       │ 'light' │ 'c-accent'                │ 'c-surface-muted' │ 6.69  │ 4.5 │ 'pass' │ 'links on bands'                        │
+│ 9       │ 'light' │ 'c-accent-contrast'       │ 'c-accent'        │ 7.69  │ 4.5 │ 'pass' │ 'primary button text'                   │
+│ 10      │ 'light' │ 'c-accent-contrast'       │ 'c-accent-hover'  │ 10.85 │ 4.5 │ 'pass' │ 'primary button hover'                  │
+│ 11      │ 'light' │ 'c-accent'                │ 'c-accent-soft'   │ 6.47  │ 4.5 │ 'pass' │ 'secondary button hover / step numbers' │
+│ 12      │ 'light' │ 'c-pending-text'          │ 'c-pending-bg'    │ 8.49  │ 4.5 │ 'pass' │ 'pending markers'                       │
+│ 13      │ 'light' │ 'c-error'                 │ 'c-bg'            │ 7.38  │ 4.5 │ 'pass' │ 'error text'                            │
+│ 14      │ 'light' │ 'c-error'                 │ 'c-error-soft'    │ 6.59  │ 4.5 │ 'pass' │ 'error summary'                         │
+│ 15      │ 'light' │ 'c-status-available'      │ 'c-surface'       │ 6.6   │ 4.5 │ 'pass' │ 'status badge'                          │
+│ 16      │ 'light' │ 'c-status-in-development' │ 'c-surface'       │ 8.26  │ 4.5 │ 'pass' │ 'status badge'                          │
+│ 17      │ 'light' │ 'c-status-up-next'        │ 'c-surface'       │ 7.48  │ 4.5 │ 'pass' │ 'status badge'                          │
+│ 18      │ 'light' │ 'c-status-exploring'      │ 'c-surface'       │ 7.82  │ 4.5 │ 'pass' │ 'status badge'                          │
+│ 19      │ 'light' │ 'c-focus'                 │ 'c-bg'            │ 5.25  │ 3   │ 'pass' │ 'focus ring (non-text)'                 │
+│ 20      │ 'light' │ 'c-border-strong'         │ 'c-surface'       │ 3.68  │ 3   │ 'pass' │ 'form field borders (non-text)'         │
+│ 21      │ 'light' │ 'c-accent'                │ 'c-bg'            │ 7.37  │ 3   │ 'pass' │ 'diagram arrows (non-text)'             │
+│ 22      │ 'dark'  │ 'c-text'                  │ 'c-bg'            │ 15.33 │ 4.5 │ 'pass' │ 'body text'                             │
+│ 23      │ 'dark'  │ 'c-text-muted'            │ 'c-bg'            │ 9.29  │ 4.5 │ 'pass' │ 'muted text / lead'                     │
+│ 24      │ 'dark'  │ 'c-text-muted'            │ 'c-surface-muted' │ 7.98  │ 4.5 │ 'pass' │ 'muted text on bands and footer'        │
+│ 25      │ 'dark'  │ 'c-text'                  │ 'c-surface'       │ 14.31 │ 4.5 │ 'pass' │ 'card text, SVG labels'                 │
+│ 26      │ 'dark'  │ 'c-text-muted'            │ 'c-surface'       │ 8.67  │ 4.5 │ 'pass' │ 'SVG sublabels in boxes'                │
+│ 27      │ 'dark'  │ 'c-text-muted'            │ 'c-accent-soft'   │ 7.25  │ 4.5 │ 'pass' │ 'SVG text in accent box'                │
+│ 28      │ 'dark'  │ 'c-text'                  │ 'c-accent-soft'   │ 11.96 │ 4.5 │ 'pass' │ 'SVG label in accent box'               │
+│ 29      │ 'dark'  │ 'c-accent'                │ 'c-bg'            │ 9.39  │ 4.5 │ 'pass' │ 'links'                                 │
+│ 30      │ 'dark'  │ 'c-accent'                │ 'c-surface-muted' │ 8.07  │ 4.5 │ 'pass' │ 'links on bands'                        │
+│ 31      │ 'dark'  │ 'c-accent-contrast'       │ 'c-accent'        │ 9.15  │ 4.5 │ 'pass' │ 'primary button text'                   │
+│ 32      │ 'dark'  │ 'c-accent-contrast'       │ 'c-accent-hover'  │ 11.47 │ 4.5 │ 'pass' │ 'primary button hover'                  │
+│ 33      │ 'dark'  │ 'c-accent'                │ 'c-accent-soft'   │ 7.33  │ 4.5 │ 'pass' │ 'secondary button hover / step numbers' │
+│ 34      │ 'dark'  │ 'c-pending-text'          │ 'c-pending-bg'    │ 9.75  │ 4.5 │ 'pass' │ 'pending markers'                       │
+│ 35      │ 'dark'  │ 'c-error'                 │ 'c-bg'            │ 9.08  │ 4.5 │ 'pass' │ 'error text'                            │
+│ 36      │ 'dark'  │ 'c-error'                 │ 'c-error-soft'    │ 7.73  │ 4.5 │ 'pass' │ 'error summary'                         │
+│ 37      │ 'dark'  │ 'c-status-available'      │ 'c-surface'       │ 10.04 │ 4.5 │ 'pass' │ 'status badge'                          │
+│ 38      │ 'dark'  │ 'c-status-in-development' │ 'c-surface'       │ 9.31  │ 4.5 │ 'pass' │ 'status badge'                          │
+│ 39      │ 'dark'  │ 'c-status-up-next'        │ 'c-surface'       │ 10.18 │ 4.5 │ 'pass' │ 'status badge'                          │
+│ 40      │ 'dark'  │ 'c-status-exploring'      │ 'c-surface'       │ 8.67  │ 4.5 │ 'pass' │ 'status badge'                          │
+│ 41      │ 'dark'  │ 'c-focus'                 │ 'c-bg'            │ 8.68  │ 3   │ 'pass' │ 'focus ring (non-text)'                 │
+│ 42      │ 'dark'  │ 'c-border-strong'         │ 'c-surface'       │ 3.78  │ 3   │ 'pass' │ 'form field borders (non-text)'         │
+│ 43      │ 'dark'  │ 'c-accent'                │ 'c-bg'            │ 9.39  │ 3   │ 'pass' │ 'diagram arrows (non-text)'             │
+└─────────┴─────────┴───────────────────────────┴───────────────────┴───────┴─────┴────────┴─────────────────────────────────────────┘
+contrast: PASS

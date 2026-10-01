@@ -1,0 +1,63 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { INDEXABLE, ORGANIZATION_NAME } from '../config/site.ts';
+import { getLocale, type LocaleCode } from '../i18n/locales.ts';
+import { ui } from '../i18n/index.ts';
+import { absoluteUrl, graph, hreflangFor } from '../lib/seo.ts';
+
+interface Props {
+  locale: LocaleCode;
+  /** Registry route ID; omitted for 404 and form result pages (which are never indexed). */
+  routeId?: string;
+  path: string;
+  title: string;
+  description: string;
+  /** Force noindex regardless of environment (404, form results). */
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+  /** Use the title as-is (home page) instead of appending the brand. */
+  fullTitle?: boolean;
+}
+
+const { locale, routeId, path, title, description, noindex = false, jsonLd, fullTitle = false } = Astro.props;
+const loc = getLocale(locale)!;
+const t = ui(locale);
+const pageTitle = fullTitle ? title : `${title} · ${ORGANIZATION_NAME}`;
+const canonical = absoluteUrl(path);
+const hreflang = routeId && !noindex ? hreflangFor(routeId) : [];
+const robots = INDEXABLE && !noindex ? 'index, follow' : 'noindex, nofollow';
+---
+
+<!doctype html>
+<html lang={loc.bcp47} dir={loc.dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {hreflang.map((l) => <link rel="alternate" hreflang={l.hreflang} href={l.href} />)}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#11151c" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={ORGANIZATION_NAME} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={loc.bcp47} />
+    <meta name="twitter:card" content="summary" />
+    {jsonLd && jsonLd.length > 0 && <script is:inline type="application/ld+json" set:html={graph(jsonLd)} />}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.skipToContent}</a>
+    <Header locale={locale} currentRouteId={routeId} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer locale={locale} currentRouteId={routeId} />
+  </body>
+</html>

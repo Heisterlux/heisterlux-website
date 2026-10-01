@@ -1,0 +1,31 @@
+---
+import FormBlock from '../components/FormBlock.astro';
+import Pending from '../components/Pending.astro';
+import { CONTACT_EMAIL } from '../config/site.ts';
+import { copy } from '../content/copy/index.ts';
+import { pathFor } from '../content/routes.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+import { resolveFormsMode } from '../lib/forms/providers.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const c = copy(locale).contact;
+const mode = resolveFormsMode({ FORMS_MODE: process.env.FORMS_MODE, VERCEL_ENV: process.env.VERCEL_ENV });
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.lead}</p>
+    <p>{CONTACT_EMAIL ? <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> : <Pending locale={locale} label={c.mailboxPending} />}</p>
+  </header>
+
+  <section aria-labelledby="contact-form-heading">
+    <h2 id="contact-form-heading">{c.formHeading}</h2>
+    <FormBlock locale={locale} formId="contact" mode={mode} />
+  </section>
+
+  <p><a href={pathFor('early-access', locale)}>{c.alternative}</a></p>
+</div>

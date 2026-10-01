@@ -1,0 +1,81 @@
+---
+import FlowDiagram from '../components/FlowDiagram.astro';
+import LayersDiagram from '../components/LayersDiagram.astro';
+import { copy } from '../content/copy/index.ts';
+import { pathFor } from '../content/routes.ts';
+import { ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const c = copy(locale).home;
+const t = ui(locale);
+---
+
+<section class="hero container" aria-labelledby="hero-heading">
+  <span class="eyebrow">{c.eyebrow}</span>
+  <h1 id="hero-heading">{c.heading}</h1>
+  <p class="lead">{c.lead}</p>
+  <div class="button-row">
+    <a class="button" href={pathFor('early-access', locale)}>{t.earlyAccessCta}</a>
+    <a class="button button--secondary" href={pathFor('how-it-works', locale)}>{t.howItWorksCta}</a>
+  </div>
+</section>
+
+<section class="section container" aria-labelledby="line-heading">
+  <h2 id="line-heading">{c.lineHeading}</h2>
+  <p>{c.lineIntro}</p>
+  <FlowDiagram steps={c.steps} label={c.steps.map((s) => s.title).join(' → ')} describedBy="line-steps" />
+  <ol class="steps" id="line-steps">
+    {c.steps.map((s) => (
+      <li>
+        <h3>{s.title}</h3>
+        <p>{s.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<section class="band" aria-labelledby="layers-heading">
+  <div class="container">
+    <h2 id="layers-heading">{c.layersHeading}</h2>
+    <p>{c.layersIntro}</p>
+    <LayersDiagram
+      layers={c.layers}
+      connectors={c.layerConnectors}
+      label={c.layers.map((l) => l.title).join(', ')}
+      describedBy="layers-list"
+    />
+    <ul class="grid" id="layers-list">
+      {c.layers.map((l) => (
+        <li class="card">
+          <h3>{l.title}</h3>
+          <p>{l.text}</p>
+        </li>
+      ))}
+    </ul>
+    <p class="notice">{c.layersNote}</p>
+  </div>
+</section>
+
+<section class="section container" aria-labelledby="why-heading">
+  <h2 id="why-heading">{c.whyHeading}</h2>
+  <ul>
+    {c.whyItems.map((i) => <li>{i}</li>)}
+  </ul>
+  <p>{c.whyClose}</p>
+  <p class="brand-line">{c.brandLine}</p>
+</section>
+
+<section class="band" aria-labelledby="cta-heading">
+  <div class="container">
+    <h2 id="cta-heading">{c.ctaHeading}</h2>
+    <p>{c.ctaText}</p>
+    <div class="button-row">
+      <a class="button" href={pathFor('early-access', locale)}>{t.earlyAccessCta}</a>
+      <a class="button button--secondary" href={pathFor('roadmap', locale)}>{copy(locale).product.roadmapLink}</a>
+    </div>
+  </div>
+</section>
