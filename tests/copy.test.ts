@@ -17,6 +17,10 @@ test('the unavailable demo is labelled as coming soon', () => {
   assert.equal(uiEn.demoComingSoon, 'Demo — coming soon');
 });
 
+test('early access is labelled as coming soon while submissions are disabled', () => {
+  assert.equal(uiEn.earlyAccessComingSoon, 'Early access — coming soon');
+});
+
 test('claim lint actually catches the original phrasings (rules are not vacuous)', () => {
   const samples = [
     'Heisterlux records them separately, because each can change on its own.',

@@ -19,7 +19,7 @@ const t = ui(locale);
   <h1 id="hero-heading">{c.heading}</h1>
   <p class="lead">{c.lead}</p>
   <div class="button-row">
-    <a class="button" href={pathFor('early-access', locale)}>{t.earlyAccessCta}</a>
+    <button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button>
     <a class="button button--secondary" href={pathFor('how-it-works', locale)}>{t.howItWorksCta}</a>
   </div>
 </section>
@@ -60,7 +60,7 @@ const t = ui(locale);
     <h2 id="cta-heading">{c.ctaHeading}</h2>
     <p>{c.ctaText}</p>
     <div class="button-row">
-      <a class="button" href={pathFor('early-access', locale)}>{t.earlyAccessCta}</a>
+      <button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button>
       <a class="button button--secondary" href={pathFor('roadmap', locale)}>{copy(locale).product.roadmapLink}</a>
     </div>
   </div>

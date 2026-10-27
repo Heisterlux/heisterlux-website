@@ -14,7 +14,6 @@ const { locale, currentRouteId } = Astro.props;
 const t = ui(locale);
 // Early Access is the primary CTA; it is kept out of the plain link list to avoid a duplicate.
 const items = navRoutes('primary', locale).filter((r) => r.id !== 'early-access');
-const earlyAccessPath = pathFor('early-access', locale);
 const isCurrent = (id: string) =>
   id === currentRouteId || (id === 'resources' && currentRouteId?.startsWith('resource:'));
 ---
@@ -34,7 +33,7 @@ const isCurrent = (id: string) =>
         ))}
         {SIGN_IN_URL && <li><a href={SIGN_IN_URL}>{t.signIn}</a></li>}
         {!SIGN_IN_URL && <li><button class="button button--secondary" type="button" disabled>{t.demoComingSoon}</button></li>}
-        <li><a class="button" href={earlyAccessPath} aria-current={currentRouteId === 'early-access' ? 'page' : undefined}>{t.earlyAccessCta}</a></li>
+        <li><button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button></li>
       </ul>
     </nav>
 
@@ -47,7 +46,7 @@ const isCurrent = (id: string) =>
           ))}
           {SIGN_IN_URL && <li><a href={SIGN_IN_URL}>{t.signIn}</a></li>}
           {!SIGN_IN_URL && <li><button class="button button--secondary" type="button" disabled>{t.demoComingSoon}</button></li>}
-          <li><a class="button" href={earlyAccessPath}>{t.earlyAccessCta}</a></li>
+          <li><button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button></li>
         </ul>
       </nav>
     </details>

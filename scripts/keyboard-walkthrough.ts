@@ -154,7 +154,7 @@ try {
   check(a.every((f) => f.inView), 'every stop is scrolled into view');
   check(a.every(visibleOutline), 'every stop shows a visible focus outline (solid, non-zero)');
   const navText = a.slice(1, 9).map((f) => f.text);
-  check(JSON.stringify(navText) === JSON.stringify(['Heisterlux home', 'Product', 'How it works', 'Roadmap', 'Trust', 'Pricing', 'Resources', 'Request early access']), `header order is logical: ${navText.join(' > ')}`);
+  check(JSON.stringify(navText) === JSON.stringify(['Heisterlux home', 'Product', 'How it works', 'Roadmap', 'Trust', 'Pricing', 'Resources']), `header order is logical and disabled pre-launch actions are skipped: ${navText.join(' > ')}`);
   check(new Set(a.map((f) => f.uid)).size === a.length, 'no focus trap: all 11 stops are different elements (header and hero CTA are two separate links to the same page)');
   await go(`${artifact}/en/`);
   await press('Tab');

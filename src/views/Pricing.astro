@@ -1,6 +1,5 @@
 ---
 import { copy } from '../content/copy/index.ts';
-import { pathFor } from '../content/routes.ts';
 import { ui } from '../i18n/index.ts';
 import type { LocaleCode } from '../i18n/locales.ts';
 
@@ -19,7 +18,7 @@ const t = ui(locale);
   </header>
   {c.body.map((p) => <p>{p}</p>)}
   <div class="button-row">
-    <a class="button" href={pathFor('early-access', locale)}>{t.earlyAccessCta}</a>
+    <button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button>
   </div>
 
   <section aria-labelledby="impact-heading">

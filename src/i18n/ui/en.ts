@@ -11,6 +11,7 @@ export const en = {
   currentLanguage: 'Current language',
   breadcrumb: 'Breadcrumb',
   earlyAccessCta: 'Request early access',
+  earlyAccessComingSoon: 'Early access — coming soon',
   demoComingSoon: 'Demo — coming soon',
   howItWorksCta: 'See how it works',
   preLaunch: 'Pre-launch',
