@@ -2,6 +2,7 @@
 import { fill, ui } from '../i18n/index.ts';
 import { getLocale, type LocaleCode } from '../i18n/locales.ts';
 import { alternatesFor, navRoutes } from '../content/routes.ts';
+import { CONTACT_EMAIL } from '../config/site.ts';
 
 interface Props {
   locale: LocaleCode;
@@ -22,7 +23,9 @@ const year = new Date().getUTCFullYear();
   <div class="container">
     <div class="site-footer__grid">
       <div>
+        <img class="footer-emblem" src="/heisterlux-emblem.png" alt="" width="1536" height="1536" loading="lazy" />
         <p class="footer-tagline">{t.footerTagline}</p>
+        {CONTACT_EMAIL && <p class="footer-email"><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>}
         <p class="muted">{t.preLaunchNote}</p>
       </div>
       <nav aria-label={t.footerNav}>

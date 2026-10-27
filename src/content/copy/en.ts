@@ -258,7 +258,7 @@ export const en = {
   },
   contact: {
     heading: 'Contact',
-    lead: 'We are setting up our email and processing arrangements.',
+    lead: 'Questions about Heisterlux? Reach us directly by email.',
     mailboxPending: 'Heisterlux contact email address',
     formHeading: 'Send a message',
     alternative: 'For early access, use the early access page instead.',

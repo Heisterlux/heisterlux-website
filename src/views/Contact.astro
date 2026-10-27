@@ -21,10 +21,13 @@ const mode = resolveFormsMode({
 ---
 
 <div class="container">
-  <header class="page-head">
-    <h1>{c.heading}</h1>
-    <p class="lead">{c.lead}</p>
-    <p>{CONTACT_EMAIL ? <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> : <Pending locale={locale} label={c.mailboxPending} />}</p>
+  <header class="page-head contact-head">
+    <div>
+      <h1>{c.heading}</h1>
+      <p class="lead">{c.lead}</p>
+      <p class="contact-email">{CONTACT_EMAIL ? <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> : <Pending locale={locale} label={c.mailboxPending} />}</p>
+    </div>
+    <img class="contact-emblem" src="/heisterlux-emblem.png" alt="" width="1536" height="1536" />
   </header>
 
   <section aria-labelledby="contact-form-heading">

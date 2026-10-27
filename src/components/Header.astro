@@ -1,5 +1,4 @@
 ---
-import BrandMark from './BrandMark.astro';
 import { SIGN_IN_URL } from '../config/site.ts';
 import { ui } from '../i18n/index.ts';
 import type { LocaleCode } from '../i18n/locales.ts';
@@ -21,7 +20,7 @@ const isCurrent = (id: string) =>
 <header class="site-header">
   <div class="container site-header__inner">
     <a class="brand" href={pathFor('home', locale)} aria-label={t.home}>
-      <BrandMark class="brand__mark" />
+      <img class="brand__mark" src="/heisterlux-emblem.png" alt="" width="1536" height="1536" />
       <span>Heisterlux</span>
     </a>
     <span class="badge-prelaunch">{t.preLaunch}</span>

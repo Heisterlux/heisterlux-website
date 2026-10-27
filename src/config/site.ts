@@ -13,8 +13,8 @@ export const ORGANIZATION_NAME = 'Heisterlux';
  */
 export const SIGN_IN_URL: string | null = null;
 
-/** Confirmed Heisterlux mailbox. Not set up yet (launch gate G-MAIL). */
-export const CONTACT_EMAIL: string | null = null;
+/** Confirmed public Heisterlux mailbox. */
+export const CONTACT_EMAIL: string | null = 'info@heisterlux.com';
 
 /** Security contact for responsible disclosure. Not set up yet (launch gate G-MAIL). */
 export const SECURITY_EMAIL: string | null = null;

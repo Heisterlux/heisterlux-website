@@ -194,9 +194,9 @@ a:hover {
 }
 
 .brand__mark {
-  inline-size: 1.75rem;
-  block-size: 1.75rem;
-  color: var(--c-accent);
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  object-fit: contain;
 }
 
 .badge-prelaunch {
@@ -384,6 +384,36 @@ main:focus {
 
 .page-head {
   padding-block: var(--s-7) var(--s-5);
+}
+
+.contact-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(6rem, 10rem);
+  align-items: center;
+  gap: var(--s-6);
+}
+
+.contact-email {
+  font-size: var(--fs-lg);
+  font-weight: 650;
+}
+
+.contact-emblem {
+  inline-size: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 0.5rem 1.25rem rgb(8 63 66 / 0.12));
+}
+
+@media (max-width: 36rem) {
+  .contact-head {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-emblem {
+    inline-size: 6rem;
+    grid-row: 1;
+  }
 }
 
 .hero {
@@ -916,6 +946,17 @@ th {
 .footer-tagline {
   font-size: var(--fs-base);
   font-weight: 600;
+}
+
+.footer-email {
+  margin-block-end: var(--s-3);
+}
+
+.footer-emblem {
+  inline-size: 4.5rem;
+  block-size: 4.5rem;
+  object-fit: contain;
+  margin-block-end: var(--s-3);
 }
 
 .footer-bottom {
