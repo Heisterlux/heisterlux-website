@@ -1,0 +1,54 @@
+---
+import CapabilityCard from '../components/CapabilityCard.astro';
+import { CAPABILITIES } from '../content/capabilities.ts';
+import { copy } from '../content/copy/index.ts';
+import { pathFor } from '../content/routes.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const all = copy(locale);
+const c = all.product;
+const stages = [...all.home.steps, { id: 'foundation', title: c.foundationTitle, text: c.foundationText }];
+// Same registry as the Roadmap. Withdrawn capabilities are only shown on the Roadmap.
+const active = CAPABILITIES.filter((cap) => !cap.withdrawn);
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.lead}</p>
+    <p class="notice">{c.statusNote}</p>
+  </header>
+
+  <section aria-labelledby="stages-heading">
+    <h2 id="stages-heading">{c.stagesHeading}</h2>
+    {stages.map((stage) => {
+      const caps = active.filter((cap) => cap.stage === stage.id);
+      return (
+        <section aria-labelledby={`stage-${stage.id}`}>
+          <h3 id={`stage-${stage.id}`}>{stage.title}</h3>
+          <p>{stage.text}</p>
+          {caps.length > 0 && (
+            <ul class="grid">
+              {caps.map((cap) => <li><CapabilityCard locale={locale} capability={cap} headingLevel="h4" /></li>)}
+            </ul>
+          )}
+        </section>
+      );
+    })}
+    <p><a href={pathFor('roadmap', locale)}>{c.roadmapLink}</a></p>
+  </section>
+
+  <section aria-labelledby="for-heading">
+    <h2 id="for-heading">{c.forHeading}</h2>
+    <ul>{c.forItems.map((i) => <li>{i}</li>)}</ul>
+  </section>
+
+  <section aria-labelledby="not-heading">
+    <h2 id="not-heading">{c.notHeading}</h2>
+    <ul>{c.notItems.map((i) => <li>{i}</li>)}</ul>
+  </section>
+</div>

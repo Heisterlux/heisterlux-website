@@ -1,0 +1,16 @@
+---
+/**
+ * Visible placeholder for a fact that is not confirmed yet. Never replaced by an invented value.
+ * Every instance carries data-pending so scripts/verify-dist.ts can count open items.
+ */
+import { ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+  label: string;
+}
+const { locale, label } = Astro.props;
+---
+
+<span class="pending" data-pending={label}>[{ui(locale).pendingPrefix} {label}]</span>

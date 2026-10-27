@@ -1,0 +1,60 @@
+---
+import FlowDiagram from '../components/FlowDiagram.astro';
+import Distinctions from '../components/Distinctions.astro';
+import { copy } from '../content/copy/index.ts';
+import { pathFor } from '../content/routes.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const all = copy(locale);
+const c = all.howItWorks;
+const home = all.home;
+const details = c.stepDetails as Record<string, string>;
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.lead}</p>
+  </header>
+
+  <section aria-labelledby="line-heading">
+    <h2 id="line-heading">{c.lineHeading}</h2>
+    <FlowDiagram steps={home.steps} label={home.steps.map((s) => s.title).join(' → ')} describedBy="how-steps" />
+    <ol class="steps" id="how-steps">
+      {home.steps.map((s) => (
+        <li id={s.id} class="anchor-heading">
+          <h3>{s.title}</h3>
+          <p>{details[s.id]}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section aria-labelledby="layers-heading">
+    <h2 id="layers-heading">{c.layersHeading}</h2>
+    <Distinctions locale={locale} idPrefix="how-layers" variant="list" />
+  </section>
+
+  <section aria-labelledby="example-heading">
+    <h2 id="example-heading">{c.exampleHeading}</h2>
+    <p>{c.exampleIntro}</p>
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          {c.example.map((row) => (
+            <tr>
+              <th scope="row">{row.layer}</th>
+              <td>{row.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p>{c.exampleClose}</p>
+    <p><a href={pathFor('resource:four-layers', locale)}>{c.readMore}</a></p>
+  </section>
+</div>

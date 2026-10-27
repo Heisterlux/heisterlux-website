@@ -1,0 +1,29 @@
+---
+import { copy } from '../content/copy/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const c = copy(locale).about;
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.lead}</p>
+  </header>
+  {c.body.map((p) => <p>{p}</p>)}
+  <section aria-labelledby="principles-heading">
+    <h2 id="principles-heading">{c.principlesHeading}</h2>
+    <ul class="grid">
+      {c.principles.map((p) => (
+        <li class="card">
+          <h3>{p.title}</h3>
+          <p>{p.text}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+</div>

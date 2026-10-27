@@ -1,0 +1,10 @@
+axe-core 4.13.0; 16 pages × light/dark × 1280/320 px; tags wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa, best-practice
+/en/ [light, 1280px] violations: [] needs-review: ["color-contrast x17"]
+/en/ [light, 320px] violations: [] needs-review: ["color-contrast x17"]
+/en/ [dark, 1280px] violations: [] needs-review: ["color-contrast x17"]
+/en/ [dark, 320px] violations: [] needs-review: ["color-contrast x17"]
+/en/how-it-works/ [light, 1280px] violations: [] needs-review: ["color-contrast x17"]
+/en/how-it-works/ [light, 320px] violations: [] needs-review: ["color-contrast x17"]
+/en/how-it-works/ [dark, 1280px] violations: [] needs-review: ["color-contrast x17"]
+/en/how-it-works/ [dark, 320px] violations: [] needs-review: ["color-contrast x17"]
+SUMMARY: 64 scans, 0 violation entries, 8 needs-review entries (axe cannot decide these automatically)

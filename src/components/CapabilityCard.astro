@@ -1,0 +1,41 @@
+---
+import StatusBadge from './StatusBadge.astro';
+import { formatDate, ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+import type { CapabilityRecord } from '../content/capabilities.ts';
+
+interface Props {
+  locale: LocaleCode;
+  capability: CapabilityRecord;
+  headingLevel?: 'h3' | 'h4';
+}
+const { locale, capability, headingLevel = 'h3' } = Astro.props;
+const t = ui(locale);
+const text = capability.text[locale];
+if (!text) throw new Error(`Capability ${capability.id} has no "${locale}" text (no silent fallback).`);
+const Heading = headingLevel;
+---
+
+<article class="card capability" id={`capability-${capability.id}`}>
+  <header>
+    <Heading>{text.name}</Heading>
+    <StatusBadge locale={locale} status={capability.status} />
+  </header>
+  <p>{text.summary}</p>
+  <dl>
+    <dt>{t.scope}</dt>
+    <dd>{text.scope}</dd>
+    <dt>{t.builtSoFar}</dt>
+    <dd>{text.built}</dd>
+    <dt>{t.stillToBuild}</dt>
+    <dd>{text.toBuild}</dd>
+    <dt>{t.customerToday}</dt>
+    <dd>{capability.status === 'available' ? t.capabilityStatus.available : t.notAvailable}</dd>
+    <dt>{t.reviewed}</dt>
+    <dd><time datetime={capability.reviewedOn}>{formatDate(locale, capability.reviewedOn)}</time></dd>
+  </dl>
+  <p class="visually-hidden">{t.limitations}:</p>
+  <ul>
+    {text.limitations.map((l) => <li>{l}</li>)}
+  </ul>
+</article>

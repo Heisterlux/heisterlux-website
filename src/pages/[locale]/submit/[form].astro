@@ -1,0 +1,83 @@
+---
+/**
+ * On-demand form result page. Receives the no-JS POST from FormBlock, runs the server-side
+ * handler and renders the outcome (or the form again with errors). Never indexed.
+ * GET requests are redirected back to the form page.
+ */
+import Base from '../../../layouts/Base.astro';
+import FormBlock from '../../../components/FormBlock.astro';
+import { copy } from '../../../content/copy/index.ts';
+import { pathFor } from '../../../content/routes.ts';
+import { ui } from '../../../i18n/index.ts';
+import { isPublishedLocale } from '../../../i18n/locales.ts';
+import { handleSubmission, type SubmissionOutcome } from '../../../lib/forms/handler.ts';
+import { FORMS_MODE, provider, rateLimiter, rateLimitSalt } from '../../../lib/forms/runtime.ts';
+import { isFormId, type FormId } from '../../../lib/forms/schema.ts';
+
+export const prerender = false;
+
+const { locale, form } = Astro.params;
+if (!locale || !form || !isPublishedLocale(locale) || !isFormId(form)) {
+  return new Response(null, { status: 404 });
+}
+const formId: FormId = form;
+const formPage = pathFor(formId === 'contact' ? 'contact' : 'early-access', locale);
+
+if (Astro.request.method !== 'POST') {
+  return Astro.redirect(formPage, 303);
+}
+
+let clientAddress = 'unknown';
+try {
+  clientAddress = Astro.clientAddress;
+} catch {
+  // Not available in every runtime; rate limiting then groups unknown clients together.
+}
+
+const outcome: SubmissionOutcome = await handleSubmission(Astro.request, formId, locale, {
+  mode: FORMS_MODE,
+  provider,
+  rateLimiter,
+  rateLimitSalt,
+  clientAddress,
+});
+
+Astro.response.status = outcome.status;
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+if (outcome.kind === 'rate-limited') Astro.response.headers.set('Retry-After', String(outcome.retryAfterSeconds));
+
+const r = copy(locale).forms.results;
+const titles: Record<SubmissionOutcome['kind'], string> = {
+  disabled: r.disabledTitle,
+  'bad-request': r.badRequestTitle,
+  invalid: r.invalidTitle,
+  'rate-limited': r.rateLimitedTitle,
+  'provider-error': r.providerErrorTitle,
+  accepted: r.acceptedTitle,
+};
+const title = titles[outcome.kind];
+const accepted = r.accepted as Record<FormId, string>;
+---
+
+<Base locale={locale} path={`/${locale}/submit/${formId}/`} title={title} description={title} noindex>
+  <div class="container">
+    <header class="page-head">
+      <h1>{title}</h1>
+    </header>
+    {FORMS_MODE === 'sandbox' && <div class="notice"><p>{ui(locale).formsSandboxNotice}</p></div>}
+    {outcome.kind === 'accepted' && (
+      <>
+        <p>{accepted[formId]}</p>
+        {formId === 'early-access' && outcome.confirmationRequired && <p>{r.acceptedConfirm}</p>}
+      </>
+    )}
+    {outcome.kind === 'disabled' && <p>{r.disabled}</p>}
+    {outcome.kind === 'rate-limited' && <p>{r.rateLimited}</p>}
+    {outcome.kind === 'bad-request' && <p>{r.badRequest}</p>}
+    {outcome.kind === 'provider-error' && <p>{r.providerError}</p>}
+    {outcome.kind === 'invalid' && <FormBlock locale={locale} formId={formId} mode={FORMS_MODE} values={outcome.values} errors={outcome.errors} />}
+    {outcome.kind === 'accepted' && <p><a href={pathFor('home', locale)}>{copy(locale).notFound.home}</a></p>}
+    {outcome.kind !== 'accepted' && outcome.kind !== 'invalid' && <p><a href={formPage}>{ui(locale).backToForm}</a></p>}
+  </div>
+</Base>

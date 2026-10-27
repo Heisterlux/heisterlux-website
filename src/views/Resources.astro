@@ -1,0 +1,44 @@
+---
+import { copy } from '../content/copy/index.ts';
+import { RESOURCES } from '../content/resources/index.ts';
+import { isLive, getRoute, pathFor } from '../content/routes.ts';
+import { formatDate, ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const c = copy(locale).resources;
+const t = ui(locale);
+// Only articles that exist in this locale — no fallback to another language.
+const articles = RESOURCES.filter((a) => isLive(getRoute(`resource:${a.id}`), locale));
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.lead}</p>
+  </header>
+  <ul class="grid">
+    {articles.map((a) => {
+      const content = a.locales[locale]!;
+      return (
+        <li>
+          <article class="card">
+            <h2 class="card-title"><a href={pathFor(`resource:${a.id}`, locale)}>{content.title}</a></h2>
+            <p>{content.description}</p>
+            <p class="muted">{t.reviewed}: <time datetime={a.dateReviewed}>{formatDate(locale, a.dateReviewed)}</time></p>
+          </article>
+        </li>
+      );
+    })}
+  </ul>
+</div>
+
+<style>
+  .card-title {
+    font-size: var(--fs-lg);
+    margin-block: 0 var(--s-3);
+  }
+</style>

@@ -1,0 +1,18 @@
+---
+import { ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+  items: { name: string; path: string }[];
+}
+const { locale, items } = Astro.props;
+---
+
+<nav class="breadcrumb" aria-label={ui(locale).breadcrumb}>
+  <ol>
+    {items.map((item, i) => (
+      <li>{i === items.length - 1 ? <a href={item.path} aria-current="page">{item.name}</a> : <a href={item.path}>{item.name}</a>}</li>
+    ))}
+  </ol>
+</nav>

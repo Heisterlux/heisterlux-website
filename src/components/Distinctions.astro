@@ -1,0 +1,54 @@
+---
+/** The four distinctions: diagram, full text equivalent, relations and host-application note. */
+import LayersDiagram from './LayersDiagram.astro';
+import { copy } from '../content/copy/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+  /** Unique prefix so ids stay unique if used more than once per page. */
+  idPrefix: string;
+  variant?: 'cards' | 'list';
+}
+const { locale, idPrefix, variant = 'cards' } = Astro.props;
+const h = copy(locale).home;
+const d = h.diagram;
+const listId = `${idPrefix}-list`;
+---
+
+<LayersDiagram
+  reliance={d.reliance}
+  use={d.use}
+  parts={d.parts}
+  rests={d.rests}
+  describedBy={d.describedBy}
+  label={d.label}
+  caption={d.caption}
+  describedById={listId}
+/>
+
+{variant === 'cards' ? (
+  <ul class="grid" id={listId}>
+    {h.layers.map((l) => (
+      <li class="card">
+        <h3>{l.title}</h3>
+        <p>{l.text}</p>
+      </li>
+    ))}
+  </ul>
+) : (
+  <dl id={listId}>
+    {h.layers.map((l) => (
+      <>
+        <dt><strong>{l.title}</strong></dt>
+        <dd>{l.text}</dd>
+      </>
+    ))}
+  </dl>
+)}
+
+<h3>{h.relationsHeading}</h3>
+<ul>
+  {h.relations.map((r) => <li>{r}</li>)}
+</ul>
+<p class="notice">{h.layersNote}</p>

@@ -1,0 +1,64 @@
+---
+import Pending from '../components/Pending.astro';
+import { SECURITY_EMAIL } from '../config/site.ts';
+import { copy } from '../content/copy/index.ts';
+import { pathFor } from '../content/routes.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const { locale } = Astro.props;
+const c = copy(locale).trust;
+---
+
+<div class="container">
+  <header class="page-head">
+    <h1>{c.heading}</h1>
+    <p class="lead">{c.lead}</p>
+  </header>
+
+  <section aria-labelledby="principles-heading">
+    <h2 id="principles-heading">{c.principlesHeading}</h2>
+    <p>{c.principlesIntro}</p>
+    <ul class="grid">
+      {c.topics.map((topic) => (
+        <li class="card" id={topic.id}>
+          <h3>{topic.title}</h3>
+          <dl class="trust-topic">
+            <dt>{c.principlesLegend.principle}</dt>
+            <dd>{topic.principle}</dd>
+            <dt>{c.principlesLegend.today}</dt>
+            <dd>{topic.today ?? c.nothingYet}</dd>
+            <dt>{c.principlesLegend.before}</dt>
+            <dd>{topic.before}</dd>
+          </dl>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section aria-labelledby="site-heading">
+    <h2 id="site-heading">{c.siteHeading}</h2>
+    <ul>{c.siteItems.map((i) => <li>{i}</li>)}</ul>
+    <p><a href={pathFor('privacy', locale)}>{copy(locale).privacy.heading}</a></p>
+  </section>
+
+  <section aria-labelledby="claims-heading">
+    <h2 id="claims-heading">{c.claimsHeading}</h2>
+    <p>{c.claimsText}</p>
+    <p><a href={pathFor('roadmap', locale)}>{copy(locale).product.roadmapLink}</a></p>
+  </section>
+
+  <section aria-labelledby="product-heading">
+    <h2 id="product-heading">{c.productHeading}</h2>
+    <p>{c.productText}</p>
+    <ul>{c.productItems.map((i) => <li>{i}</li>)}</ul>
+    <p>{c.noCertifications}</p>
+  </section>
+
+  <section aria-labelledby="security-heading">
+    <h2 id="security-heading">{c.securityHeading}</h2>
+    <p>{SECURITY_EMAIL ? <a href={`mailto:${SECURITY_EMAIL}`}>{SECURITY_EMAIL}</a> : <Pending locale={locale} label={c.securityPending} />}</p>
+  </section>
+</div>
