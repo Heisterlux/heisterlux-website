@@ -257,6 +257,13 @@ a:hover {
   color: var(--c-accent-contrast);
 }
 
+.nav-list button.button {
+  min-block-size: auto;
+  padding: var(--s-2) var(--s-3);
+  font-size: 0.975rem;
+  white-space: nowrap;
+}
+
 .nav-mobile {
   display: none;
   margin-inline-start: auto;
@@ -296,6 +303,12 @@ a:hover {
 
 .nav-mobile .nav-list a {
   display: block;
+  padding: var(--s-3);
+}
+
+.nav-mobile .nav-list button.button {
+  inline-size: 100%;
+  min-block-size: 2.75rem;
   padding: var(--s-3);
 }
 

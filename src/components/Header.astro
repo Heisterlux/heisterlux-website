@@ -33,6 +33,7 @@ const isCurrent = (id: string) =>
           <li><a href={r.path} aria-current={isCurrent(r.id) ? 'page' : undefined}>{r.label}</a></li>
         ))}
         {SIGN_IN_URL && <li><a href={SIGN_IN_URL}>{t.signIn}</a></li>}
+        {!SIGN_IN_URL && <li><button class="button button--secondary" type="button" disabled>{t.demoComingSoon}</button></li>}
         <li><a class="button" href={earlyAccessPath} aria-current={currentRouteId === 'early-access' ? 'page' : undefined}>{t.earlyAccessCta}</a></li>
       </ul>
     </nav>
@@ -45,6 +46,7 @@ const isCurrent = (id: string) =>
             <li><a href={r.path} aria-current={isCurrent(r.id) ? 'page' : undefined}>{r.label}</a></li>
           ))}
           {SIGN_IN_URL && <li><a href={SIGN_IN_URL}>{t.signIn}</a></li>}
+          {!SIGN_IN_URL && <li><button class="button button--secondary" type="button" disabled>{t.demoComingSoon}</button></li>}
           <li><a class="button" href={earlyAccessPath}>{t.earlyAccessCta}</a></li>
         </ul>
       </nav>

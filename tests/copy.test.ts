@@ -13,6 +13,10 @@ test('copy contains none of the known overclaims', () => {
   assert.deepEqual(findClaimViolations(allText), []);
 });
 
+test('the unavailable demo is labelled as coming soon', () => {
+  assert.equal(uiEn.demoComingSoon, 'Demo — coming soon');
+});
+
 test('claim lint actually catches the original phrasings (rules are not vacuous)', () => {
   const samples = [
     'Heisterlux records them separately, because each can change on its own.',
