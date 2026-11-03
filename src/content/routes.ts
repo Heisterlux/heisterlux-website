@@ -1,3 +1,4 @@
+import { INDEXABLE } from '../config/site.ts';
 import { DEFAULT_LOCALE, PUBLISHED_LOCALES, type LocaleCode } from '../i18n/locales.ts';
 import { RESOURCES, type ResourceArticle } from './resources/index.ts';
 import { RELEASES } from './releases.ts';
@@ -31,7 +32,8 @@ export type PageKind =
 
 /**
  * Copy provenance. Nothing on this site comes from an approved WEB-001A/B/C source — none was
- * found during recovery — so all copy is `new-draft` until reviewed.
+ * found during recovery — so copy is `new-draft` until reviewed. Only founder-approved pages are
+ * `approved`, and only those can ever be indexed (see SEO_ALLOWLIST).
  */
 export type CopyStatus = 'new-draft' | 'reviewed' | 'approved';
 
@@ -61,7 +63,7 @@ const D = '2026-09-30';
 
 const STATIC_ROUTES: RouteDef[] = [
   {
-    id: 'home', kind: 'home', datePublished: D, dateReviewed: D, copyStatus: 'new-draft', enabled: true,
+    id: 'home', kind: 'home', datePublished: D, dateReviewed: D, copyStatus: 'approved', enabled: true,
     locales: {
       en: {
         slug: '',
@@ -73,7 +75,7 @@ const STATIC_ROUTES: RouteDef[] = [
     },
   },
   {
-    id: 'product', kind: 'product', nav: 'primary', datePublished: D, dateReviewed: D, copyStatus: 'new-draft', enabled: true,
+    id: 'product', kind: 'product', nav: 'primary', datePublished: D, dateReviewed: D, copyStatus: 'approved', enabled: true,
     locales: {
       en: {
         slug: 'product',
@@ -84,7 +86,7 @@ const STATIC_ROUTES: RouteDef[] = [
     },
   },
   {
-    id: 'how-it-works', kind: 'how-it-works', nav: 'primary', datePublished: D, dateReviewed: D, copyStatus: 'new-draft', enabled: true,
+    id: 'how-it-works', kind: 'how-it-works', nav: 'primary', datePublished: D, dateReviewed: D, copyStatus: 'approved', enabled: true,
     locales: {
       en: {
         slug: 'how-it-works',
@@ -95,7 +97,7 @@ const STATIC_ROUTES: RouteDef[] = [
     },
   },
   {
-    id: 'roadmap', kind: 'roadmap', nav: 'primary', datePublished: D, dateReviewed: D, copyStatus: 'new-draft', enabled: true,
+    id: 'roadmap', kind: 'roadmap', nav: 'primary', datePublished: D, dateReviewed: D, copyStatus: 'approved', enabled: true,
     locales: {
       en: {
         slug: 'roadmap',
@@ -229,6 +231,36 @@ export const ROUTES: readonly RouteDef[] = [...STATIC_ROUTES, ...RESOURCE_ROUTES
   if (!ROUTES.find((r) => r.id === 'home')?.locales[DEFAULT_LOCALE]) {
     throw new Error('The default locale must have a home page (x-default target).');
   }
+}
+
+/**
+ * Explicit SEO allowlist: the only routes that may ever be indexed. Every other route is noindex
+ * in every environment. Adding an ID here is a release decision, not a content edit.
+ */
+export const SEO_ALLOWLIST: readonly string[] = [
+  'home',
+  'product',
+  'how-it-works',
+  'roadmap',
+  'resource:four-layers',
+  'resource:when-ai-changes',
+];
+
+for (const id of SEO_ALLOWLIST) {
+  if (!ROUTES.some((r) => r.id === id)) throw new Error(`SEO allowlist entry "${id}" is not a route.`);
+}
+
+/** Content-level eligibility, independent of the environment: allowlisted, enabled and approved. */
+export function isSeoEligible(route: RouteDef): boolean {
+  return route.enabled && route.copyStatus === 'approved' && SEO_ALLOWLIST.includes(route.id);
+}
+
+/**
+ * A page is indexable only when the build is a production build with the explicit release switch
+ * (INDEXABLE) AND the route is eligible. Used for the robots meta tag and the sitemap.
+ */
+export function isIndexable(route: RouteDef): boolean {
+  return INDEXABLE && isSeoEligible(route);
 }
 
 export function getRoute(id: string): RouteDef {

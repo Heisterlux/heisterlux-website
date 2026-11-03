@@ -14,6 +14,7 @@ export const en = {
     eyebrow: 'Pre-launch',
     heading: 'Know where your organization relies on AI — and what to do when that changes.',
     lead: 'Heisterlux is being built to show which AI your organization depends on, why that reliance was considered justified, and which decisions may be affected when something shifts. So the next step can be proportionate, not improvised.',
+    status: 'Heisterlux is an independent project currently in development. The platform is not yet available for customer use.',
     lineHeading: 'From visibility to action',
     lineIntro: 'Heisterlux follows one line of reasoning, from knowing what is there to knowing what to do.',
     steps: [

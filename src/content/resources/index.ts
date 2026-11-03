@@ -48,8 +48,8 @@ export interface ResourceArticle {
 }
 
 export const RESOURCES: readonly ResourceArticle[] = [
-  { id: 'four-layers', published: true, datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: fourLayersEn } },
-  { id: 'when-ai-changes', published: true, datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'new-draft', locales: { en: whenAiChangesEn } },
+  { id: 'four-layers', published: true, datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'approved', locales: { en: fourLayersEn } },
+  { id: 'when-ai-changes', published: true, datePublished: '2026-09-30', dateReviewed: '2026-09-30', copyStatus: 'approved', locales: { en: whenAiChangesEn } },
   { id: 'ai-literacy-eu', published: true, datePublished: '2026-09-30', dateReviewed: '2026-10-01', copyStatus: 'new-draft', locales: { en: aiLiteracyEn } },
 ];
 

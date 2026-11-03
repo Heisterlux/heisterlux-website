@@ -5,12 +5,15 @@
  * Checks: internal links, one h1, title/description, self-canonical, hreflang reciprocity and
  * x-default, html lang/dir, robots meta, JSON-LD validity and forbidden types, inline
  * scripts/handlers, external resources, legacy remnants, CSP per route, size budgets and
- * pending (unconfirmed) items. With --launch, pending items and noindex fail the run.
+ * pending (unconfirmed) items. Indexing is checked against the SEO allowlist: only allowlisted, approved
+ * routes in an indexable build may be `index`, and the sitemap must list exactly those. With --launch, the
+ * build must be indexable and indexable pages must carry no pending items.
  */
 import { readFileSync, readdirSync, statSync, writeFileSync, existsSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { findClaimViolations } from './claim-lint.ts';
+import { isSeoEligible, livePages } from '../src/content/routes.ts';
 
 const OUT = '.vercel/output';
 const STATIC = join(OUT, 'static');
@@ -57,6 +60,12 @@ const cspFor = (path: string) =>
 const hreflangMap = new Map<string, Map<string, string>>();
 const pageReport: Record<string, unknown>[] = [];
 let pendingTotal = 0;
+// An indexable build is recognised by its robots.txt (a closed build disallows everything).
+const robotsTxt = readFileSync(join(STATIC, 'robots.txt'), 'utf8');
+const buildIndexable = !/^Disallow:\s*\/\s*$/m.test(robotsTxt);
+const eligiblePaths = new Set(livePages().filter((p) => isSeoEligible(p.route)).map((p) => p.path));
+const expectIndex = (url: string) => buildIndexable && eligiblePaths.has(url);
+
 const FORBIDDEN_TEXT = [/supabase/i, /sb_publishable/i, /sgixvphwhaocvgfisodc/i, /AI Discovery Demo/i, /localStorage/];
 const FORBIDDEN_LD = ['aggregateRating', 'Review', 'review', 'Offer', 'offers', 'award', 'numberOfEmployees', 'logo'];
 
@@ -81,7 +90,9 @@ for (const file of htmlFiles) {
   // Robots
   const robots = head.match(/<meta name="robots" content="([^"]*)"/)?.[1];
   if (!robots) fail(`${url}: missing robots meta`);
-  if (launch && robots?.includes('noindex') && !is404) fail(`${url}: noindex in launch mode`);
+  if (robots && robots.includes('noindex') === expectIndex(url)) {
+    fail(`${url}: robots meta "${robots}" but expected ${expectIndex(url) ? 'index' : 'noindex'}`);
+  }
 
   // Canonical + hreflang
   if (!is404) {
@@ -164,7 +175,7 @@ for (const file of htmlFiles) {
   // Pending markers
   const pending = [...html.matchAll(/data-pending="([^"]*)"/g)].map((m) => m[1]!);
   pendingTotal += pending.length;
-  if (launch && pending.length > 0) fail(`${url}: ${pending.length} unconfirmed item(s) in launch mode`);
+  if (launch && expectIndex(url) && pending.length > 0) fail(`${url}: ${pending.length} unconfirmed item(s) in launch mode`);
 
   // Size budget: HTML + linked CSS + linked JS + fonts (images: none used)
   const assets = [...head.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map((m) => m[1]!);
@@ -195,9 +206,19 @@ for (const [page, map] of hreflangMap) {
 const sitemap = readFileSync(join(STATIC, 'sitemap.xml'), 'utf8');
 const sitemapLocs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]!);
 for (const loc of sitemapLocs) if (!hreflangMap.has(loc)) fail(`sitemap: ${loc} is not a generated page`);
-for (const page of hreflangMap.keys()) if (!sitemapLocs.includes(page)) fail(`sitemap: missing ${page}`);
-const robotsTxt = readFileSync(join(STATIC, 'robots.txt'), 'utf8');
-if (!launch && !robotsTxt.includes('Disallow: /\n')) fail('robots.txt: preview build must disallow all');
+for (const page of hreflangMap.keys()) {
+  const path = page.slice(ORIGIN.length);
+  if (expectIndex(path) && !sitemapLocs.includes(page)) fail(`sitemap: missing ${page}`);
+  if (!expectIndex(path) && sitemapLocs.includes(page)) fail(`sitemap: ${page} is not indexable`);
+}
+if (buildIndexable) {
+  if (!/^Allow:\s*\/\s*$/m.test(robotsTxt)) fail('robots.txt: indexable build must allow crawling');
+  if (!robotsTxt.includes(`Sitemap: ${ORIGIN}/sitemap.xml`)) fail('robots.txt: indexable build must reference the sitemap');
+  if (!robotsTxt.includes('Disallow: /en/submit/')) fail('robots.txt: form result routes must stay disallowed');
+} else if (sitemapLocs.length > 0) {
+  fail('sitemap: a closed build must not list any URL');
+}
+if (launch && !buildIndexable) fail('launch mode needs an indexable build (VERCEL_ENV=production and PUBLIC_SITE_INDEXABLE=true)');
 
 // Whole-artifact scans
 const fontBytes = files.filter((f) => /\.(woff2?|ttf|otf)$/.test(f)).reduce((n, f) => n + statSync(f).size, 0);

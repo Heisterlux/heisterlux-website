@@ -26,7 +26,7 @@ export const en: ResourceContent = {
       heading: 'The original obligation (since 2 February 2025)',
       paragraphs: [
         'As adopted in 2024, Article 4 required providers and deployers of AI systems to take measures to ensure, to their best extent, a sufficient level of AI literacy of their staff and of other persons dealing with the operation and use of AI systems on their behalf, taking into account their knowledge, experience, education and training and the context of use.',
-        'Chapter I of the AI Act, which contains Article 4, applies from 2 February 2025. The amending Regulation keeps that date for Chapters I and II.',
+        'Under Article 113, third paragraph, point (a) of the AI Act, Chapters I and II apply from 2 February 2025. Article 4 is part of Chapter I. Regulation (EU) 2026/1744 keeps that date; the only later date in that point (2 December 2026) concerns certain provisions of Article 5, not Article 4.',
       ],
     },
     {
@@ -34,9 +34,9 @@ export const en: ResourceContent = {
       heading: 'What Regulation (EU) 2026/1744 changed',
       paragraphs: ['The Regulation replaces Article 4 with a new text. According to the official wording:'],
       list: [
-        'Paragraph 1: providers and deployers shall take measures to support the development of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their knowledge, experience, education and training, the context of use and the persons on whom the systems are used. The obligation does not require them to guarantee any specific level of AI literacy of any individual.',
+        'Paragraph 1: providers and deployers shall take measures to support the development of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training, the context the AI systems are to be used in, and the persons or groups of persons on whom they are to be used. The obligation does not require them to guarantee any specific level of AI literacy of any individual.',
         'Paragraph 2: the Commission and the Member States shall support and facilitate providers and deployers, in particular SMEs; the Commission shall publish practical examples of compliance on the single information platform.',
-        'Paragraph 3: the AI Board shall adopt recommendations, taking into account European competence frameworks, including common objectives.',
+        'Paragraph 3: the AI Board shall adopt recommendations, taking into account European competence frameworks, to support the Commission and the Member States in promoting AI literacy, including by setting out common objectives.',
       ],
     },
     {
@@ -46,7 +46,7 @@ export const en: ResourceContent = {
       list: [
         'Proposal: the Commission’s Digital Omnibus on AI proposal. It is the earlier stage; the adopted text is what counts.',
         'Adopted amendment: Regulation (EU) 2026/1744, signed on 8 July 2026 and published in the Official Journal on 24 July 2026. It enters into force on the third day after publication, which is 27 July 2026.',
-        'Applicable obligation: Article 4 has applied since 2 February 2025. From 27 July 2026 the replaced text is the applicable one. The final provisions as we read them set no later application date for Article 4.',
+        'Applicable obligation: Article 4 has applied since 2 February 2025. From 27 July 2026 the replaced text is the applicable one. Article 113, third paragraph, point (a), as amended, sets no later application date for Article 4.',
       ],
     },
     {
