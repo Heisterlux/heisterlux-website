@@ -3,6 +3,7 @@ import { SIGN_IN_URL } from '../config/site.ts';
 import { ui } from '../i18n/index.ts';
 import type { LocaleCode } from '../i18n/locales.ts';
 import { navRoutes, pathFor } from '../content/routes.ts';
+import LinkedInButton from './LinkedInButton.astro';
 
 interface Props {
   locale: LocaleCode;
@@ -32,7 +33,7 @@ const isCurrent = (id: string) =>
         ))}
         {SIGN_IN_URL && <li><a href={SIGN_IN_URL}>{t.signIn}</a></li>}
         {!SIGN_IN_URL && <li><button class="button button--secondary" type="button" disabled>{t.demoComingSoon}</button></li>}
-        <li><button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button></li>
+        <li><LinkedInButton locale={locale} /></li>
       </ul>
     </nav>
 
@@ -45,7 +46,7 @@ const isCurrent = (id: string) =>
           ))}
           {SIGN_IN_URL && <li><a href={SIGN_IN_URL}>{t.signIn}</a></li>}
           {!SIGN_IN_URL && <li><button class="button button--secondary" type="button" disabled>{t.demoComingSoon}</button></li>}
-          <li><button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button></li>
+          <li><LinkedInButton locale={locale} /></li>
         </ul>
       </nav>
     </details>

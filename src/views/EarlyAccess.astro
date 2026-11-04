@@ -1,22 +1,15 @@
 ---
-import FormBlock from '../components/FormBlock.astro';
+import LinkedInButton from '../components/LinkedInButton.astro';
 import { copy } from '../content/copy/index.ts';
 import { pathFor } from '../content/routes.ts';
 import type { LocaleCode } from '../i18n/locales.ts';
-import { resolveFormsMode } from '../lib/forms/providers.ts';
 
 interface Props {
   locale: LocaleCode;
 }
 const { locale } = Astro.props;
 const c = copy(locale).earlyAccess;
-// Static page: the rendered state reflects the build-time mode; the server enforces it again.
-const mode = resolveFormsMode({
-  FORMS_MODE: process.env.FORMS_MODE,
-  VERCEL: process.env.VERCEL,
-  VERCEL_ENV: process.env.VERCEL_ENV,
-  VERCEL_URL: process.env.VERCEL_URL,
-});
+const l = copy(locale).linkedin;
 ---
 
 <div class="container">
@@ -25,20 +18,12 @@ const mode = resolveFormsMode({
     <p class="lead">{c.lead}</p>
   </header>
 
-  <section aria-labelledby="what-heading">
-    <h2 id="what-heading">{c.whatHeading}</h2>
-    <ul>{c.whatItems.map((i) => <li>{i}</li>)}</ul>
-  </section>
-
-  <section aria-labelledby="request-heading">
-    <h2 id="request-heading">{c.formHeading}</h2>
-    <FormBlock locale={locale} formId="early-access" mode={mode} />
-  </section>
-
-  <section aria-labelledby="keep-heading">
-    <h2 id="keep-heading">{c.keepHeading}</h2>
-    <p>{c.keepText}</p>
-    <FormBlock locale={locale} formId="keep-informed" mode={mode} />
+  <section aria-labelledby="linkedin-heading">
+    <h2 id="linkedin-heading">{l.heading}</h2>
+    <p>{l.text}</p>
+    <div class="button-row">
+      <LinkedInButton locale={locale} />
+    </div>
   </section>
 
   <p class="muted"><a href={pathFor('privacy', locale)}>{copy(locale).privacy.heading}</a></p>

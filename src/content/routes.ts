@@ -145,7 +145,7 @@ const STATIC_ROUTES: RouteDef[] = [
       en: {
         slug: 'early-access',
         title: 'Early access',
-        description: 'Ask to take part in Heisterlux early access, or ask to be kept informed about the launch.',
+        description: 'Follow Heisterlux on LinkedIn to see how it develops and to share what your organization needs from AI governance.',
       },
     },
   },

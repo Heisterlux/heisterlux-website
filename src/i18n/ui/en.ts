@@ -12,6 +12,8 @@ export const en = {
   breadcrumb: 'Breadcrumb',
   earlyAccessCta: 'Request early access',
   earlyAccessComingSoon: 'Early access — coming soon',
+  followOnLinkedIn: 'Follow Heisterlux on LinkedIn',
+  opensInNewTab: 'opens in a new tab',
   demoComingSoon: 'Demo — coming soon',
   howItWorksCta: 'See how it works',
   preLaunch: 'Pre-launch',

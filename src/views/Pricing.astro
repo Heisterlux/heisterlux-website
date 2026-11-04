@@ -1,6 +1,6 @@
 ---
+import LinkedInButton from '../components/LinkedInButton.astro';
 import { copy } from '../content/copy/index.ts';
-import { ui } from '../i18n/index.ts';
 import type { LocaleCode } from '../i18n/locales.ts';
 
 interface Props {
@@ -8,7 +8,6 @@ interface Props {
 }
 const { locale } = Astro.props;
 const c = copy(locale).pricing;
-const t = ui(locale);
 ---
 
 <div class="container">
@@ -18,7 +17,7 @@ const t = ui(locale);
   </header>
   {c.body.map((p) => <p>{p}</p>)}
   <div class="button-row">
-    <button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button>
+    <LinkedInButton locale={locale} />
   </div>
 
   <section aria-labelledby="impact-heading">

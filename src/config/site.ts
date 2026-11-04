@@ -13,6 +13,9 @@ export const ORGANIZATION_NAME = 'Heisterlux';
  */
 export const SIGN_IN_URL: string | null = null;
 
+/** Official Heisterlux LinkedIn company page. Plain outbound link only: no widget, pixel or script. */
+export const LINKEDIN_URL = 'https://www.linkedin.com/company/146882632/';
+
 /** Confirmed public Heisterlux mailbox. */
 export const CONTACT_EMAIL: string | null = 'info@heisterlux.com';
 

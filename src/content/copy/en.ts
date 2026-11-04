@@ -65,8 +65,6 @@ export const en = {
     ],
     whyClose: 'None of this is unusual. What is hard is knowing, when it happens, what it may touch.',
     brandLine: 'Confidence is earned. Not generated.',
-    ctaHeading: 'Help shape Heisterlux',
-    ctaText: 'We are inviting organizations to help us understand their needs before launch. Tell us how your organization uses AI.',
   },
   product: {
     heading: 'Product',
@@ -216,7 +214,7 @@ export const en = {
     lead: 'Heisterlux is in pre-launch and pricing has not been set yet.',
     body: [
       'Pricing has not been decided. We intend to publish it here before Heisterlux becomes generally available.',
-      'If pricing matters for your decision, tell us through the early access page. We will say what we know and what we do not know yet.',
+      'If pricing matters for your decision, get in touch through the contact page. We will say what we know and what we do not know yet.',
     ],
     impactHeading: 'A principle we intend to keep',
     impactQuote: 'Better AI governance shouldn’t be limited to organizations with the largest budgets.',
@@ -226,6 +224,10 @@ export const en = {
     heading: 'Resources',
     lead: 'Careful explanations about AI reliance and AI change. Each article lists its primary sources, its limitations and when it was last reviewed.',
     readArticle: 'Read article',
+  },
+  linkedin: {
+    heading: 'Help shape the future of Heisterlux.',
+    text: "We're building Heisterlux in the open. Follow our progress, share your ideas, and help us understand what organizations really need from AI governance.",
   },
   earlyAccess: {
     heading: 'Early access',
@@ -262,7 +264,7 @@ export const en = {
     lead: 'Questions about Heisterlux? Reach us directly by email.',
     mailboxPending: 'Heisterlux contact email address',
     formHeading: 'Send a message',
-    alternative: 'For early access, use the early access page instead.',
+    alternative: 'To follow Heisterlux as it develops, see the early access page.',
   },
   privacy: {
     heading: 'Privacy',
@@ -283,7 +285,7 @@ export const en = {
       {
         anchor: 'forms',
         heading: 'Forms',
-        text: 'The early access, keep-me-informed and contact forms do not accept submissions yet. Before they do, this section will describe for each form: the data collected, the purpose, the legal basis, the email provider that processes it, where it is stored and how long it is kept. "Keep me informed" will require your explicit consent and a confirmation email (double opt-in). Requesting early access or sending a message will not sign you up for news.',
+        text: 'The contact form does not accept submissions yet. Before it does, this section will describe the data collected, the purpose, the legal basis, the email provider that processes it, where it is stored and how long it is kept. Sending a message will not sign you up for news. This website has no interest-registration or newsletter form. It links to the Heisterlux LinkedIn page; that link is a plain hyperlink and this website passes no data to LinkedIn. If you follow the link, LinkedIn processes your data under its own privacy terms.',
         pending: 'email provider, processing region, retention periods and legal bases',
       },
       {

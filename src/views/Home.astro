@@ -1,6 +1,7 @@
 ---
 import FlowDiagram from '../components/FlowDiagram.astro';
 import Distinctions from '../components/Distinctions.astro';
+import LinkedInButton from '../components/LinkedInButton.astro';
 import { copy } from '../content/copy/index.ts';
 import { pathFor } from '../content/routes.ts';
 import { ui } from '../i18n/index.ts';
@@ -20,7 +21,7 @@ const t = ui(locale);
   <p class="lead">{c.lead}</p>
   <p>{c.status}</p>
   <div class="button-row">
-    <button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button>
+    <LinkedInButton locale={locale} />
     <a class="button button--secondary" href={pathFor('how-it-works', locale)}>{t.howItWorksCta}</a>
   </div>
 </section>
@@ -58,10 +59,10 @@ const t = ui(locale);
 
 <section class="band" aria-labelledby="cta-heading">
   <div class="container">
-    <h2 id="cta-heading">{c.ctaHeading}</h2>
-    <p>{c.ctaText}</p>
+    <h2 id="cta-heading">{copy(locale).linkedin.heading}</h2>
+    <p>{copy(locale).linkedin.text}</p>
     <div class="button-row">
-      <button class="button" type="button" disabled>{t.earlyAccessComingSoon}</button>
+      <LinkedInButton locale={locale} />
       <a class="button button--secondary" href={pathFor('roadmap', locale)}>{copy(locale).product.roadmapLink}</a>
     </div>
   </div>

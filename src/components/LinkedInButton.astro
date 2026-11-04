@@ -1,0 +1,16 @@
+---
+/**
+ * Plain outbound link to the official Heisterlux LinkedIn company page.
+ * No widget, pixel or script; nothing is sent to LinkedIn until the visitor follows the link.
+ */
+import { LINKEDIN_URL } from '../config/site.ts';
+import { ui } from '../i18n/index.ts';
+import type { LocaleCode } from '../i18n/locales.ts';
+
+interface Props {
+  locale: LocaleCode;
+}
+const t = ui(Astro.props.locale);
+---
+
+<a class="button" href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">{t.followOnLinkedIn}<span class="visually-hidden"> ({t.opensInNewTab})</span></a>
